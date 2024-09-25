@@ -14,6 +14,16 @@ public:
         return (dis(gen) < probability) ? a : b;     // Retourne a si la probabilité est respectée, sinon b
     }
 
+    // Méthode pour choisir un élément aléatoire à partir d'un vecteur
+    template <typename T>
+    T choose_random(const std::vector<T>& vec) {
+        if (vec.empty()) {
+            throw std::out_of_range("Cannot choose from an empty vector.");
+        }
+        std::uniform_int_distribution<> dis(0, vec.size() - 1);  // Distribution pour choisir un indice aléatoire
+        return vec[dis(gen)];  // Retourner l'élément choisi aléatoirement
+    }
+
 private:
     std::random_device rd;  // Source d'entropie pour la génération aléatoire
     std::mt19937 gen;       // Générateur de nombres aléatoires basé sur Mersenne Twister

@@ -4,6 +4,7 @@
 
 #include <vector>
 #include "Activation.h"
+#include"Genome.h"  
 
 namespace neat {
 
@@ -48,6 +49,27 @@ private:
 
 };
 
+class LinkMutator {
+public:
+    LinkMutator();  // Constructeur
+
+    LinkGene new_value(int input_id, int output_id); // Méthode pour générer un nouveau lien
+
+private:
+    double random_weight(); // Fonction privée pour générer un poids aléatoire
+};
+
+
+bool would_create_cycle(const std::vector<neat::LinkGene>& links, int input_id, int output_id);
+
+int choose_random_input_or_hidden_neuron(const std::vector<NeuronGene>& neurons);
+
+int choose_random_output_or_hidden_neuron(const std::vector<NeuronGene>& neurons);
+
+
+void mutate_add_link(Genome &genome);
+
+void mutate_remove_link(Genome &genome);
 
 } // namespace neat
 
