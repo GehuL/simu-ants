@@ -13,6 +13,7 @@ struct NeuronGene {
     int neuron_id;
     double bias;
     Activation activation;  // Enum ou fonction d'activation
+    
 };
 
 // Identifiants de la connexion entre deux neurones
@@ -26,6 +27,10 @@ struct LinkGene {
     LinkId link_id;    // Connexion entre les neurones
     double weight;     // Poids de la connexion
     bool is_enabled;   // Si la connexion est active
+
+    bool has_neuron(const NeuronGene& neuron) const {
+        return link_id.input_id == neuron.neuron_id || link_id.output_id == neuron.neuron_id;
+    }
 };
 
 
@@ -66,10 +71,17 @@ int choose_random_input_or_hidden_neuron(const std::vector<NeuronGene>& neurons)
 
 int choose_random_output_or_hidden_neuron(const std::vector<NeuronGene>& neurons);
 
+std::vector<NeuronGene>::const_iterator choose_random_hidden(std::vector<NeuronGene>& neurons);
+
+
 
 void mutate_add_link(Genome &genome);
 
 void mutate_remove_link(Genome &genome);
+
+void mutate_add_neuron(Genome &genome);
+
+void mutate_remove_neuron(Genome &genome);
 
 } // namespace neat
 

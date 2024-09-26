@@ -7,6 +7,7 @@
 #include <optional>
 #include <unordered_set>
 #include <functional>
+#include "NeuronMutator.h"
 
 namespace neat {
 
@@ -108,6 +109,25 @@ int neat::choose_random_output_or_hidden_neuron(const std::vector<NeuronGene>& n
     return valid_neurons[random_index];
 }
 
+// Fonction pour choisir un neurone caché aléatoire
+std::vector<NeuronGene>::const_iterator choose_random_hidden(std::vector<NeuronGene>& neurons) {
+    std::vector<std::vector<NeuronGene>::const_iterator> hidden_neurons;
+
+    // Supposons que vous avez une façon de déterminer si un neurone est caché.
+    for (auto it = neurons.begin(); it != neurons.end(); ++it) {
+        if (/* condition pour déterminer si le neurone est caché */) {
+            hidden_neurons.push_back(it);
+        }
+    }
+
+    if (hidden_neurons.empty()) {
+        throw std::out_of_range("No hidden neurons available.");
+    }
+
+    RNG rng; // Assurez-vous que RNG est bien défini
+    return rng.choose_random(hidden_neurons); // Utilisez votre méthode choose_random
+}
+
 bool would_create_cycle(const std::vector<neat::LinkGene>& links, int input_id, int output_id) {
     std::unordered_set<int> visited;  // Pour suivre les neurones déjà visités
 
@@ -174,4 +194,47 @@ void mutate_remove_link(Genome &genome)
     genome.links.erase(std::remove(genome.links.begin(), genome.links.end(), to_remove), genome.links.end());
 }
 
-} // namespace neat
+void mutate_add_neuron(Genome &genome)
+{
+    RNG rng;
+
+    if (genome.links.empty()) {
+        return;
+    }
+    neat::LinkGene link_to_split = rng.choose_random(genome.links);  // Choisir un lien à diviser
+    link_to_split.is_enabled = false;  // Désactiver le lien existant
+
+    NeuronMutator neuron_mutator;  // Instancier NeuronMutator
+    neat::NeuronGene new_neuron = neuron_mutator.new_neuron();  // Créer un nouveau neurone
+    genome.add_neuron(new_neuron);  // Ajouter le nouveau neurone
+
+    neat::LinkId link_id = link_to_split.link_id;
+    double weight = link_to_split.weight;
+
+    genome.add_link(neat::LinkGene{{link_id.input_id}, 1.0, true});  // Ajouter un lien du neurone d'entrée au nouveau neurone
+    genome.add_link(neat::LinkGene{{new_neuron.neuron_id, link_id.output_id}, weight, true});  // Ajouter un lien du nouveau neurone au neurone de sortie
+}
+
+void mutate_remove_neuron(Genome &genome) {
+    if (genome.neurons.empty()) {
+        return;
+    }
+    
+    RNG rng;
+    auto neuron_it = choose_random_hidden(genome.neurons);
+
+    // Effacer les liens qui pointent vers ce neurone
+    genome.links.erase(std::remove_if(genome.links.begin(), genome.links.end(), 
+        [neuron_it](const LinkGene &link) {
+            return link.has_neuron(*neuron_it);  // Utilisez le neurone dereferencé
+        }),
+        genome.links.end());
+
+    // Supprimer le neurone
+    genome.neurons.erase(neuron_it);  // Utilisez l'itérateur ici
+}
+
+
+}  // namespace neat
+
+
