@@ -120,7 +120,6 @@ int main2()
   
     // SetTargetFPS(60);               // Set our game to run at 60 frames-per-seconde
     // SetWindowState(FLAG_VSYNC_HINT);
-    
     InitGame();
 
     double lastUpdateTime = 0;

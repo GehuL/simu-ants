@@ -6,10 +6,9 @@
 
 using namespace simu;
 
-Engine Engine::engine;
-
 Engine::Engine() : m_tickPeriod(1.0/100.0), m_framePeriod(1.0/60.0)
 {
+    m_camera.zoom = 1.f;
 }
 
 int Engine::run(int screenWidth, int screenHeight, std::string title)
@@ -22,6 +21,9 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
     int frameCounter = 0;
 
     InitWindow(screenWidth, screenHeight, title.c_str());
+    SetWindowState(FLAG_WINDOW_RESIZABLE);
+    
+    m_renderer = LoadRenderTexture(screenWidth, screenHeight);
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
@@ -50,7 +52,7 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
             {
                 double now = GetTime();
                 lastDrawTime = now;
-                updateFrame();
+                drawAll();
                 frameCounter++;
             }
         }
@@ -91,38 +93,24 @@ void Engine::set_tps(int tps)
     this->m_tickPeriod = 1.0 / static_cast<double>(tps);
 }
 
-void Engine::updateFrame()
+void Engine::drawAll()
 {
     BeginDrawing();
+        BeginTextureMode(m_renderer);
 
-        ClearBackground(RAYWHITE);
+            ClearBackground(RAYWHITE);
 
-        BeginMode2D(m_camera);
+            BeginMode2D(m_camera);
+                drawFrame();
+            EndMode2D();
 
 
-        EndMode2D();
-
-        DrawText(TextFormat("%d FPS\n%d TPS", m_lastFrameCounter, m_lastTickCounter), 5, 0, 20, GREEN);
-
-        float framePerSecond = get_fps();
-        float tickPerSecond = get_tps();
-
-        GuiSlider((Rectangle){ GetScreenWidth() / 2 - 100, GetScreenHeight() - 20, 200, 16 }, "FPS 1", "100%", &framePerSecond, 1, 300);
-        GuiSlider((Rectangle){ GetScreenWidth() / 2 - 100, GetScreenHeight() - 50, 200, 16 }, "TPS 0", "100%", &tickPerSecond, 0, 1000);
-        
-        if(static_cast<int>(framePerSecond) != get_fps())
-            set_fps(framePerSecond);
-
-        if(static_cast<int>(tickPerSecond) != get_tps())
-        {
-            m_noDelay = false;
-            if(tickPerSecond >= 1000)
-            {
-                m_noDelay = true;
-                tickPerSecond = 999999999;
-            }
-            set_tps(tickPerSecond);
-        }
+        EndTextureMode();
+            
+        DrawTexturePro(m_renderer.texture, {0, 0, (float)m_renderer.texture.width, -(float)m_renderer.texture.height}, 
+                                           {0, 0, (float)GetScreenWidth(), (float)GetScreenHeight()},
+                                            {0, 0}, 0, WHITE);
+        drawUI();
 
     EndDrawing();
 
@@ -135,4 +123,33 @@ void Engine::updateFrame()
 void Engine::updateTick()
 {
 
+}
+
+void Engine::drawFrame()
+{
+}
+
+void Engine::drawUI()
+{
+    DrawText(TextFormat("%d FPS\n%d TPS", m_lastFrameCounter, m_lastTickCounter), 5, 0, 20, GREEN);
+
+    float framePerSecond = get_fps();
+    float tickPerSecond = get_tps();
+
+    GuiSlider((Rectangle){ GetScreenWidth() / 2.f - 100.f, GetScreenHeight() - 20.f, 200, 16 }, "FPS 1", "100%", &framePerSecond, 1, 300);
+    GuiSlider((Rectangle){ GetScreenWidth() / 2.f - 100.f, GetScreenHeight() - 50.f, 200, 16 }, "TPS 0", "100%", &tickPerSecond, 0, 1000);
+    
+    if(static_cast<int>(framePerSecond) != get_fps())
+        set_fps(framePerSecond);
+
+    if(static_cast<int>(tickPerSecond) != get_tps())
+    {
+        m_noDelay = false;
+        if(tickPerSecond >= 1000)
+        {
+            m_noDelay = true;
+            tickPerSecond = 999999999;
+        }
+        set_tps(tickPerSecond);
+    }
 }

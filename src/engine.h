@@ -10,6 +10,8 @@ namespace simu
     class Engine
     {
         public:
+            Engine();
+            
             int run(int screenWidth, int screenHeight, std::string title);
 
             void set_tps(int tps);
@@ -18,13 +20,16 @@ namespace simu
             const inline int get_tps(){return 1.0/m_tickPeriod;};
             const inline int get_fps(){return 1.0/m_framePeriod;};
 
-            static Engine engine;
+            virtual void drawFrame();
+            virtual void drawUI();
+            virtual void updateTick();
 
+
+        protected:
+            Camera2D m_camera;
         private:
-            Engine();
 
-            void updateTick();
-            void updateFrame();
+            void drawAll();
 
             double m_tickPeriod;
             double m_framePeriod;
@@ -34,9 +39,8 @@ namespace simu
 
             bool m_noDelay;
 
-            Camera2D m_camera;
+            RenderTexture2D m_renderer;
     };
 }
-
 
 #endif
