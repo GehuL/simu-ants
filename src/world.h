@@ -1,8 +1,6 @@
 #ifndef __WORLD_H__
 #define __WORLD_H__
 
-#include "config.h"
-#include "raylib.h"
 
 #include "engine.h"
 #include "entity.h"
@@ -27,11 +25,11 @@ namespace simu
                  if(typeid(T) == typeid(Entity))
                     throw std::invalid_argument("T does not inherit Entity");
 
-                std::shared_ptr<T> en = std::make_shared<T>();
-                en->m_id = m_entity_cnt;
+                std::shared_ptr<T> en = std::make_shared<T>(m_entity_cnt);
 
                 m_entities.push_back(en);
                 m_entity_cnt++;
+                
                 return en;
             };
 
@@ -79,7 +77,6 @@ namespace simu
 
             Grid m_grid;
     };
-
 
     inline World& getWorld() { return simu::World::world; };
 }

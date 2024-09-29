@@ -59,7 +59,7 @@ void Grid::setTile(Tile tile, int x, int y)
 Tile const Grid::getTile(int x, int y)
 {
     if(!isValid(x, y))
-        return Tile(Type::BORDER, WHITE);
+        return BORDER;
     else
        return m_grid[y*m_gridWidth + x];
 }
@@ -81,9 +81,9 @@ void Grid::setTile(Tile tile, float x, float y)
         setTile(tile, tileX, tileY);
 }
 
-Vector2 const Grid::toTileCoord(float x, float y)
+Vector2i const Grid::toTileCoord(float x, float y)
 {
     int tileX = x / getTileSize();
     int tileY = y / getTileSize();
-    return (Vector2){tileX, tileY};
+    return (Vector2i) {tileX, tileY};
 }

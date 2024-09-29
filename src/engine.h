@@ -1,9 +1,11 @@
 #ifndef __ENGINE_H__
 #define __ENGINE_H__
 
+#define RAYGUI_IMPLEMENTATION
+
 #include "config.h"
 #include "raylib.h"
-#include "string"
+#include <string>
 
 namespace simu
 {
@@ -23,7 +25,6 @@ namespace simu
             virtual void drawFrame();
             virtual void drawUI();
             virtual void updateTick();
-
 
         protected:
             Camera2D m_camera;

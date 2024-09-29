@@ -2,13 +2,14 @@
 #define __TILES_H__
 
 #include "raylib.h"
+#include "others.h"
 
 namespace simu
 {
     enum class Type
     {
         AIR,
-        WALL,
+        GROUND,
         FOOD,
         PHEROMONE,
         BORDER,  
@@ -16,18 +17,15 @@ namespace simu
 
     struct Tile
     {
-        Tile(Type type=Type::AIR, Color color=WHITE) : type(type), color(color) {};
-        Tile& operator =(Tile& t) { this->type = t.type; this->color = t.color; return *this; };
-
         Type type;
         Color color;
-
     };
 
-    static const Tile AIR = Tile(Type::AIR, WHITE);
-    static const Tile WALL = Tile(Type::WALL, BROWN);
-    static const Tile FOOD = Tile(Type::FOOD, YELLOW);
-    static const Tile PHEROMONE = Tile(Type::AIR, PINK);
+    const Tile AIR = (Tile) {Type::AIR, WHITE};
+    const Tile GROUND = (Tile) {Type::GROUND, BROWN};
+    const Tile FOOD = (Tile) {Type::FOOD, YELLOW};
+    const Tile PHEROMONE = (Tile) {Type::PHEROMONE, PINK};
+    const Tile BORDER = (Tile) {Type::BORDER, WHITE};
 
     class Grid
     {
@@ -47,7 +45,7 @@ namespace simu
             // Renvoie une tuile en fonction des coordonnées x et y
             Tile getTile(float x, float y);
             void setTile(Tile tile, float x, float y);
-            Vector2 const toTileCoord(float x, float y);
+            Vector2i const toTileCoord(float x, float y);
 
             int const getGridWidth() { return m_gridWidth; };
             int const getTileSize() { return m_tileSize; };

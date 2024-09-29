@@ -21,13 +21,13 @@ void World::handleMouse()
     Vector2 pos = GetScreenToWorld2D(GetMousePosition(), m_camera);
     if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)) // PUT WALL
     {
-        m_grid.setTile(Tile(Type::WALL, BROWN), pos.x, pos.y);
+        m_grid.setTile(GROUND, pos.x, pos.y);
     }else if(IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) // REMOVE TILE
     {
-        m_grid.setTile(Tile(), pos.x, pos.y);
+        m_grid.setTile(AIR, pos.x, pos.y);
     }else
     {
-        Vector2 grid_pos = m_grid.toTileCoord(pos.x, pos.y);
+        Vector2i grid_pos = m_grid.toTileCoord(pos.x, pos.y);
         const int tileSize = m_grid.getTileSize();
         DrawRectangle(grid_pos.x * tileSize , grid_pos.y * tileSize, tileSize, tileSize, (Color){50, 0, 253, 100});
     }
@@ -52,6 +52,11 @@ void World::drawFrame()
     m_grid.draw();
     handleKeyboard();
     handleMouse();
+
+    for(auto& en : m_entities)
+    {
+        en->draw();
+    }
 }
 
 void World::drawUI()
@@ -62,5 +67,9 @@ void World::drawUI()
 void World::updateTick()
 {
     m_grid.update();
+    for(auto& en : m_entities)
+    {
+        en->update();
+    }
 }
 
