@@ -4,12 +4,15 @@
 #include "GenomeIndexer.h"
 #include"Genome.h"  
 #include <cassert>
+#include <algorithm> // For std::clamp
 #include <optional>
 #include <unordered_set>
 #include <functional>
 #include "NeuronMutator.h"
 
 namespace neat {
+
+
 
 NeuronGene Neat::crossover_neuron(const NeuronGene &a, const NeuronGene &b) {
     assert(a.neuron_id == b.neuron_id);
@@ -233,6 +236,28 @@ void mutate_remove_neuron(Genome &genome) {
     // Supprimer le neurone
     genome.neurons.erase(neuron_it);  // Utilisez l'itérateur ici
 }
+
+double clamp(double x){
+    DoubleConfig config;
+    return std::min(config.max_value, std::max(config.min_value, x));
+}
+
+
+double new_value(){
+    RNG rng;
+    DoubleConfig config;
+    return clamp(rng.next_gaussian(config.init_mean, config.init_stdev));
+}
+
+double mutate_delta(double value){
+    RNG rng;
+    DoubleConfig config;
+    double delta = clamp( rng.next_gaussian(0, config.mutate_power));
+    return clamp (value + delta);
+}
+
+
+
 
 
 }  // namespace neat

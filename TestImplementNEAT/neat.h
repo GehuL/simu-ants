@@ -8,11 +8,15 @@
 
 namespace neat {
 
+
+
 // Structure d'un neurone dans le génome
 struct NeuronGene {
     int neuron_id;
     double bias;
     Activation activation;  // Enum ou fonction d'activation
+
+
     
 };
 
@@ -38,6 +42,16 @@ struct LinkGene {
 struct Individual {
     Genome genome;
     double fitness;
+};
+
+struct DoubleConfig {
+    double init_mean = 0.0;
+    double init_stdev = 1.0;
+    double min_value = -20.0;
+    double max_value = 20.0;
+    double mutation_rate = 0.2;
+    double mutate_power = 1.2;
+    double replace_rate = 0.05;
 };
 
 // Classe Neat contenant les méthodes d'évolution
@@ -82,6 +96,10 @@ void mutate_remove_link(Genome &genome);
 void mutate_add_neuron(Genome &genome);
 
 void mutate_remove_neuron(Genome &genome);
+
+double clamp(double x);
+double new_value();
+double mutate_delta(double value);
 
 } // namespace neat
 

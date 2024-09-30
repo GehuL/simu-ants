@@ -42,6 +42,11 @@ public:
         return *(std::begin(options) + dis(gen));  // Retourner un élément aléatoire
     }
 
+    double next_gaussian(double mean, double stddev) {
+    std::normal_distribution<double> dist(mean, stddev);
+    return dist(gen);  // Utilise le générateur de nombres aléatoires défini dans RNG
+}
+
 private:
     std::random_device rd;  // Source d'entropie pour la génération aléatoire
     std::mt19937 gen;       // Générateur de nombres aléatoires basé sur Mersenne Twister
