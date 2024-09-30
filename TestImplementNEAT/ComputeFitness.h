@@ -9,8 +9,11 @@ public:
     // Constructeur qui prend un générateur RNG en référence
     ComputeFitness(RNG &rng);
 
-    // Méthode pour évaluer la fitness d'un génome
-    double evaluate(const Genome &genome);
+    // Surcharge de l'opérateur () pour évaluer la fitness d'un génome
+    double operator()(const Genome &genome) const;
+
+    // Méthode pour évaluer la fitness d'un génome (si besoin d'une version nommée)
+    double evaluate(const Genome &genome) const;
 
 private:
     RNG &rng;  // Référence au générateur RNG utilisé pour l'évaluation

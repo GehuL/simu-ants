@@ -1,6 +1,7 @@
 #include "Utils.h"
 #include <fstream>
 #include <iostream>
+#include "neat.h"
 
 // Implémentation de la fonction save
 void save(const Genome &genome, const std::string &filename) {
@@ -11,7 +12,7 @@ void save(const Genome &genome, const std::string &filename) {
     }
 
     // Sauvegarder les informations du génome dans le fichier
-    file << "Genome ID: " << genome.genome_id << "\n";
+    file << "Genome ID: " << genome.get_genome_id() << "\n";
     file << "Neurons:\n";
     for (const auto &neuron : genome.neurons) {
         file << "Neuron ID: " << neuron.neuron_id << ", Bias: " << neuron.bias << "\n";

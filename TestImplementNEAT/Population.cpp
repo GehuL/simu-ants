@@ -4,13 +4,16 @@
 #include "ComputeFitness.h"
 #include "Genome.h"
 #include <iostream>
+#include <algorithm>  // Pour std::max_element
 
 // Constructeur de la classe Population
 Population::Population(NeatConfig config, RNG &rng) : config{config}, rng{rng} {
     for (int i = 0; i < config.population_size; ++i) {
-        individuals.push_back({new_genome(), kFitnessComputed});
+        // Utiliser Individual au lieu de std::pair<Genome, bool>
+        individuals.push_back(neat::Individual(new_genome()));
     }
 }
+
 
 // Méthode pour générer le prochain ID de génome
 int Population::next_genome_id() {
@@ -59,31 +62,21 @@ neat::LinkGene Population::new_link(int input_id, int output_id) {
 // Méthode run pour exécuter les générations et retourner le meilleur individu
 neat::Individual Population::run(ComputeFitness &compute_fitness, int num_generations) {
     for (int generation = 0; generation < num_generations; ++generation) {
-        // Calculer la fitness de chaque individu
         for (auto &individual : individuals) {
-            if (individual.fitness_computed == false) {
-                individual.fitness = compute_fitness.evaluate(individual.genome);
+            if (!individual.fitness_computed) {
+                individual.fitness = compute_fitness(individual.genome);
                 individual.fitness_computed = true;
             }
         }
 
-        // Sélectionner le meilleur individu
-        auto best_it = std::max_element(individuals.begin(), individuals.end(), 
-            [](const Individual &a, const Individual &b) {
-                return a.fitness < b.fitness;
-            });
-
-        // Logique de reproduction et mutation pour générer la nouvelle population
-        generate_new_population();
-
-        // Afficher des informations sur la génération
-        std::cout << "Generation: " << generation << " Best fitness: " << best_it->fitness << std::endl;
+        // Sélectionner et reproduire la prochaine génération (logique à ajouter)
     }
 
-    // Retourner le meilleur individu final
+    // Retourner le meilleur individu
     return *std::max_element(individuals.begin(), individuals.end(), 
-        [](const Individual &a, const Individual &b) {
+        [](const neat::Individual &a, const neat::Individual &b) {
             return a.fitness < b.fitness;
         });
 }
+
 

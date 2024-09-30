@@ -1,4 +1,6 @@
 #include "Genome.h"
+#include "neat.h"  // Inclure neat.h pour les définitions complètes
+#include <optional>  // Inclure <optional> pour utiliser std::optional
 
 Genome::Genome(int id, int num_inputs, int num_outputs)
     : genome_id(id), num_inputs(num_inputs), num_outputs(num_outputs) {}
@@ -9,6 +11,10 @@ int Genome::get_num_inputs() const {
 
 int Genome::get_num_outputs() const {
     return num_outputs;  // Retourne le nombre de sorties
+}
+
+int Genome::get_genome_id() const {
+    return genome_id;  // Retourne l'ID du génome
 }
 
 void Genome::add_neuron(const neat::NeuronGene &neuron) {

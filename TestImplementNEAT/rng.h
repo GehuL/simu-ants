@@ -47,6 +47,11 @@ public:
     return dist(gen);  // Utilise le générateur de nombres aléatoires défini dans RNG
 }
 
+    double next_double() {
+        std::uniform_real_distribution<> dis(0, 1);  // Distribution pour les nombres réels entre 0 et 1
+        return dis(gen);  // Retourne un nombre aléatoire entre 0 et 1
+    }
+
 private:
     std::random_device rd;  // Source d'entropie pour la génération aléatoire
     std::mt19937 gen;       // Générateur de nombres aléatoires basé sur Mersenne Twister

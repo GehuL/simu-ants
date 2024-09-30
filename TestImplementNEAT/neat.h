@@ -4,7 +4,8 @@
 
 #include <vector>
 #include "Activation.h"
-#include"Genome.h"  
+#include "Genome.h" // Ensure this file defines the Genome class
+#include "GenomeIndexer.h"
 
 namespace neat {
 
@@ -39,9 +40,14 @@ struct LinkGene {
 
 
 
+// Structure pour représenter un individu
 struct Individual {
     Genome genome;
+    bool fitness_computed;
     double fitness;
+
+    Individual(const Genome &genome)
+        : genome(genome), fitness_computed(false), fitness(0.0) {}
 };
 
 struct DoubleConfig {

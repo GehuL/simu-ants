@@ -20,13 +20,14 @@ public:
 private:
     NeatConfig config;
     RNG &rng;
-    std::vector<std::pair<Genome, bool>> individuals;
-    neat::Individual run(ComputeFitness &compute_fitness, int num_generations);
+    std::vector<neat::Individual> individuals;  // Vecteur d'individus
 
     int next_genome_id();
     Genome new_genome();
     neat::NeuronGene new_neuron(int neuron_id);
     neat::LinkGene new_link(int input_id, int output_id);
+
+    neat::Individual run(ComputeFitness &compute_fitness, int num_generations);
 };
 
 #endif // POPULATION_H
