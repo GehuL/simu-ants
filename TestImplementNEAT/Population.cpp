@@ -59,24 +59,65 @@ neat::LinkGene Population::new_link(int input_id, int output_id) {
     return link;
 }
 
-// Méthode run pour exécuter les générations et retourner le meilleur individu
-neat::Individual Population::run(ComputeFitness &compute_fitness, int num_generations) {
-    for (int generation = 0; generation < num_generations; ++generation) {
-        for (auto &individual : individuals) {
-            if (!individual.fitness_computed) {
-                individual.fitness = compute_fitness(individual.genome);
-                individual.fitness_computed = true;
-            }
-        }
-
-        // Sélectionner et reproduire la prochaine génération (logique à ajouter)
+void Population::mutate(Genome &genome) {
+    RNG rng;
+    
+    
+    // Probabilité d'ajouter un lien
+    if (rng.next_double() < config.probability_add_link) {
+        neat::mutate_add_link(genome);
     }
 
-    // Retourner le meilleur individu
-    return *std::max_element(individuals.begin(), individuals.end(), 
-        [](const neat::Individual &a, const neat::Individual &b) {
-            return a.fitness < b.fitness;
-        });
+    // Probabilité de supprimer un lien
+    if (rng.next_double() < config.probability_remove_link) {
+        neat::mutate_remove_link(genome);
+    }
+
+    // Probabilité d'ajouter un neurone
+    if (rng.next_double() < config.probability_add_neuron) {
+        neat::mutate_add_neuron(genome);
+    }
+
+    // Probabilité de supprimer un neurone
+    if (rng.next_double() < config.probability_remove_neuron) {
+        neat::mutate_remove_neuron(genome);
+    }
+
+    // Appliquer la mutation non structurelle aux poids des liens
+    for (auto &link : genome.links) {
+        if (rng.next_double() < config.probability_mutate_link_weight) {
+            link.weight = neat::mutate_delta(link.weight);  // Muter le poids du lien
+        }
+    }
+
+    // Appliquer la mutation non structurelle aux biais des neurones
+    for (auto &neuron : genome.neurons) {
+        if (rng.next_double() < config.probability_mutate_neuron_bias) {
+            neuron.bias = neat::mutate_delta(neuron.bias);  // Muter le biais du neurone
+        }
+    }
+}
+
+
+
+// Exemple de la méthode reproduce() que vous pourriez implémenter
+std::vector<neat::Individual> Population::reproduce() {
+    auto old_members = sort_individuals_by_fitness(individuals);
+    int reproduction_cutoff = std::ceil(config.survival_threshold * old_members.size());
+    std::vector<neat::Individual> new_generation;
+    int spawn_size = config.population_size;
+
+    while (spawn_size-- >= 0) {
+        RNG rng;
+        const auto& p1 = *rng.choose_random(old_members, reproduction_cutoff);
+        const auto& p2 = *rng.choose_random(old_members, reproduction_cutoff);
+        neat::Neat neat_instance;
+        Genome offspring = neat_instance.crossover(p1.genome, p2.genome);  // Vous devez définir `crossover`
+        mutate(offspring);  // Vous devez définir `mutate`
+        new_generation.push_back(neat::Individual(offspring));
+    }
+
+    return new_generation;
 }
 
 

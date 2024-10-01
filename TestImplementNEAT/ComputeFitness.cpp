@@ -20,4 +20,9 @@ double ComputeFitness::evaluate(const Genome &genome) const {
     // Vous pouvez retourner un score de fitness basé sur votre logique :
     // Par exemple, renvoyer une valeur aléatoire pour simuler la fitness
     return rng.next_double();
-}
+
+    
+    }
+
+
+
