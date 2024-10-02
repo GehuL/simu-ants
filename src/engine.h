@@ -16,11 +16,13 @@ namespace simu
             
             int run(int screenWidth, int screenHeight, std::string title);
 
-            void set_tps(int tps);
-            void set_fps(int fps);
+            void setTPS(int tps);
+            void setFPS(int fps);
 
-            const inline int get_tps(){return 1.0/m_tickPeriod;};
-            const inline int get_fps(){return 1.0/m_framePeriod;};
+            const inline int getTPS(){return 1.0/m_tickPeriod;};
+            const inline int getFPS(){return 1.0/m_framePeriod;};
+
+            void setPause(bool pause);
 
             virtual void drawFrame();
             virtual void drawUI();
@@ -40,7 +42,10 @@ namespace simu
 
             bool m_noDelay;
 
-            RenderTexture2D m_renderer;
+            bool m_pause;
+
+            RenderTexture2D m_renderer; // Board layer
+            RenderTexture2D m_gui_renderer; // GUI layer
     };
 }
 

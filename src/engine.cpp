@@ -16,6 +16,7 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
     double lastUpdateTime = 0;
     double lastDrawTime = 0;
     double lastProfilerTime = 0;
+    double lastGUITime = 0;
 
     int tickCounter = 0;
     int frameCounter = 0;
@@ -24,37 +25,70 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
     SetWindowState(FLAG_WINDOW_RESIZABLE);
     
     m_renderer = LoadRenderTexture(screenWidth, screenHeight);
+    m_gui_renderer = LoadRenderTexture(screenWidth, screenHeight);
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
         // Update logic
-        double updateDelta = GetTime() - lastUpdateTime;
-        if(updateDelta >= m_tickPeriod)
+        double updateDelta = 0.0;
+        if(!m_pause)
         {
-            double now = GetTime();
-            lastUpdateTime = now;
-            updateTick();
-            tickCounter++;
-        }
-
-        // Draw frame
-        double drawDelta = GetTime() - lastDrawTime;
-
-        if(drawDelta >= m_framePeriod)
-        {
-            double updateDelta2 = GetTime() - lastUpdateTime;
-            if(updateDelta2 >= m_tickPeriod && !m_noDelay) // Pas le temps pour dessiner, priorité sur update
-            {
-                frameCounter--;
-                TRACELOG(LOG_INFO, "Frame skipped !");
-            }else
+            updateDelta = GetTime() - lastUpdateTime;
+            if(updateDelta >= m_tickPeriod)
             {
                 double now = GetTime();
-                lastDrawTime = now;
-                drawAll();
-                frameCounter++;
+                lastUpdateTime = now;
+                updateTick();
+                tickCounter++;
             }
+        }
+
+        double drawDelta = GetTime() - lastDrawTime;
+        double uiDelta = GetTime() - lastGUITime;
+
+        bool b_drawAll = drawDelta >= m_framePeriod;
+        bool b_updateUI = uiDelta > 1.0 / 30.0;
+
+        // Draw frame OR update UI
+        if(b_updateUI || b_drawAll)
+        {
+            BeginDrawing();
+
+            if(b_drawAll)
+            {
+                double updateDelta2 = GetTime() - lastUpdateTime;
+                if(updateDelta2 >= m_tickPeriod && !m_noDelay) // Pas le temps pour dessiner, priorité sur update
+                {
+                    frameCounter--;
+                    TRACELOG(LOG_INFO, "Frame skipped !");
+                }else
+                {
+                    double now = GetTime();
+                    lastDrawTime = now;
+                    drawAll();
+                }
+            }
+
+            // Draw frame
+            DrawTexturePro(m_renderer.texture, {0, 0, (float)m_renderer.texture.width, -(float)m_renderer.texture.height}, {0, 0, (float)GetScreenWidth(), (float)GetScreenHeight()}, {0, 0}, 0, WHITE);
+            
+            // Draw UI at 30 FPS
+            if(b_updateUI) 
+            {
+                lastGUITime = GetTime();
+                drawUI();
+                PollInputEvents();
+            }
+
+            // Draw UI            
+            DrawTexturePro(m_renderer.texture, {0, 0, (float)m_renderer.texture.width, -(float)m_renderer.texture.height}, {0, 0, (float)GetScreenWidth(), (float)GetScreenHeight()}, {0, 0}, 0, WHITE);
+
+            EndDrawing();
+
+#ifdef SUPPORT_CUSTOM_FRAME_CONTROL
+    SwapScreenBuffer();
+#endif
         }
 
         // Profiling update
@@ -83,46 +117,54 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
     return 0;
 }
 
-void Engine::set_fps(int fps)
+void Engine::setFPS(int fps)
 {
+    if(fps <= 0)
+        fps = 1;
+
     this->m_framePeriod = 1.0 / static_cast<double>(fps);
 }
 
-void Engine::set_tps(int tps)
+void Engine::setTPS(int tps)
 {
+    // Si fps = 0, m_tickPeriod = infinite
+    m_noDelay = false;
+    if(tps >= 1000)
+    {
+        m_noDelay = true;
+        tps = 999999999;
+    }else if(tps <= 0)
+    {
+        m_pause = true;
+        tps = 0;
+    }else
+    {
+        m_pause = false;
+    }
     this->m_tickPeriod = 1.0 / static_cast<double>(tps);
 }
 
 void Engine::drawAll()
 {
-    BeginDrawing();
-        BeginTextureMode(m_renderer);
+    BeginTextureMode(m_renderer);
 
-            ClearBackground(RAYWHITE);
+        ClearBackground(RAYWHITE);
 
-            BeginMode2D(m_camera);
-                drawFrame();
-            EndMode2D();
+        BeginMode2D(m_camera);
+            drawFrame();
+        EndMode2D();
 
-
-        EndTextureMode();
-            
-        DrawTexturePro(m_renderer.texture, {0, 0, (float)m_renderer.texture.width, -(float)m_renderer.texture.height}, 
-                                           {0, 0, (float)GetScreenWidth(), (float)GetScreenHeight()},
-                                            {0, 0}, 0, WHITE);
-        drawUI();
-
-    EndDrawing();
-
-#ifdef SUPPORT_CUSTOM_FRAME_CONTROL
-    SwapScreenBuffer();
-    PollInputEvents();
-#endif
+    EndTextureMode();
 }
 
 void Engine::updateTick()
 {
 
+}
+
+void Engine::setPause(bool pause)
+{
+    this->m_pause = pause;
 }
 
 void Engine::drawFrame()
@@ -133,23 +175,21 @@ void Engine::drawUI()
 {
     DrawText(TextFormat("%d FPS\n%d TPS", m_lastFrameCounter, m_lastTickCounter), 5, 0, 20, GREEN);
 
-    float framePerSecond = get_fps();
-    float tickPerSecond = get_tps();
+    if(m_pause)
+    {
+        const char* pause_txt = "PAUSED";
+        DrawText(pause_txt, GetScreenWidth() - MeasureText(pause_txt, 20), 0, 20, RED);
+    }
+
+    float framePerSecond = getFPS();
+    float tickPerSecond = getTPS();
 
     GuiSlider((Rectangle){ GetScreenWidth() / 2.f - 100.f, GetScreenHeight() - 20.f, 200, 16 }, "FPS 1", "100%", &framePerSecond, 1, 300);
     GuiSlider((Rectangle){ GetScreenWidth() / 2.f - 100.f, GetScreenHeight() - 50.f, 200, 16 }, "TPS 0", "100%", &tickPerSecond, 0, 1000);
     
-    if(static_cast<int>(framePerSecond) != get_fps())
-        set_fps(framePerSecond);
+    if(static_cast<int>(framePerSecond) != getFPS())
+        setFPS(framePerSecond);
 
-    if(static_cast<int>(tickPerSecond) != get_tps())
-    {
-        m_noDelay = false;
-        if(tickPerSecond >= 1000)
-        {
-            m_noDelay = true;
-            tickPerSecond = 999999999;
-        }
-        set_tps(tickPerSecond);
-    }
+    if(static_cast<int>(tickPerSecond) != getTPS())
+        setTPS(tickPerSecond);
 }

@@ -3,6 +3,7 @@
 
 int main(void)
 {   
-    simu::getWorld().spawnEntity<simu::Ant>();
-    return simu::getWorld().run(800, 800, "ants-simulation");
+    simu::World& world = simu::getWorld(); 
+    world.init();
+    return world.run(800, 800, "ants-simulation");
 }
