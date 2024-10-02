@@ -10,6 +10,7 @@
 #include <memory>
 #include <optional>
 #include <algorithm>
+#include <array>
 
 namespace simu
 {
@@ -18,6 +19,22 @@ namespace simu
         public:
     
             static World world;
+
+            template<class T>
+            void  spawnEntities(size_t count, std::vector<std::weak_ptr<T>>* newly_en)
+            {
+                const size_t en_cnt = m_entities.size();
+                m_entities.resize(en_cnt + count);
+
+                for(size_t i = 0; i < count; i++)
+                {
+                    std::shared_ptr<T> en = std::make_shared<T>(m_entity_cnt++);
+                    m_entities[en_cnt + i] = en;
+        
+                    if(newly_en != nullptr)
+                        newly_en->push_back(en);
+                }
+            }
 
             template<class T>
             std::weak_ptr<T> spawnEntity()
@@ -60,6 +77,8 @@ namespace simu
 
             Grid& getGrid() { return m_grid; };
 
+            void init();
+
         private:
             World();
 
@@ -76,6 +95,9 @@ namespace simu
             std::vector<std::shared_ptr<Entity>> m_entities;
 
             Grid m_grid;
+
+            int m_cursorTileIndex;
+            const std::array<const Tile, 3> m_cursorTiles = {GROUND, FOOD, PHEROMONE};  
     };
 
     inline World& getWorld() { return simu::World::world; };

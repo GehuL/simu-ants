@@ -1,6 +1,8 @@
 #include "world.h"
 #include <exception>
 
+#include "ant.h"
+
 using namespace simu;
 
 World World::world;
@@ -14,6 +16,8 @@ void World::init()
 {
     m_entities.clear();
     m_grid.reset();
+
+    spawnEntities<Ant>(10, nullptr);
 }
 
 void World::handleMouse()
@@ -21,10 +25,14 @@ void World::handleMouse()
     Vector2 pos = GetScreenToWorld2D(GetMousePosition(), m_camera);
     if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)) // PUT WALL
     {
-        m_grid.setTile(GROUND, pos.x, pos.y);
+        m_grid.setTile(m_cursorTiles[m_cursorTileIndex], pos.x, pos.y);
     }else if(IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) // REMOVE TILE
     {
         m_grid.setTile(AIR, pos.x, pos.y);
+    }else if(IsMouseButtonDown(MOUSE_BUTTON_MIDDLE))
+    {
+        m_cursorTileIndex++;
+        m_cursorTileIndex %= m_cursorTiles.size();
     }else
     {
         Vector2i grid_pos = m_grid.toTileCoord(pos.x, pos.y);

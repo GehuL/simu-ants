@@ -28,6 +28,20 @@ void Grid::draw()
 
 void Grid::update()
 {
+    for(int i = 0; i < getTileNumber(); i++)
+    {
+        Tile* tile = &m_grid[i];
+        switch(tile->type)
+        {
+            case Type::PHEROMONE:
+                tile->color.a -= 1;
+                if(tile->color.a <= 0)
+                    *tile = AIR; 
+            break;
+            default:
+                continue;
+        }
+    }
 
 }
 
