@@ -19,12 +19,26 @@ void Ant::update()
  
     // m_life -= 0.01f;
 
-    // if(m_rotateCd <= 0)
-    // {
-    //     m_rotateCd = 100;
-    //     m_target_angle = GetRandomValue(-100, 100) * 0.01f * 2 * PI;
-    // }
-    // m_rotateCd--;
+    if(m_rotateCd <= 0)
+    {
+        m_rotateCd = GetRandomValue(30, 100);
+        m_angle = GetRandomValue(-100, 100) * 0.01f * 2 * PI;
+        m_velocity = Vector2Rotate(m_velocity, m_angle);
+    }
+    m_rotateCd--;
+
+    m_pos = Vector2Add(m_pos, m_velocity);
+
+    Tile facingTile = getTileFacing();
+    
+    if(facingTile.type == Type::GROUND || facingTile.type == Type::FOOD)
+        take();
+    
+    if(facingTile.type == Type::BORDER || facingTile.type == Type::GROUND)
+        m_velocity = Vector2Negate(m_velocity);
+    
+    if(GetRandomValue(0, 40) == 0)
+        put();
 
     // float da = m_target_angle - m_angle;
     // m_angle += da * 0.00001f;
