@@ -67,6 +67,7 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
                     double now = GetTime();
                     lastDrawTime = now;
                     drawAll();
+                    frameCounter++;
                 }
             }
 
@@ -77,12 +78,12 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
             if(b_updateUI) 
             {
                 lastGUITime = GetTime();
-                drawUI();
+                updateUI();
                 PollInputEvents();
             }
 
             // Draw UI            
-            DrawTexturePro(m_renderer.texture, {0, 0, (float)m_renderer.texture.width, -(float)m_renderer.texture.height}, {0, 0, (float)GetScreenWidth(), (float)GetScreenHeight()}, {0, 0}, 0, WHITE);
+            DrawTexturePro(m_gui_renderer.texture, {0, 0, (float)m_gui_renderer.texture.width, -(float)m_gui_renderer.texture.height}, {0, 0, (float)GetScreenWidth(), (float)GetScreenHeight()}, {0, 0}, 0, WHITE);
 
             EndDrawing();
 
@@ -148,7 +149,7 @@ void Engine::drawAll()
 {
     BeginTextureMode(m_renderer);
 
-        ClearBackground(RAYWHITE);
+        ClearBackground(WHITE);
 
         BeginMode2D(m_camera);
             drawFrame();
@@ -173,6 +174,17 @@ void Engine::drawFrame()
 
 void Engine::drawUI()
 {
+    
+}
+
+void Engine::updateUI()
+{
+    BeginTextureMode(m_gui_renderer);
+
+    ClearBackground((Color){255, 255, 255, 0});
+
+    drawUI();
+    
     DrawText(TextFormat("%d FPS\n%d TPS", m_lastFrameCounter, m_lastTickCounter), 5, 0, 20, GREEN);
 
     if(m_pause)
@@ -192,4 +204,6 @@ void Engine::drawUI()
 
     if(static_cast<int>(tickPerSecond) != getTPS())
         setTPS(tickPerSecond);
+
+    EndTextureMode();
 }

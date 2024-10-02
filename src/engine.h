@@ -33,6 +33,7 @@ namespace simu
         private:
 
             void drawAll();
+            void updateUI();
 
             double m_tickPeriod;
             double m_framePeriod;

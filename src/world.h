@@ -59,11 +59,12 @@ namespace simu
             }
 
             Grid& getGrid() { return m_grid; };
+            
+            void init();
 
         private:
             World();
 
-            void init();
 
             void handleKeyboard();
             void handleMouse();
