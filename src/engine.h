@@ -44,8 +44,7 @@ namespace simu
 
             bool m_pause;
 
-            RenderTexture2D m_renderer; // Board layer
-            RenderTexture2D m_gui_renderer; // GUI layer
+            RenderTexture2D m_renderer;
     };
 }
 
