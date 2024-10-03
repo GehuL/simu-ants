@@ -26,7 +26,7 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
     m_renderer = LoadRenderTexture(screenWidth, screenHeight);
 
     // Main game loop
-    while (!WindowShouldClose())    // Detect window close button or ESC key
+    while (!WindowShouldClose()) // Detect window close button or ESC key
     {
         // Update logic
         double updateDelta = 0.0;
@@ -45,7 +45,19 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
         // Draw frame
         double drawDelta = GetTime() - lastDrawTime;
 
+<<<<<<< HEAD
         if(drawDelta >= m_framePeriod)
+=======
+        bool b_drawAll = drawDelta >= m_framePeriod;
+        bool b_updateUI = uiDelta >=  1.0 / 30.0;
+
+        // Draw frame OR update UI
+        if(b_updateUI || b_drawAll)
+        {
+            BeginDrawing();
+
+            if(b_drawAll)
+>>>>>>> test-ui
             {
                 double updateDelta2 = GetTime() - lastUpdateTime;
                 if(updateDelta2 >= m_tickPeriod && !m_noDelay) // Pas le temps pour dessiner, priorité sur update
@@ -57,8 +69,34 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
                     double now = GetTime();
                     lastDrawTime = now;
                     drawAll();
+<<<<<<< HEAD
                 frameCounter++;
             }
+=======
+                    frameCounter++;
+                }
+            }
+
+            // Draw frame
+            DrawTexturePro(m_renderer.texture, {0, 0, (float)m_renderer.texture.width, -(float)m_renderer.texture.height}, {0, 0, (float)GetScreenWidth(), (float)GetScreenHeight()}, {0, 0}, 0, WHITE);
+            
+            // Draw UI at 30 FPS
+            if(b_updateUI) 
+            {
+                lastGUITime = GetTime();
+                updateUI();
+                PollInputEvents();
+            }
+
+            // Draw UI            
+            DrawTexturePro(m_gui_renderer.texture, {0, 0, (float)m_gui_renderer.texture.width, -(float)m_gui_renderer.texture.height}, {0, 0, (float)GetScreenWidth(), (float)GetScreenHeight()}, {0, 0}, 0, WHITE);
+
+            EndDrawing();
+
+#ifdef SUPPORT_CUSTOM_FRAME_CONTROL
+    SwapScreenBuffer();
+#endif
+>>>>>>> test-ui
         }
 
         // Profiling update
@@ -75,12 +113,13 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
             tickCounter = 0;
         }
     
-        // Différence de temps libre entre update et draw
+        // Différence de temps libre entre update et draw (drawDelta inclue le temps de l'affichage de l'UI)
         double waitTime = MIN(m_framePeriod - drawDelta, m_tickPeriod - updateDelta);
         if(!m_noDelay && waitTime >= 0.0) // Il reste du temps pour mettre en pause  
         {
             // Désactiver le waitTime permet d'augmenter la priorité du processus 
             WaitTime(waitTime);
+            // TRACELOG(LOG_INFO, "waitTime: %lf ms", waitTime * 1000.0);
         }
     }
     CloseWindow();
@@ -119,7 +158,7 @@ void Engine::drawAll()
     BeginDrawing();
     BeginTextureMode(m_renderer);
 
-        ClearBackground(RAYWHITE);
+        ClearBackground(WHITE);
 
         BeginMode2D(m_camera);
             drawFrame();
@@ -156,6 +195,17 @@ void Engine::drawFrame()
 
 void Engine::drawUI()
 {
+    
+}
+
+void Engine::updateUI()
+{
+    BeginTextureMode(m_gui_renderer);
+
+    ClearBackground((Color){255, 255, 255, 0});
+
+    drawUI();
+    
     DrawText(TextFormat("%d FPS\n%d TPS", m_lastFrameCounter, m_lastTickCounter), 5, 0, 20, GREEN);
 
     if(m_pause)
@@ -167,8 +217,8 @@ void Engine::drawUI()
     float framePerSecond = getFPS();
     float tickPerSecond = getTPS();
 
-    GuiSlider((Rectangle){ GetScreenWidth() / 2.f - 100.f, GetScreenHeight() - 20.f, 200, 16 }, "FPS 1", "100%", &framePerSecond, 1, 300);
-    GuiSlider((Rectangle){ GetScreenWidth() / 2.f - 100.f, GetScreenHeight() - 50.f, 200, 16 }, "TPS 0", "100%", &tickPerSecond, 0, 1000);
+    GuiSlider((Rectangle){ GetScreenWidth() / 2.f - 100.f, GetScreenHeight() - 20.f, 200, 16 }, TextFormat("FPS %d", static_cast<int>(framePerSecond)), "100%", &framePerSecond, 1, 300);
+    GuiSlider((Rectangle){ GetScreenWidth() / 2.f - 100.f, GetScreenHeight() - 50.f, 200, 16 }, TextFormat("TPS %d", static_cast<int>(tickPerSecond)), "100%", &tickPerSecond, 0, 1000);
     
     if(static_cast<int>(framePerSecond) != getFPS())
         setFPS(framePerSecond);
@@ -176,4 +226,8 @@ void Engine::drawUI()
     if(static_cast<int>(tickPerSecond) != getTPS())
         setTPS(tickPerSecond);
 
+<<<<<<< HEAD
+=======
+    EndTextureMode();
+>>>>>>> test-ui
 }

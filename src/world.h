@@ -76,7 +76,7 @@ namespace simu
             }
 
             Grid& getGrid() { return m_grid; };
-
+            
             void init();
 
         private:

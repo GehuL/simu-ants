@@ -58,8 +58,6 @@ void World::handleKeyboard()
 void World::drawFrame()
 {
     m_grid.draw();
-    handleKeyboard();
-    handleMouse();
 
     for(auto& en : m_entities)
     {
@@ -69,7 +67,8 @@ void World::drawFrame()
 
 void World::drawUI()
 {
-    Engine::drawUI();
+    handleKeyboard();
+    handleMouse();
 }
 
 void World::updateTick()
