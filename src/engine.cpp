@@ -28,7 +28,7 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
     m_gui_renderer = LoadRenderTexture(screenWidth, screenHeight);
 
     // Main game loop
-    while (!WindowShouldClose())    // Detect window close button or ESC key
+    while (!WindowShouldClose()) // Detect window close button or ESC key
     {
         // Update logic
         double updateDelta = 0.0;
@@ -48,7 +48,7 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
         double uiDelta = GetTime() - lastGUITime;
 
         bool b_drawAll = drawDelta >= m_framePeriod;
-        bool b_updateUI = uiDelta > 1.0 / 30.0;
+        bool b_updateUI = uiDelta >=  1.0 / 30.0;
 
         // Draw frame OR update UI
         if(b_updateUI || b_drawAll)
@@ -106,12 +106,13 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
             tickCounter = 0;
         }
     
-        // Différence de temps libre entre update et draw
+        // Différence de temps libre entre update et draw (drawDelta inclue le temps de l'affichage de l'UI)
         double waitTime = MIN(m_framePeriod - drawDelta, m_tickPeriod - updateDelta);
         if(!m_noDelay && waitTime >= 0.0) // Il reste du temps pour mettre en pause  
         {
             // Désactiver le waitTime permet d'augmenter la priorité du processus 
             WaitTime(waitTime);
+            // TRACELOG(LOG_INFO, "waitTime: %lf ms", waitTime * 1000.0);
         }
     }
     CloseWindow();
@@ -196,8 +197,8 @@ void Engine::updateUI()
     float framePerSecond = getFPS();
     float tickPerSecond = getTPS();
 
-    GuiSlider((Rectangle){ GetScreenWidth() / 2.f - 100.f, GetScreenHeight() - 20.f, 200, 16 }, "FPS 1", "100%", &framePerSecond, 1, 300);
-    GuiSlider((Rectangle){ GetScreenWidth() / 2.f - 100.f, GetScreenHeight() - 50.f, 200, 16 }, "TPS 0", "100%", &tickPerSecond, 0, 1000);
+    GuiSlider((Rectangle){ GetScreenWidth() / 2.f - 100.f, GetScreenHeight() - 20.f, 200, 16 }, TextFormat("FPS %d", static_cast<int>(framePerSecond)), "100%", &framePerSecond, 1, 300);
+    GuiSlider((Rectangle){ GetScreenWidth() / 2.f - 100.f, GetScreenHeight() - 50.f, 200, 16 }, TextFormat("TPS %d", static_cast<int>(tickPerSecond)), "100%", &tickPerSecond, 0, 1000);
     
     if(static_cast<int>(framePerSecond) != getFPS())
         setFPS(framePerSecond);
