@@ -16,6 +16,7 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
     double lastUpdateTime = 0;
     double lastDrawTime = 0;
     double lastProfilerTime = 0;
+    double lastGUITime = 0;
 
     int tickCounter = 0;
     int frameCounter = 0;
@@ -24,6 +25,7 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
     SetWindowState(FLAG_WINDOW_RESIZABLE);
     
     m_renderer = LoadRenderTexture(screenWidth, screenHeight);
+    m_gui_renderer = LoadRenderTexture(screenWidth, screenHeight);
 
     // Main game loop
     while (!WindowShouldClose()) // Detect window close button or ESC key
@@ -42,12 +44,9 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
             }
         }
 
-        // Draw frame
         double drawDelta = GetTime() - lastDrawTime;
+        double uiDelta = GetTime() - lastGUITime;
 
-<<<<<<< HEAD
-        if(drawDelta >= m_framePeriod)
-=======
         bool b_drawAll = drawDelta >= m_framePeriod;
         bool b_updateUI = uiDelta >=  1.0 / 30.0;
 
@@ -57,7 +56,6 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
             BeginDrawing();
 
             if(b_drawAll)
->>>>>>> test-ui
             {
                 double updateDelta2 = GetTime() - lastUpdateTime;
                 if(updateDelta2 >= m_tickPeriod && !m_noDelay) // Pas le temps pour dessiner, priorité sur update
@@ -69,10 +67,6 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
                     double now = GetTime();
                     lastDrawTime = now;
                     drawAll();
-<<<<<<< HEAD
-                frameCounter++;
-            }
-=======
                     frameCounter++;
                 }
             }
@@ -96,7 +90,6 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
 #ifdef SUPPORT_CUSTOM_FRAME_CONTROL
     SwapScreenBuffer();
 #endif
->>>>>>> test-ui
         }
 
         // Profiling update
@@ -164,18 +157,6 @@ void Engine::drawAll()
         EndMode2D();
 
     EndTextureMode();
-            
-        DrawTexturePro(m_renderer.texture, {0, 0, (float)m_renderer.texture.width, -(float)m_renderer.texture.height}, 
-                                           {0, 0, (float)GetScreenWidth(), (float)GetScreenHeight()},
-                                            {0, 0}, 0, WHITE);
-        drawUI();
-
-    EndDrawing();
-
-#ifdef SUPPORT_CUSTOM_FRAME_CONTROL
-    SwapScreenBuffer();
-    PollInputEvents();
-#endif
 }
 
 void Engine::updateTick()
@@ -224,9 +205,3 @@ void Engine::updateUI()
 
     if(static_cast<int>(tickPerSecond) != getTPS())
         setTPS(tickPerSecond);
-
-<<<<<<< HEAD
-=======
-    EndTextureMode();
->>>>>>> test-ui
-}

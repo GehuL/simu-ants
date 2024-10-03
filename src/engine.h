@@ -46,6 +46,7 @@ namespace simu
             bool m_pause;
 
             RenderTexture2D m_renderer;
+            RenderTexture2D m_gui_renderer;
     };
 }
 
