@@ -24,7 +24,6 @@ void Ant::update()
         m_rotateCd = GetRandomValue(30, 100);
         m_angle += GetRandomValue(-100, 100) * 0.01f * PI / 4;
         m_velocity = Vector2Rotate((Vector2){1.0, 0.0}, m_angle);
-        // m_angle = -PI/4;
     }
     
     Vector2 lastPos = m_pos;

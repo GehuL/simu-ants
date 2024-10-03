@@ -17,7 +17,7 @@ void World::init()
     m_entities.clear();
     m_grid.reset();
 
-    spawnEntities<Ant>(1, nullptr);
+    spawnEntities<Ant>(10, nullptr);
 }
 
 void World::handleMouse()
