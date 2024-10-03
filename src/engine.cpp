@@ -155,7 +155,6 @@ void Engine::setTPS(int tps)
 
 void Engine::drawAll()
 {
-    BeginDrawing();
     BeginTextureMode(m_renderer);
 
         ClearBackground(WHITE);
