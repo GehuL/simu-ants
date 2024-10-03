@@ -205,3 +205,6 @@ void Engine::updateUI()
 
     if(static_cast<int>(tickPerSecond) != getTPS())
         setTPS(tickPerSecond);
+    
+    EndTextureMode();
+}
