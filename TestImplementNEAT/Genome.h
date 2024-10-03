@@ -24,6 +24,9 @@ public:
     int get_num_outputs() const;
     int get_genome_id() const;
 
+    std::vector<int> make_input_ids() const;
+    std::vector<int> make_output_ids() const;
+
     // Méthodes pour manipuler le génome
     void add_neuron(const neat::NeuronGene &neuron);
     void add_link(const neat::LinkGene &link);

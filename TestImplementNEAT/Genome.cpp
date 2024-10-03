@@ -43,3 +43,19 @@ std::optional<neat::LinkGene> Genome::find_link(neat::LinkId link_id) const {
     return std::nullopt;  // Retourne un optional vide si non trouvé
 }
 
+std::vector<int> Genome::make_input_ids() const {
+    std::vector<int> input_ids;
+    for (int i = 0; i < num_inputs; i++) {
+        input_ids.push_back(i);  // Ajoute les IDs des entrées
+    }
+    return input_ids;
+}
+
+std::vector<int> Genome::make_output_ids() const {
+    std::vector<int> output_ids;
+    for (int i = 0; i < num_outputs; i++) {
+        output_ids.push_back(num_inputs + i);  // Ajoute les IDs des sorties
+    }
+    return output_ids;
+}
+
