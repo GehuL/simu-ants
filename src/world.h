@@ -82,8 +82,6 @@ namespace simu
         private:
             World();
 
-            void init();
-
             void handleKeyboard();
             void handleMouse();
 

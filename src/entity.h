@@ -27,6 +27,7 @@ namespace simu
             Tile const getTileFacing();
 
             Vector2i const getTileFacingPos();
+            Vector2i const getTilePosOn();
 
             long const getId() { return m_id; };
 

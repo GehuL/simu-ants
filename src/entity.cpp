@@ -31,11 +31,16 @@ Vector2i const simu::Entity::getTileFacingPos()
 {
     Grid& grid = getWorld().getGrid();
     // Translate ant position to facing tile position
-    Vector2i tilePos = grid.toTileCoord(m_pos.x, m_pos.y);
+    Vector2i tilePos = grid.toTileCoord(m_pos.x + grid.getTileSize() / 2.0, m_pos.y + grid.getTileSize() / 2.0);
     Vector2 vel = Vector2Rotate((Vector2){1.0, 0}, m_angle);
     
     // Get the tile the ant is facing
-    return (Vector2i){tilePos.x + static_cast<int>(vel.x), tilePos.y + static_cast<int>(vel.y)};;
+    return (Vector2i){tilePos.x + static_cast<int>(round(vel.x)), tilePos.y + static_cast<int>(round(vel.y))};;
+}
+
+Vector2i const simu::Entity::getTilePosOn()
+{
+    return getWorld().getGrid().toTileCoord(m_pos.x, m_pos.y);
 }
 
 std::string const Entity::toString()

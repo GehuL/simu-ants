@@ -19,37 +19,51 @@ void Ant::update()
  
     // m_life -= 0.01f;
 
-    if(m_rotateCd <= 0)
+    if(m_rotateCd-- <= 0)
     {
         m_rotateCd = GetRandomValue(30, 100);
-        m_angle = GetRandomValue(-100, 100) * 0.01f * 2 * PI;
-        m_velocity = Vector2Rotate(m_velocity, m_angle);
+        m_angle += GetRandomValue(-100, 100) * 0.01f * PI / 4;
+        m_velocity = Vector2Rotate((Vector2){1.0, 0.0}, m_angle);
+        // m_angle = -PI/4;
     }
-    m_rotateCd--;
-
+    
+    Vector2 lastPos = m_pos;
     m_pos = Vector2Add(m_pos, m_velocity);
 
-    Tile facingTile = getTileFacing();
-    
-    if(facingTile.type == Type::GROUND || facingTile.type == Type::FOOD)
-        take();
-    
+    // Tuile dans la direction de la fourmis
+    Vector2i facingPos = getTileFacingPos();
+    Tile facingTile = getWorld().getGrid().getTile(facingPos.x, facingPos.y);
+
     if(facingTile.type == Type::BORDER || facingTile.type == Type::GROUND)
-        m_velocity = Vector2Negate(m_velocity);
+    {
+        // Vector2i posOn = getTilePosOn();
+        
+        // // Fait rebondir la fourmis selon son angle 
+        // if(facingPos.y != posOn.y)
+        // {
+        //     m_velocity.y *= -1;
+        // }
+        
+        // if(facingPos.x != posOn.x)
+        // {
+        //     m_velocity.x *= -1;
+        // } 
+        // // Tourne son angle par rapport à l'angle de son vecteur vitesse
+        // m_angle = Vector2Angle({1.0, 0.0}, m_velocity);
+        
+        // Fait revenir a son ancienne position car elle risque de foncer dans un mur
+        m_pos = lastPos;
+        m_rotateCd = 0; // Elle prendra une nouvelle décision
+    }
+
+
+    // if(facingTile.type == Type::GROUND || facingTile.type == Type::FOOD)
+    //     take();
     
     if(GetRandomValue(0, 40) == 0)
         put();
 
-    // float da = m_target_angle - m_angle;
-    // m_angle += da * 0.00001f;
-    // m_angle = -PI/2.f;
-
-    // move();
-    this->m_pos.x += 0.1f;
-
     pheromone();
-
-    take();
 }
 
 void Ant::draw() 
