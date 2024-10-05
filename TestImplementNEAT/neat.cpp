@@ -82,26 +82,33 @@ double LinkMutator::random_weight() {
     return ((double)std::rand() / RAND_MAX) * 2.0 - 1.0; 
 }
 
-int neat::choose_random_input_or_hidden_neuron(const std::vector<NeuronGene>& neurons) {
+int choose_random_input_or_hidden_neuron(const std::vector<NeuronGene>& neurons) {
     std::vector<int> valid_neurons;
+    NeatConfig config;
+
     for (const auto& neuron : neurons) {
-        // Condition pour vérifier si le neurone est d'entrée ou caché
-        if (/* condition ici */) {
-            valid_neurons.push_back(neuron.neuron_id);
+        // Exclure les neurones de sortie (qui ont des IDs entre num_inputs et num_inputs + num_outputs)
+        if (neuron.neuron_id < config.num_inputs || 
+            (neuron.neuron_id >= config.num_inputs + config.num_outputs)) {
+            valid_neurons.push_back(neuron.neuron_id);  // Ajouter les neurones d'entrée et cachés
         }
     }
+
     if (valid_neurons.empty()) {
         return -1; // ou gérer l'erreur autrement
     }
+
     int random_index = std::rand() % valid_neurons.size();
     return valid_neurons[random_index];
 }
 
-int neat::choose_random_output_or_hidden_neuron(const std::vector<NeuronGene>& neurons) {
+
+int choose_random_output_or_hidden_neuron(const std::vector<NeuronGene>& neurons) {
     std::vector<int> valid_neurons;
     for (const auto& neuron : neurons) {
+        NeatConfig config;
         // Condition pour vérifier si le neurone est de sortie ou caché
-        if (/* condition ici */) {
+        if (neuron.neuron_id >= config.num_inputs && neuron.neuron_id < config.num_inputs + config.num_outputs) {
             valid_neurons.push_back(neuron.neuron_id);
         }
     }
@@ -115,10 +122,10 @@ int neat::choose_random_output_or_hidden_neuron(const std::vector<NeuronGene>& n
 // Fonction pour choisir un neurone caché aléatoire
 std::vector<NeuronGene>::const_iterator choose_random_hidden(std::vector<NeuronGene>& neurons) {
     std::vector<std::vector<NeuronGene>::const_iterator> hidden_neurons;
-
+    NeatConfig config;
     // Supposons que vous avez une façon de déterminer si un neurone est caché.
     for (auto it = neurons.begin(); it != neurons.end(); ++it) {
-        if (/* condition pour déterminer si le neurone est caché */) {
+        if (it->neuron_id >= config.num_inputs + config.num_outputs) {
             hidden_neurons.push_back(it);
         }
     }

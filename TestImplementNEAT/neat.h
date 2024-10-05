@@ -4,8 +4,9 @@
 
 #include <vector>
 #include "Activation.h"
-#include "Genome.h" // Ensure this file defines the Genome class
+#include "Genome.h" 
 #include "GenomeIndexer.h"
+#include "NeatConfig.h"
 
 namespace neat {
 
@@ -25,6 +26,11 @@ struct NeuronGene {
 struct LinkId {
     int input_id;
     int output_id;
+
+     // Définir l'opérateur == pour comparer deux LinkId
+        bool operator==(const LinkId& other) const {
+            return input_id == other.input_id && output_id == other.output_id;
+        }
 };
 
 // Structure représentant une connexion entre deux neurones
@@ -32,6 +38,11 @@ struct LinkGene {
     LinkId link_id;    // Connexion entre les neurones
     double weight;     // Poids de la connexion
     bool is_enabled;   // Si la connexion est active
+
+    // Définir l'opérateur == pour comparer deux LinkGene
+        bool operator==(const LinkGene& other) const {
+            return link_id == other.link_id && weight == other.weight && is_enabled == other.is_enabled;
+        }
 
     bool has_neuron(const NeuronGene& neuron) const {
         return link_id.input_id == neuron.neuron_id || link_id.output_id == neuron.neuron_id;
@@ -74,6 +85,7 @@ public:
     Genome crossover(const Individual &dominant, const Individual &recessive);
 private:
     GenomeIndexer m_genome_indexer;
+    
 
 };
 

@@ -1,0 +1,7 @@
+Genome ID: 1
+Neurons:
+Neuron ID: 0, Bias: 0.5
+Neuron ID: 1, Bias: -0.3
+Neuron ID: 2, Bias: 0.1
+Links:
+Link from neuron 0 to neuron 1 with weight 0.8 (enabled)

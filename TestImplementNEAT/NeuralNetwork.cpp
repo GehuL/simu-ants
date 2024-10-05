@@ -1,23 +1,24 @@
 #include "NeuralNetwork.h"
 #include <unordered_set>
+#include <iostream>
 
-std::vector<double> FeedForwardNeuralNetwork::activate(const std::vector<double> &inputs) {
+std::vector<double> FeedForwardNeuralNetwork::activate(const std::vector<double>& inputs) {
     assert(inputs.size() == m_input_ids.size());
     std::unordered_map<int, double> values;
-    
+
     // Assigner les valeurs d'entrée
-    for (int i = 0; i < inputs.size(); i++) {
+    for (size_t i = 0; i < inputs.size(); i++) {  // Modifier int en size_t
         int input_id = m_input_ids[i];
         values[input_id] = inputs[i];
     }
-    
+
     // Initialiser les sorties
     for (int output_id : m_output_ids) {
         values[output_id] = 0.0;
     }
-    
+
     // Calcul des valeurs des neurones
-    for (const auto &neuron : m_neurons) {
+    for (const auto& neuron : m_neurons) {
         double value = 0.0;
         for (const NeuronInput& input : neuron.inputs) {
             assert(values.find(input.input_id) != values.end());
@@ -25,7 +26,7 @@ std::vector<double> FeedForwardNeuralNetwork::activate(const std::vector<double>
         }
 
         value += neuron.bias;
-        value = std::visit([&value](auto&& fn) { return fn(value); }, neuron.activation);// Appeler la fonction d'activation
+        value = std::visit([&value](auto&& fn) { return fn(value); }, neuron.activation); // Appeler la fonction d'activation
 
         values[neuron.neuron_id] = value;
     }
@@ -38,6 +39,7 @@ std::vector<double> FeedForwardNeuralNetwork::activate(const std::vector<double>
     }
     return outputs;
 }
+
 
 std::vector<std::vector<int>> feed_forward_layer(
     const std::vector<int>& inputs, 
@@ -89,6 +91,15 @@ FeedForwardNeuralNetwork create_from_genome(const Genome &genome) {
     // Utiliser les méthodes adéquates pour obtenir les identifiants d'entrée et de sortie
     std::vector<int> inputs = genome.make_input_ids();
     std::vector<int> outputs = genome.make_output_ids();
+
+    std::cout << "Input IDs: ";
+for (int id : inputs) {
+    std::cout << id << " ";
+}
+std::cout << "\nOutput IDs: ";
+for (int id : outputs) {
+    std::cout << id << " ";
+}
     
     // Organiser les neurones en couches
     std::vector<std::vector<int>> layers = feed_forward_layer(inputs, outputs, genome.links);
@@ -106,6 +117,9 @@ FeedForwardNeuralNetwork create_from_genome(const Genome &genome) {
 
             // Trouver le neurone correspondant dans le génome
             auto neuron_gene_opt = genome.find_neuron(neuron_id);
+            if (!neuron_gene_opt.has_value()) {
+    std::cout << "Neurone ID " << neuron_id << " non trouve dans le genome." << std::endl;
+}
             assert(neuron_gene_opt.has_value());
             const neat::NeuronGene& neuron_gene = *neuron_gene_opt;
 

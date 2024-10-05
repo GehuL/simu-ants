@@ -107,10 +107,11 @@ std::vector<neat::Individual> Population::reproduce() {
     std::vector<neat::Individual> new_generation;
     int spawn_size = config.population_size;
 
-    while (spawn_size-- >= 0) {
+    while (spawn_size-- > 0) {  // Utilisation de `-- > 0` pour éviter d'ajouter une génération supplémentaire
         RNG rng;
-        const auto& p1 = *rng.choose_random(old_members, reproduction_cutoff);
-        const auto& p2 = *rng.choose_random(old_members, reproduction_cutoff);
+        // Récupérer les parents
+        neat::Individual& p1 = rng.choose_random(old_members, reproduction_cutoff);
+        neat::Individual& p2 = rng.choose_random(old_members, reproduction_cutoff);
         neat::Neat neat_instance;
         Genome offspring = neat_instance.crossover(p1.genome, p2.genome);  // Vous devez définir `crossover`
         mutate(offspring);  // Vous devez définir `mutate`
@@ -119,5 +120,34 @@ std::vector<neat::Individual> Population::reproduce() {
 
     return new_generation;
 }
+
+
+std::vector<neat::Individual> Population::sort_individuals_by_fitness(const std::vector<neat::Individual>& individuals) {
+    // Créer une copie des individus à trier
+    std::vector<neat::Individual> sorted_individuals = individuals;
+
+    // Trie les individus en fonction de leur fitness (du plus grand au plus petit)
+    std::sort(sorted_individuals.begin(), sorted_individuals.end(), 
+        [](const neat::Individual& a, const neat::Individual& b) {
+            return a.fitness > b.fitness;
+        });
+
+    return sorted_individuals;
+}
+
+
+void Population::update_best() {
+    // Cherche l'individu avec la meilleure fitness
+    auto best_it = std::max_element(individuals.begin(), individuals.end(), 
+        [](const neat::Individual& a, const neat::Individual& b) {
+            return a.fitness < b.fitness;
+        });
+    
+    // Mettre à jour best_individual si un meilleur individu est trouvé
+    if (best_it != individuals.end()) {
+        best_individual = *best_it;
+    }
+}
+
 
 
