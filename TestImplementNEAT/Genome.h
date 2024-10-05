@@ -13,6 +13,9 @@ namespace neat {
 
 class Genome {
 public:
+
+    Genome();
+
     Genome(int id, int num_inputs, int num_outputs);
 
     // Vecteurs de neurones et de liens

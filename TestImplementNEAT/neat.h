@@ -46,6 +46,9 @@ struct Individual {
     bool fitness_computed;
     double fitness;
 
+    Individual() 
+        : genome(), fitness_computed(false), fitness(0.0) {}
+
     Individual(const Genome &genome)
         : genome(genome), fitness_computed(false), fitness(0.0) {}
 };

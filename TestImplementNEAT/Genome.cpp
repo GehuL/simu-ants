@@ -2,6 +2,9 @@
 #include "neat.h"  // Inclure neat.h pour les définitions complètes
 #include <optional>  // Inclure <optional> pour utiliser std::optional
 
+
+Genome::Genome() : genome_id(0), num_inputs(0), num_outputs(0) {}
+
 Genome::Genome(int id, int num_inputs, int num_outputs)
     : genome_id(id), num_inputs(num_inputs), num_outputs(num_outputs) {}
 
