@@ -35,6 +35,7 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
         if(!m_pause)
         {
             updateDelta = GetTime() - lastUpdateTime;
+
             if(updateDelta >= m_tickPeriod)
             {
                 double now = GetTime();
@@ -44,11 +45,13 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
             }
         }
 
+        // lastDrawTime += lag;
         double drawDelta = GetTime() - lastDrawTime;
+
         double uiDelta = GetTime() - lastGUITime;
 
         bool b_drawAll = drawDelta >= m_framePeriod;
-        bool b_updateUI = uiDelta >=  1.0 / 30.0;
+        bool b_updateUI = uiDelta >=  1.0 / 30.0; // Keep ui at a consistant frame rate
 
         // Draw frame OR update UI
         if(b_updateUI || b_drawAll)
@@ -108,7 +111,8 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
     
         // Différence de temps libre entre update et draw (drawDelta inclue le temps de l'affichage de l'UI)
         double waitTime = MIN(m_framePeriod - drawDelta, m_tickPeriod - updateDelta);
-        if(!m_noDelay && waitTime >= 0.0) // Il reste du temps pour mettre en pause  
+        // double waitTime = m_tickPeriod - updateDelta;
+        if(!m_noDelay && waitTime >= 0.0) // Il reste du temps pour mettre en pause 
         {
             // Désactiver le waitTime permet d'augmenter la priorité du processus 
             WaitTime(waitTime);
@@ -119,7 +123,7 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
     return 0;
 }
 
-void Engine::setFPS(int fps)
+void Engine::setFPS(float fps)
 {
     if(fps <= 0)
         fps = 1;
@@ -127,7 +131,7 @@ void Engine::setFPS(int fps)
     this->m_framePeriod = 1.0 / static_cast<double>(fps);
 }
 
-void Engine::setTPS(int tps)
+void Engine::setTPS(float tps)
 {
     // Si fps = 0, m_tickPeriod = infinite
     m_noDelay = false;
@@ -137,11 +141,11 @@ void Engine::setTPS(int tps)
         tps = 999999999;
     }else if(tps <= 0)
     {
-        m_pause = true;
-        tps = 0;
+        setPause(true);
+        tps = 1;
     }else
     {
-        m_pause = false;
+        setPause(false);
     }
     this->m_tickPeriod = 1.0 / static_cast<double>(tps);
 }

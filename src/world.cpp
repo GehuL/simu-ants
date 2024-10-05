@@ -53,6 +53,8 @@ void World::handleKeyboard()
     if (IsKeyDown(KEY_LEFT)) m_camera.offset.x += camera_speed;
 
     if(IsKeyPressed(KEY_ENTER)) init();
+
+    if(IsKeyPressed(KEY_P)) setPause(!isPaused());
 }
 
 void World::drawFrame()

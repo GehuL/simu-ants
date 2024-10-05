@@ -16,13 +16,14 @@ namespace simu
             
             int run(int screenWidth, int screenHeight, std::string title);
 
-            void setTPS(int tps);
-            void setFPS(int fps);
+            void setTPS(float tps);
+            void setFPS(float fps);
 
             const inline int getTPS(){return 1.0/m_tickPeriod;};
             const inline int getFPS(){return 1.0/m_framePeriod;};
 
             void setPause(bool pause);
+            bool const isPaused() { return m_pause; };
 
             virtual void drawFrame();
             virtual void drawUI();
