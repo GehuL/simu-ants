@@ -18,6 +18,8 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
     double lastProfilerTime = 0;
     double lastGUITime = 0;
 
+    double lag = 0.0;
+
     int tickCounter = 0;
     int frameCounter = 0;
 
@@ -30,18 +32,20 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
     // Main game loop
     while (!WindowShouldClose()) // Detect window close button or ESC key
     {
-        // Update logic
-        double updateDelta = 0.0;
+        double start = GetTime();
+
         if(!m_pause)
         {
-            updateDelta = GetTime() - lastUpdateTime;
-
-            if(updateDelta >= m_tickPeriod)
+            // Update logic
+            lag += start - lastUpdateTime;
+            while(lag >= m_tickPeriod)
             {
-                double now = GetTime();
-                lastUpdateTime = now;
                 updateTick();
+                lag -= m_tickPeriod;
                 tickCounter++;
+
+                if(m_noDelay)
+                    break;
             }
         }
 
@@ -60,18 +64,10 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
 
             if(b_drawAll)
             {
-                double updateDelta2 = GetTime() - lastUpdateTime;
-                if(updateDelta2 >= m_tickPeriod && !m_noDelay) // Pas le temps pour dessiner, priorité sur update
-                {
-                    frameCounter--;
-                    TRACELOG(LOG_INFO, "Frame skipped !");
-                }else
-                {
-                    double now = GetTime();
-                    lastDrawTime = now;
-                    drawAll();
-                    frameCounter++;
-                }
+                double now = GetTime();
+                lastDrawTime = now;
+                drawAll();
+                frameCounter++;
             }
 
             // Draw frame
@@ -96,11 +92,11 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
         }
 
         // Profiling update
-        double now = GetTime();
-        double profilerDelta = now - lastProfilerTime;
+        double now2 = GetTime();
+        double profilerDelta = now2 - lastProfilerTime;
         if(profilerDelta > 1.0)
         {
-            lastProfilerTime = now; // pas besoin d'être précis pour le profiling
+            lastProfilerTime = now2; // pas besoin d'être précis pour le profiling
             
             m_lastFrameCounter = frameCounter;
             frameCounter = 0;
@@ -109,15 +105,17 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
             tickCounter = 0;
         }
     
+        double delta = GetTime() - start;
         // Différence de temps libre entre update et draw (drawDelta inclue le temps de l'affichage de l'UI)
-        double waitTime = MIN(m_framePeriod - drawDelta, m_tickPeriod - updateDelta);
-        // double waitTime = m_tickPeriod - updateDelta;
+        double waitTime = MIN(m_framePeriod - delta, m_tickPeriod - delta);
         if(!m_noDelay && waitTime >= 0.0) // Il reste du temps pour mettre en pause 
         {
             // Désactiver le waitTime permet d'augmenter la priorité du processus 
             WaitTime(waitTime);
-            // TRACELOG(LOG_INFO, "waitTime: %lf ms", waitTime * 1000.0);
+            TRACELOG(LOG_INFO, "waitTime: %lf ms", waitTime * 1000.0);
         }
+        
+        lastUpdateTime = start;
     }
     CloseWindow();
     return 0;
