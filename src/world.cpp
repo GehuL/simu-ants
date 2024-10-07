@@ -9,11 +9,15 @@ World World::world;
 
 World::World() : m_entity_cnt(0), m_grid(100, 5)
 {
-
 }
 
 void World::init()
 {
+    Engine::init();
+
+    float offset = (GetScreenWidth() - m_grid.getGridWidth() * m_grid.getTileSize()) / 2.f;
+    m_camera.offset = (Vector2){offset, offset};
+
     m_entities.clear();
     m_grid.reset();
 
