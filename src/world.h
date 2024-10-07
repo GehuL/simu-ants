@@ -77,7 +77,7 @@ namespace simu
 
             Grid& getGrid() { return m_grid; };
             
-            void init();
+            void init() override;
 
         private:
             World();
