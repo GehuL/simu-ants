@@ -29,15 +29,17 @@ void World::handleMouse()
     }else if(IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) // REMOVE TILE
     {
         m_grid.setTile(AIR, pos.x, pos.y);
-    }else if(IsMouseButtonDown(MOUSE_BUTTON_MIDDLE))
-    {
-        m_cursorTileIndex++;
-        m_cursorTileIndex %= m_cursorTiles.size();
     }else
     {
         Vector2i grid_pos = m_grid.toTileCoord(pos.x, pos.y);
         const int tileSize = m_grid.getTileSize();
         DrawRectangle(grid_pos.x * tileSize , grid_pos.y * tileSize, tileSize, tileSize, (Color){50, 0, 253, 100});
+    }
+    
+    if(IsMouseButtonPressed(MOUSE_BUTTON_MIDDLE))
+    {
+        m_cursorTileIndex++;
+        m_cursorTileIndex %= m_cursorTiles.size();
     }
 
     m_camera.zoom += GetMouseWheelMove() * 0.1f;
