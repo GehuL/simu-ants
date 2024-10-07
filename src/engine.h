@@ -29,6 +29,8 @@ namespace simu
             virtual void drawUI();
             virtual void updateTick();
 
+            virtual void init() {};
+
         protected:
             Camera2D m_camera;
         private:

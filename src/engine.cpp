@@ -29,6 +29,8 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
     m_renderer = LoadRenderTexture(screenWidth, screenHeight);
     m_gui_renderer = LoadRenderTexture(screenWidth, screenHeight);
 
+    init();
+
     // Main game loop
     while (!WindowShouldClose()) // Detect window close button or ESC key
     {
