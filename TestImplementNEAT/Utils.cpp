@@ -29,3 +29,31 @@ void save(const Genome &genome, const std::string &filename) {
     file.close();
     std::cout << "Genome saved to " << filename << std::endl;
 }
+
+std::vector<double> get_game_state() {
+    std::vector<double> game_state;
+
+    // Exemple d'état du jeu, vous devez adapter cela à votre jeu spécifique
+    //game_state.push_back(player_position_x);
+    //game_state.push_back(player_position_y);
+    //game_state.push_back(enemy_distance);
+    //game_state.push_back(player_health);
+
+    return game_state;  // Retourne un vecteur représentant l'état du jeu
+}
+
+void perform_actions(const std::vector<double>& actions) {
+    // Exemple d'actions à partir des sorties du réseau de neurones
+    if (actions[0] > 0.5) {
+        
+    } else {
+         
+    }
+
+    if (actions[1] > 0.5) {
+         
+    } else {
+        
+    }
+}
+

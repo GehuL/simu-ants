@@ -7,4 +7,8 @@
 // Fonction pour sauvegarder un génome dans un fichier
 void save(const Genome &genome, const std::string &filename);
 
+std::vector<double> get_game_state();
+
+void perform_actions(const std::vector<double>& actions);
+
 #endif // UTILS_H

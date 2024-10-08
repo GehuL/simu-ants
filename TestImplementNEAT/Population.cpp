@@ -14,6 +14,11 @@ Population::Population(NeatConfig config, RNG &rng) : config{config}, rng{rng} {
     }
 }
 
+// Méthode pour obtenir les individus
+std::vector<neat::Individual>& Population::get_individuals() {
+    return individuals;
+}
+
 
 // Méthode pour générer le prochain ID de génome
 int Population::next_genome_id() {

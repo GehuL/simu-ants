@@ -74,6 +74,10 @@ std::vector<std::vector<int>> feed_forward_layer(
 }
 
 // Fonction utilitaire pour convertir un Activation en ActivationFn
+/**@brief Convertir un Activation en ActivationFn
+ * @param activation Activation à convertir
+ * @return ActivationFn correspondant à l'Activation
+ */
 ActivationFn convert_activation(const Activation& activation) {
     switch (activation.get_type()) {
         case Activation::Type::Sigmoid:
