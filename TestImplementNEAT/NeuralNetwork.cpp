@@ -3,6 +3,8 @@
 #include <iostream>
 
 std::vector<double> FeedForwardNeuralNetwork::activate(const std::vector<double>& inputs) {
+    std::cout << "Inputs size: " << inputs.size() << "\n";
+    std::cout << "m_input_ids size: " << m_input_ids.size() << "\n";
     assert(inputs.size() == m_input_ids.size());
     std::unordered_map<int, double> values;
 
