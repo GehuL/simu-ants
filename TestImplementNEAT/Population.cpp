@@ -32,14 +32,18 @@ Genome Population::new_genome() {
 
     // Ajouter les neurones d'entrée
     for (int neuron_id = 0; neuron_id < config.num_inputs; ++neuron_id) {
-        genome.add_neuron(new_neuron(neuron_id));
+        genome.add_neuron(new_neuron(neuron_id));  // IDs positifs pour les neurones d'entrée
+    }
+
+    // Ajouter les neurones de sortie
+    for (int neuron_id = 0; neuron_id < config.num_outputs; ++neuron_id) {
+        genome.add_neuron(new_neuron(config.num_inputs + neuron_id));  // IDs positifs pour les neurones de sortie
     }
 
     // Ajouter les liens entre les neurones d'entrée et de sortie
     for (int i = 0; i < config.num_inputs; i++) {
-        int input_id = -i - 1;
         for (int output_id = 0; output_id < config.num_outputs; ++output_id) {
-            genome.add_link(new_link(input_id, output_id));
+            genome.add_link(new_link(i, config.num_inputs + output_id));  // Ne pas utiliser d'IDs négatifs
         }
     }
 

@@ -7,6 +7,8 @@
 #include "NeatConfig.h"
 #include "neat.h"
 #include "NeuralNetwork.h"
+#include"Utils.h"
+#include <iostream>
 
 class Population {
 public:
@@ -67,6 +69,10 @@ neat::Individual Population::runV2(FitnessFn compute_fitness, int num_generation
         // Calcul de la fitness pour chaque individu
         for (auto &individual : individuals) {
             if (!individual.fitness_computed) {
+                // Sauvegarde du génome avant de créer le réseau neuronal
+                std::string filename = "genome_before_create_from_genome_generation_" + std::to_string(generation) + "_individual_" + std::to_string(&individual - &individuals[0]) + ".txt";
+                save(individual.genome, filename);  // Sauvegarde du génome avant création
+                
                 // Créer un réseau neuronal à partir du génome
                 FeedForwardNeuralNetwork nn = create_from_genome(individual.genome);
 

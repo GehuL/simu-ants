@@ -104,9 +104,11 @@ std::cout << "\nOutput IDs: ";
 for (int id : outputs) {
     std::cout << id << " ";
 }
-    
+  
     // Organiser les neurones en couches
     std::vector<std::vector<int>> layers = feed_forward_layer(inputs, outputs, genome.links);
+
+    
 
     std::vector<Neuron> neurons;
     for (const auto &layer : layers) {
