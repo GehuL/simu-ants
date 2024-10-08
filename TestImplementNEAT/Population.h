@@ -70,8 +70,13 @@ neat::Individual Population::runV2(FitnessFn compute_fitness, int num_generation
         for (auto &individual : individuals) {
             if (!individual.fitness_computed) {
                 // Sauvegarde du génome avant de créer le réseau neuronal
-                std::string filename = "genome_before_create_from_genome_generation_" + std::to_string(generation) + "_individual_" + std::to_string(&individual - &individuals[0]) + ".txt";
-                save(individual.genome, filename);  // Sauvegarde du génome avant création
+                std::string filename = "genome_saves/genome_before_create_from_genome_generation_" 
+                                       + std::to_string(generation) 
+                                       + "_individual_" 
+                                       + std::to_string(&individual - &individuals[0]) 
+                                       + ".txt";
+                
+                save(individual.genome, filename);  // Sauvegarde dans le dossier 'genomes_saves'
                 
                 // Créer un réseau neuronal à partir du génome
                 FeedForwardNeuralNetwork nn = create_from_genome(individual.genome);

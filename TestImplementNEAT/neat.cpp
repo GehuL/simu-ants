@@ -87,10 +87,11 @@ int choose_random_input_or_hidden_neuron(const std::vector<NeuronGene>& neurons)
     NeatConfig config;
 
     for (const auto& neuron : neurons) {
-        // Exclure les neurones de sortie (qui ont des IDs entre num_inputs et num_inputs + num_outputs)
+        // Neurones d'entrée : ID entre 0 et num_inputs - 1
+        // Neurones cachés : ID > num_inputs + num_outputs - 1
         if (neuron.neuron_id < config.num_inputs || 
-            (neuron.neuron_id >= config.num_inputs + config.num_outputs)) {
-            valid_neurons.push_back(neuron.neuron_id);  // Ajouter les neurones d'entrée et cachés
+            neuron.neuron_id >= config.num_inputs + config.num_outputs) {
+            valid_neurons.push_back(neuron.neuron_id);
         }
     }
 
@@ -105,10 +106,12 @@ int choose_random_input_or_hidden_neuron(const std::vector<NeuronGene>& neurons)
 
 int choose_random_output_or_hidden_neuron(const std::vector<NeuronGene>& neurons) {
     std::vector<int> valid_neurons;
+    NeatConfig config;
+
     for (const auto& neuron : neurons) {
-        NeatConfig config;
-        // Condition pour vérifier si le neurone est de sortie ou caché
-        if (neuron.neuron_id >= config.num_inputs && neuron.neuron_id < config.num_inputs + config.num_outputs) {
+        // Neurones de sortie : ID entre num_inputs et num_inputs + num_outputs - 1
+        if (neuron.neuron_id >= config.num_inputs && 
+            neuron.neuron_id < config.num_inputs + config.num_outputs) {
             valid_neurons.push_back(neuron.neuron_id);
         }
     }
@@ -123,12 +126,14 @@ int choose_random_output_or_hidden_neuron(const std::vector<NeuronGene>& neurons
 std::vector<NeuronGene>::const_iterator choose_random_hidden(std::vector<NeuronGene>& neurons) {
     std::vector<std::vector<NeuronGene>::const_iterator> hidden_neurons;
     NeatConfig config;
-    // Supposons que vous avez une façon de déterminer si un neurone est caché.
+    
+    // Supposons que vous avez une façon de déterminer si un neurone est caché (ID > num_inputs + num_outputs - 1)
     for (auto it = neurons.begin(); it != neurons.end(); ++it) {
         if (it->neuron_id >= config.num_inputs + config.num_outputs) {
             hidden_neurons.push_back(it);
         }
     }
+
 
     if (hidden_neurons.empty()) {
         throw std::out_of_range("No hidden neurons available.");
