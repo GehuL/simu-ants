@@ -24,7 +24,7 @@ void World::init()
     m_entities.clear();
     m_grid.reset();
 
-    spawnEntities<Ant>(10, nullptr);
+    spawnEntities<Ant>(10);
 }
 
 void World::save(std::ofstream &file)
@@ -42,12 +42,16 @@ void World::save(std::ofstream &file)
 void World::load(std::ifstream &file)
 {
     TRACELOG(LOG_INFO, "Loading simulation..");
+
+    m_entities.clear();
+
     json j = json::parse(file);
+    size_t entity_cnt = j.size();
     
-    for(auto& e : j)
+    for(auto it = spawnEntities<Ant>(entity_cnt); it != m_entities.end(); it++)
     {
-        auto& a = *spawnEntity<Ant>().lock();
-        from_json(e, a);
+        auto& a = *it->get();
+        from_json(j, a);
     }
     // auto en = spawnEntity<Ant>().lock().get();
     // from_json(j, *en);

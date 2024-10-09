@@ -22,19 +22,19 @@ namespace simu
             static World world;
 
             template<class T>
-            void  spawnEntities(size_t count, std::vector<std::weak_ptr<T>>* newly_en)
+            std::vector<std::shared_ptr<simu::Entity>>::iterator spawnEntities(size_t count)
             {
                 const size_t en_cnt = m_entities.size();
                 m_entities.resize(en_cnt + count);
+
+                auto from = m_entities.end();
 
                 for(size_t i = 0; i < count; i++)
                 {
                     std::shared_ptr<T> en = std::make_shared<T>(m_entity_cnt++);
                     m_entities[en_cnt + i] = en;
-        
-                    if(newly_en != nullptr)
-                        newly_en->push_back(en);
                 }
+                return from;
             }
 
             template<class T>
