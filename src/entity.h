@@ -5,9 +5,13 @@
 #include <ostream>
 #include <iostream>
 
+#include "json.hpp"
+
 #include "raylib.h"
 #include "tiles.h"
 #include "others.h"
+
+using json = nlohmann::json;
 
 namespace simu
 {
@@ -39,14 +43,20 @@ namespace simu
             std::string const getType() { return m_type; };
             std::string const toString();
 
+            friend void to_json(json& j, const Entity& p);
+            friend void from_json(const json& j, Entity& p);
+
         private:
             const long m_id;
-            const std::string m_type;
-
+            std::string m_type;
         protected:
-            Vector2 m_pos, m_velocity;
+            Vector2 m_pos;
+            Vector2 m_velocity;
             float m_angle;
     };
+
+    void to_json(json& j, const Entity& p);
+    void from_json(const json& j, Entity& p);
 
     /*class Carriable
     {
@@ -63,7 +73,6 @@ namespace simu
             std::weak_ptr<Entity> m_carrier;
             bool is_carried;
     };*/
-
 
     std::ostream &operator<<(std::ostream& os, Entity& entity);
 }

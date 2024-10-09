@@ -54,3 +54,23 @@ std::ostream& simu::operator<<(std::ostream& os, Entity& entity)
     os << str;
     return os;
 }
+
+void simu::to_json(json& j, const simu::Entity& p) 
+{
+    j["type"] = p.m_type;
+    j["posX"] = p.m_pos.x;
+    j["posY"] = p.m_pos.y;
+    j["velX"] = p.m_velocity.y;
+    j["velY"] = p.m_velocity.y;
+    j["angle"] = p.m_angle;
+}
+
+void simu::from_json(const json& j, simu::Entity& p)
+{
+    j.at("type").get_to(p.m_type);
+    j.at("posX").get_to(p.m_pos.x);
+    j.at("posY").get_to( p.m_pos.y);
+    j.at("velX").get_to( p.m_velocity.y);
+    j.at("velY") .get_to( p.m_velocity.y);
+    j.at("angle").get_to( p.m_angle);
+}

@@ -30,6 +30,9 @@ namespace simu
             void take();     // Porte un objet sur elle (nourriture/mur)
             void put();       // Déposer l'objet qu'elle porte
 
+            friend void to_json(json& j, const Ant& p);
+            friend void from_json(const json& j, Ant& p);
+
         private:
 
             void move(); // Se déplace en fonction de son angle
@@ -40,6 +43,9 @@ namespace simu
             float m_target_angle;
             int m_rotateCd;
     };
+
+    void to_json(json& j, const Ant& p) ;
+    void from_json(const json& j, Ant& p);
 }
 
 #endif

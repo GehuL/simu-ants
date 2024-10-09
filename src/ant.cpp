@@ -143,3 +143,13 @@ void Ant::move()
     m_velocity = Vector2Rotate(m_velocity, m_angle);
     m_pos = Vector2Add(m_pos, m_velocity);
 }
+
+void simu::to_json(json &j, const Ant &p)
+{
+    to_json(j, static_cast<const Entity&>(p));
+}
+
+void simu::from_json(const json &j, Ant &p)
+{
+    from_json(j, static_cast<Entity&>(p));
+}

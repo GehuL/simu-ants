@@ -1,9 +1,12 @@
 #include "world.h"
 #include <exception>
 
+#include "utils.h"
 #include "ant.h"
+#include "json.hpp"
 
 using namespace simu;
+using json = nlohmann::json;
 
 World World::world;
 
@@ -22,6 +25,33 @@ void World::init()
     m_grid.reset();
 
     spawnEntities<Ant>(10, nullptr);
+}
+
+void World::save(std::ofstream &file)
+{
+    TRACELOG(LOG_INFO, "Saving simulation..");
+    json j;
+    for(auto& en : m_entities)
+    {
+        j += *en.get();
+    }
+    file << j;
+    TRACELOG(LOG_INFO, "Saved !");
+}
+
+void World::load(std::ifstream &file)
+{
+    TRACELOG(LOG_INFO, "Loading simulation..");
+    json j = json::parse(file);
+    
+    for(auto& e : j)
+    {
+        auto& a = *spawnEntity<Ant>().lock();
+        from_json(e, a);
+    }
+    // auto en = spawnEntity<Ant>().lock().get();
+    // from_json(j, *en);
+    TRACELOG(LOG_INFO, "Loaded !");
 }
 
 void World::handleMouse()
@@ -61,6 +91,20 @@ void World::handleKeyboard()
     if(IsKeyPressed(KEY_ENTER)) init();
 
     if(IsKeyPressed(KEY_P)) setPause(!isPaused());
+
+    if(IsKeyPressed(KEY_S))
+    {
+        auto file = std::ofstream("simu-save.json", std::ios_base::out);
+        save(file);
+        file.close();
+    }
+
+    if(IsKeyPressed(KEY_R))
+    {
+        auto file = std::ifstream("simu-save.json", std::ios_base::in);
+        load(file);
+        file.close();
+    }
 }
 
 void World::drawFrame()
@@ -77,6 +121,8 @@ void World::drawUI()
 {
     handleKeyboard();
     handleMouse();
+
+    DrawText(TextFormat("Entity: %d", m_entities.size()), 0, 100, 20, BLUE);
 }
 
 void World::updateTick()

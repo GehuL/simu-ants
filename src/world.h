@@ -11,6 +11,7 @@
 #include <optional>
 #include <algorithm>
 #include <array>
+#include <fstream>
 
 namespace simu
 {
@@ -78,6 +79,9 @@ namespace simu
             Grid& getGrid() { return m_grid; };
             
             void init() override;
+
+            void save(std::ofstream& file);
+            void load(std::ifstream& file);
 
         private:
             World();
