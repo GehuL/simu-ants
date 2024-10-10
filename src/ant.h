@@ -21,9 +21,11 @@ namespace simu
             void update() override;
             void draw() override;
 
-            Tile const getCarriedObject() { return m_carried_object; };
+            Tile getCarriedObject() const { return m_carried_object; };
 
-            float const getLife() { return m_life; };
+            float getLife() const { return m_life; };
+
+            const std::string getType() const override { return "ant"; };
 
             // ------ ACTIONS IA -------
             void eat();       // Mange sur sa position (si il y a quelque chose)

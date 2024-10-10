@@ -13,7 +13,7 @@ m_target_angle(ant.m_target_angle), m_rotateCd(ant.m_rotateCd)
 {
 }
 
-Ant::Ant(const long id) : Entity(id, "ant"), m_life(100.f), m_carried_object(AIR)
+Ant::Ant(const long id) : Entity(id), m_life(100.f), m_carried_object(AIR)
 {
     m_velocity = (Vector2){1.f, 1.f};
 }
@@ -153,11 +153,19 @@ void Ant::move()
 void simu::to_json(json &j, const Ant &p)
 {
     to_json(j, static_cast<const Entity&>(p));
+    j["life"] = p.m_life;
+    j["carried_object"] = p.m_carried_object.type;
+    j["target_angle"] = p.m_target_angle;
+    j["rotateCd"] = p.m_rotateCd;
 }
 
 void simu::from_json(const json &j, Ant &p)
 {
     from_json(j, static_cast<Entity&>(p));
+    j.at("life").get_to(p.m_life);
+    j.at("carried_object").get_to(p.m_carried_object.type);
+    j.at("target_angle").get_to(p.m_target_angle);
+    j.at("rotateCd").get_to(p.m_rotateCd);
 }
 
 Ant& Ant::operator=(const Ant& ant)

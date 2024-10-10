@@ -23,7 +23,7 @@ namespace simu
             const inline int getFPS(){return 1.0/m_framePeriod;};
 
             void setPause(bool pause);
-            bool const isPaused() { return m_pause; };
+            bool isPaused() const { return m_pause; };
 
             virtual void drawFrame();
             virtual void drawUI();

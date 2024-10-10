@@ -33,11 +33,14 @@ void World::save(std::ofstream &file)
  
     // TODO: Traiter les exceptions
     // TODO: Sauvegarder n'importe quel type enfant de Entity
+    // TODO: Sauvegarder la seed de la génération de nombre aléatoire
+    // TODO: Sauvegarder la grille
 
     json j;
     for(auto& en : m_entities)
     {
-        j += *en.get();
+        Entity& a = *en.get();
+        j += dynamic_cast<Ant&>(a);
     }
     file << j;
     TRACELOG(LOG_INFO, "Saved !");
@@ -48,6 +51,8 @@ void World::load(const std::string& filename)
     TRACELOG(LOG_INFO, "Loading simulation..");
     
     // TODO: Charger n'importe quel type enfant de Entity
+    // TODO: Charger la seed de la génération de nombre aléatoire
+    // TODO: Charger la grille
     try
     {
         auto file = std::ifstream(filename, std::ios_base::in);

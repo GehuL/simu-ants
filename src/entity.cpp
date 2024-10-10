@@ -5,13 +5,12 @@
 
 using namespace simu;
 
-Entity::Entity(const long id, const Entity& en) : m_id(id), 
-m_type(en.m_type), m_pos(en.m_pos), 
+Entity::Entity(const long id, const Entity& en) : m_id(id), m_pos(en.m_pos), 
 m_velocity(en.m_velocity), m_angle(en.m_angle)
 {
 }
 
-Entity::Entity(const long id, const std::string type) : m_id(id), m_type(type),  m_angle(0) 
+Entity::Entity(const long id) : m_id(id), m_angle(0) 
 {
     m_pos = (Vector2) {0.f, 0.f};
     m_velocity = (Vector2) {0.f, 0.f};
@@ -22,18 +21,18 @@ Entity::~Entity()
     std::cout << "Destroyed " << *this << std::endl;
 }
 
-Tile const Entity::getTileOn()
+Tile Entity::getTileOn() const
 {
     return getWorld().getGrid().getTile(m_pos.x, m_pos.y);
 }
 
-Tile const Entity::getTileFacing()
+Tile Entity::getTileFacing() const
 {
     Vector2i facingTilePos = getTileFacingPos();
     return getWorld().getGrid().getTile(facingTilePos.x, facingTilePos.y);;
 }
 
-Vector2i const simu::Entity::getTileFacingPos()
+Vector2i simu::Entity::getTileFacingPos() const
 {
     Grid& grid = getWorld().getGrid();
     // Translate ant position to facing tile position
@@ -44,14 +43,14 @@ Vector2i const simu::Entity::getTileFacingPos()
     return (Vector2i){tilePos.x + static_cast<int>(round(vel.x)), tilePos.y + static_cast<int>(round(vel.y))};;
 }
 
-Vector2i const simu::Entity::getTilePosOn()
+Vector2i simu::Entity::getTilePosOn() const
 {
     return getWorld().getGrid().toTileCoord(m_pos.x, m_pos.y);
 }
 
-std::string const Entity::toString()
+std::string Entity::toString() const
 {
-    return "{type:" + m_type + ",id:" + std::to_string(m_id) + "}";
+    return "{type:" + getType() + ",id:" + std::to_string(m_id) + "}";
 }
 
 std::ostream& simu::operator<<(std::ostream& os, Entity& entity)
@@ -63,7 +62,8 @@ std::ostream& simu::operator<<(std::ostream& os, Entity& entity)
 
 void simu::to_json(json& j, const simu::Entity& p) 
 {
-    j["type"] = p.m_type;
+    // j["type"] = typeid(p).name(); // A PROSCRIRE ! DEPEND DE L'ENVIRONNEMENT !
+    j["type"] = p.getType(); 
     j["posX"] = p.m_pos.x;
     j["posY"] = p.m_pos.y;
     j["velX"] = p.m_velocity.y;
@@ -73,7 +73,6 @@ void simu::to_json(json& j, const simu::Entity& p)
 
 void simu::from_json(const json& j, simu::Entity& p)
 {
-    j.at("type").get_to(p.m_type);
     j.at("posX").get_to(p.m_pos.x);
     j.at("posY").get_to( p.m_pos.y);
     j.at("velX").get_to( p.m_velocity.y);
@@ -83,7 +82,6 @@ void simu::from_json(const json& j, simu::Entity& p)
 
 Entity& Entity::operator=(const Entity& en)
 {
-    m_type = en.m_type; 
     m_pos = en.m_pos;
     m_velocity = en.m_velocity;
     m_angle = en.m_angle;

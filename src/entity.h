@@ -21,28 +21,29 @@ namespace simu
             friend class World;
 
             Entity(const long id, const Entity& entity);
-            Entity(const long id, const std::string type = "entity");
+            Entity(const long id);
 
             virtual ~Entity();
 
             virtual void update() = 0;
             virtual void draw() = 0;
 
-            Tile const getTileOn();
-            Tile const getTileFacing();
+            virtual const std::string getType() const = 0;
 
-            Vector2i const getTileFacingPos();
-            Vector2i const getTilePosOn();
+            Tile getTileOn() const;
+            Tile getTileFacing() const;
 
-            long const getId() { return m_id; };
+            Vector2i getTileFacingPos() const;
+            Vector2i getTilePosOn() const;
 
-            Vector2 const getPos() { return m_pos; };
-            Vector2 const getVel() { return m_velocity; };
+            const long getId() const { return m_id; };
 
-            float const getAngle() { return m_angle; };
+            Vector2 getPos() const{ return m_pos; };
+            Vector2 getVel() const { return m_velocity; };
 
-            std::string const getType() { return m_type; };
-            std::string const toString();
+            const float getAngle() const { return m_angle; };
+
+            std::string toString() const;
 
             friend void to_json(json& j, const Entity& p);
             friend void from_json(const json& j, Entity& p);
@@ -51,7 +52,6 @@ namespace simu
 
         private:
             const long m_id;
-            std::string m_type;
         protected:
             Vector2 m_pos;
             Vector2 m_velocity;
