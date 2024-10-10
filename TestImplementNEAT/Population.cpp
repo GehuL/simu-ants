@@ -115,6 +115,7 @@ std::vector<neat::Individual> Population::reproduce() {
     int reproduction_cutoff = std::ceil(config.survival_threshold * old_members.size());
     std::vector<neat::Individual> new_generation;
     int spawn_size = config.population_size;
+    
 
     while (spawn_size-- > 0) {  // Utilisation de `-- > 0` pour éviter d'ajouter une génération supplémentaire
         RNG rng;
@@ -123,6 +124,7 @@ std::vector<neat::Individual> Population::reproduce() {
         neat::Individual& p2 = rng.choose_random(old_members, reproduction_cutoff);
         neat::Neat neat_instance;
         Genome offspring = neat_instance.crossover(p1.genome, p2.genome);  // Vous devez définir `crossover`
+        std::cout<<"ok"<<std::endl;
         mutate(offspring);  // Vous devez définir `mutate`
         new_generation.push_back(neat::Individual(offspring));
     }
@@ -156,6 +158,7 @@ void Population::update_best() {
     if (best_it != individuals.end()) {
         best_individual = *best_it;
     }
+    
 }
 
 

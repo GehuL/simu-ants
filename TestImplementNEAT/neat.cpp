@@ -9,6 +9,7 @@
 #include <unordered_set>
 #include <functional>
 #include "NeuronMutator.h"
+#include <iostream>
 
 namespace neat {
 
@@ -61,6 +62,7 @@ Genome Neat::crossover(const Individual &dominant, const Individual &recessive) 
             offspring.add_link(crossover_link(dominant_link, *recessive_link));
         }
     }
+    std::cout<<"okcrossover"<<std::endl;
 
     return offspring; // N'oublie pas de retourner le génome fils !
 }
