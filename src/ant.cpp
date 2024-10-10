@@ -15,7 +15,6 @@ m_target_angle(ant.m_target_angle), m_rotateCd(ant.m_rotateCd)
 
 Ant::Ant(const long id) : Entity(id), m_life(100.f), m_carried_object(AIR)
 {
-    m_velocity = (Vector2){1.f, 1.f};
 }
 
 void Ant::update()

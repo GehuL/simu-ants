@@ -75,10 +75,11 @@ void World::load(const std::string& filename)
         file.close();
 
         TRACELOG(LOG_INFO, "Loaded !");
-    }catch(const json::parse_error& e)
+    }catch(const json::exception& e)
     {
         TRACELOG(LOG_ERROR, "Erreur de chargement du fichier %s: %s", filename, e.what());
-    }catch(const std::ifstream::failure& e)
+    }
+    catch(const std::ifstream::failure& e)
     {
         TRACELOG(LOG_ERROR, "Erreur de chargement du fichier %s: %s", filename, e.what());
     }

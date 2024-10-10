@@ -25,7 +25,7 @@ namespace simu
 
             float getLife() const { return m_life; };
 
-            const std::string getType() const override { return "ant"; };
+            std::string getType() const override { return "ant"; };
 
             // ------ ACTIONS IA -------
             void eat();       // Mange sur sa position (si il y a quelque chose)
