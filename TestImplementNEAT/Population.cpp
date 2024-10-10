@@ -26,29 +26,55 @@ int Population::next_genome_id() {
     return id++;
 }
 
-// Méthode pour générer un nouveau génome
+// Méthode pour générer un nouveau génome avec des neurones cachés
 Genome Population::new_genome() {
     Genome genome{next_genome_id(), config.num_inputs, config.num_outputs};
 
     // Ajouter les neurones d'entrée
     for (int neuron_id = 0; neuron_id < config.num_inputs; ++neuron_id) {
-        genome.add_neuron(new_neuron(neuron_id));  // IDs positifs pour les neurones d'entrée
+        genome.add_neuron(new_neuron(neuron_id));
     }
 
     // Ajouter les neurones de sortie
-    for (int neuron_id = 0; neuron_id < config.num_outputs; ++neuron_id) {
-        genome.add_neuron(new_neuron(config.num_inputs + neuron_id));  // IDs positifs pour les neurones de sortie
+    for (int output_id = 0; output_id < config.num_outputs; ++output_id) {
+        genome.add_neuron(new_neuron(config.num_inputs + output_id));
     }
 
-    // Ajouter les liens entre les neurones d'entrée et de sortie
-    for (int i = 0; i < config.num_inputs; i++) {
+    // Ajouter des neurones cachés aléatoirement (entre 1 et 3)
+    RNG rng;
+    int num_hidden_neurons = rng.next_int(1, 4);  // Génère entre 1 et 3 neurones cachés
+    for (int i = 0; i < num_hidden_neurons; ++i) {
+        int hidden_id = config.num_inputs + config.num_outputs + i;
+        genome.add_neuron(new_neuron(hidden_id));
+
+        // Ajouter des liens entre neurones d'entrée et cachés
+        for (int input_id = 0; input_id < config.num_inputs; ++input_id) {
+            genome.add_link(new_link(input_id, hidden_id));
+        }
+
+        // Ajouter des liens entre neurones cachés et de sortie
         for (int output_id = 0; output_id < config.num_outputs; ++output_id) {
-            genome.add_link(new_link(i, config.num_inputs + output_id));  // Ne pas utiliser d'IDs négatifs
+            genome.add_link(new_link(hidden_id, config.num_inputs + output_id));
+        }
+
+        // (Facultatif) Ajouter des liens entre neurones cachés (création d'une couche intermédiaire plus complexe)
+        for (int j = 0; j < i; ++j) {
+            int other_hidden_id = config.num_inputs + config.num_outputs + j;
+            genome.add_link(new_link(hidden_id, other_hidden_id));
+             // Ajoute les liens bidirectionnels si souhaité
+        }
+    }
+
+    // Ajouter des liens entre les neurones d'entrée et de sortie
+    for (int i = 0; i < config.num_inputs; ++i) {
+        for (int output_id = 0; output_id < config.num_outputs; ++output_id) {
+            genome.add_link(new_link(i, config.num_inputs + output_id));
         }
     }
 
     return genome;
 }
+
 
 // Méthode pour créer un nouveau neurone
 neat::NeuronGene Population::new_neuron(int neuron_id) {

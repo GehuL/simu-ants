@@ -10,6 +10,12 @@ class RNG {
 public:
     RNG() : gen(rd()) {}  // Initialisation du générateur
 
+    // Génère un entier aléatoire entre min et max (inclus)
+    int next_int(int min, int max) {
+        std::uniform_int_distribution<int> dist(min, max);
+        return dist(gen);
+    }
+
     // Méthode pour choisir entre deux valeurs avec une probabilité
     template <typename T>
     T choose(double probability, const T& a, const T& b) {
