@@ -1,17 +1,20 @@
 #ifndef __WORLD_H__
 #define __WORLD_H__
 
-
-#include "engine.h"
-#include "entity.h"
-#include "tiles.h"
-
+#include <type_traits>
 #include <vector>
 #include <memory>
 #include <optional>
 #include <algorithm>
 #include <array>
 #include <fstream>
+
+#include "engine.h"
+#include "entity.h"
+#include "tiles.h"
+
+#define TEMPLATE_CONDITION(T) std::enable_if_t<std::is_base_of<Entity, T>::value && !std::is_same<Entity, T>::value>
+#define CHECK_TEMPLATE_ST(T) static_assert(std::is_base_of<Entity, T>::value && !std::is_same<Entity, T>::value, "T doit etre une class fille de Entity");
 
 namespace simu
 {
@@ -21,9 +24,19 @@ namespace simu
     
             static World world;
 
-            template<class T>
+            /**
+             * @brief Ajoute des entités dans la simulation
+             * @param count Quantité d'entitée à ajouter
+             * @return La position du premier élément ajouté. Renvoie end() si il y a une erreur (count <= 0)
+             */
+            template<class T, class = TEMPLATE_CONDITION(T)>
             std::vector<std::shared_ptr<simu::Entity>>::iterator spawnEntities(size_t count)
             {
+                CHECK_TEMPLATE_ST(T)
+
+                if(count <= 0)
+                    return m_entities.end();
+
                 const size_t en_cnt = m_entities.size();
 
                 // Redimensionne le vecteur pour ajouter "count" nouveaux éléments
@@ -40,11 +53,10 @@ namespace simu
                 return m_entities.begin() + en_cnt;
             }
 
-            template<class T>
+            template<class T, class = TEMPLATE_CONDITION(T)>
             std::weak_ptr<T> spawnEntity()
             {
-                 if(typeid(T) == typeid(Entity))
-                    throw std::invalid_argument("T does not inherit Entity");
+                CHECK_TEMPLATE_ST(T)
 
                 std::shared_ptr<T> en = std::make_shared<T>(m_entity_cnt);
 
@@ -54,9 +66,11 @@ namespace simu
                 return en;
             };
 
-            template<class T>
+            template<class T, class = TEMPLATE_CONDITION(T)>
             std::weak_ptr<T> getEntity(long id)
             {
+                CHECK_TEMPLATE_ST(T)
+
                 auto it = std::find_if(m_entities.begin(), m_entities.end(), [id](std::shared_ptr<Entity> en)
                 {
                     return en.get()->getId() == id;
