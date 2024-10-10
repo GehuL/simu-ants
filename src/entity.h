@@ -21,14 +21,14 @@ namespace simu
             friend class World;
 
             Entity(const long id, const Entity& entity);
-            Entity(const long id);
+            Entity(const long id = -1);
 
             virtual ~Entity();
 
             virtual void update() = 0;
             virtual void draw() = 0;
 
-            virtual const std::string getType() const = 0;
+            virtual std::string getType() const { return "entity"; };
 
             Tile getTileOn() const;
             Tile getTileFacing() const;

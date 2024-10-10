@@ -50,13 +50,12 @@ Vector2i simu::Entity::getTilePosOn() const
 
 std::string Entity::toString() const
 {
-    return "{type:" + getType() + ",id:" + std::to_string(m_id) + "}";
+    return "{type:" + getType() + ", id:" + std::to_string(m_id) + "}";
 }
 
 std::ostream& simu::operator<<(std::ostream& os, Entity& entity)
 {
-    std::string str = entity.toString();
-    os << str;
+    os << entity.toString();
     return os;
 }
 
