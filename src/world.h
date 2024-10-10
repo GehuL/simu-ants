@@ -25,16 +25,19 @@ namespace simu
             std::vector<std::shared_ptr<simu::Entity>>::iterator spawnEntities(size_t count)
             {
                 const size_t en_cnt = m_entities.size();
-                m_entities.resize(en_cnt + count);
 
-                auto from = m_entities.end();
+                // Redimensionne le vecteur pour ajouter "count" nouveaux éléments
+                m_entities.resize(en_cnt + count); 
 
-                for(size_t i = 0; i < count; i++)
+                // Itère à partir de l'ancienne fin, jusqu'à la nouvelle fin
+                for (size_t i = en_cnt; i < m_entities.size(); ++i)
                 {
-                    std::shared_ptr<T> en = std::make_shared<T>(m_entity_cnt++);
-                    m_entities[en_cnt + i] = en;
+                    m_entities[i] = std::make_shared<T>(m_entity_cnt);
+                    m_entity_cnt++;
                 }
-                return from;
+
+                // Retourne l'itérateur correspondant à l'ancienne fin (avant ajout des nouveaux éléments)
+                return m_entities.begin() + en_cnt;
             }
 
             template<class T>
