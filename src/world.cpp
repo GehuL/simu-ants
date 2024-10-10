@@ -30,6 +30,10 @@ void World::init()
 void World::save(std::ofstream &file)
 {
     TRACELOG(LOG_INFO, "Saving simulation..");
+ 
+    // TODO: Traiter les exceptions
+    // TODO: Sauvegarder n'importe quel type enfant de Entity
+
     json j;
     for(auto& en : m_entities)
     {
@@ -39,23 +43,40 @@ void World::save(std::ofstream &file)
     TRACELOG(LOG_INFO, "Saved !");
 }
 
-void World::load(std::ifstream &file)
+void World::load(const std::string& filename)
 {
     TRACELOG(LOG_INFO, "Loading simulation..");
-
-    m_entities.clear();
-
-    json j = json::parse(file);
-    size_t entity_cnt = j.size();
     
-    for(auto it = spawnEntities<Ant>(entity_cnt); it != m_entities.end(); it++)
+    // TODO: Charger n'importe quel type enfant de Entity
+    try
     {
-        auto& a = *it->get();
-        from_json(j, a);
+        auto file = std::ifstream(filename, std::ios_base::in);
+        
+        json j = json::parse(file);
+        
+        // Charge toutes les entités
+        std::vector<Ant> ants = j;
+
+        m_entities.clear();
+        auto it = spawnEntities<Ant>(ants.size());
+
+        // Si pas d'erreur de chargement, on peut copier 
+        for(size_t i = 0; i < ants.size(); i++)
+        {
+            std::shared_ptr<Ant> en = std::dynamic_pointer_cast<Ant>(*(it + i));
+            *en.get() = ants[i];
+        }
+
+        file.close();
+
+        TRACELOG(LOG_INFO, "Loaded !");
+    }catch(const json::parse_error& e)
+    {
+        TRACELOG(LOG_ERROR, "Erreur de chargement du fichier %s: %s", filename, e.what());
+    }catch(const std::ifstream::failure& e)
+    {
+        TRACELOG(LOG_ERROR, "Erreur de chargement du fichier %s: %s", filename, e.what());
     }
-    // auto en = spawnEntity<Ant>().lock().get();
-    // from_json(j, *en);
-    TRACELOG(LOG_INFO, "Loaded !");
 }
 
 void World::handleMouse()
@@ -104,11 +125,7 @@ void World::handleKeyboard()
     }
 
     if(IsKeyPressed(KEY_R))
-    {
-        auto file = std::ifstream("simu-save.json", std::ios_base::in);
-        load(file);
-        file.close();
-    }
+        load("simu-save.json");
 }
 
 void World::drawFrame()

@@ -12,7 +12,10 @@ namespace simu
     class Ant : public Entity
     {
         public:
-            Ant(const long id);
+
+            Ant(const long id, const Ant& ant);
+            Ant(const long id = -1);
+
             virtual ~Ant(){};
 
             void update() override;
@@ -32,6 +35,8 @@ namespace simu
 
             friend void to_json(json& j, const Ant& p);
             friend void from_json(const json& j, Ant& p);
+
+            Ant& operator=(const Ant& en);
 
         private:
 

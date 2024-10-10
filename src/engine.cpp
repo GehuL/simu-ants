@@ -114,7 +114,7 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
         {
             // Désactiver le waitTime permet d'augmenter la priorité du processus 
             WaitTime(waitTime);
-            TRACELOG(LOG_INFO, "waitTime: %lf ms", waitTime * 1000.0);
+            // TRACELOG(LOG_INFO, "waitTime: %lf ms", waitTime * 1000.0);
         }
         
         lastUpdateTime = start;

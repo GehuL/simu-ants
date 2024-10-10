@@ -7,6 +7,12 @@
 
 using namespace simu;
 
+Ant::Ant(const long id, const Ant& ant) : Entity(id, ant), m_life(ant.m_life), 
+m_carried_object(ant.m_carried_object), 
+m_target_angle(ant.m_target_angle), m_rotateCd(ant.m_rotateCd)
+{
+}
+
 Ant::Ant(const long id) : Entity(id, "ant"), m_life(100.f), m_carried_object(AIR)
 {
     m_velocity = (Vector2){1.f, 1.f};
@@ -153,3 +159,14 @@ void simu::from_json(const json &j, Ant &p)
 {
     from_json(j, static_cast<Entity&>(p));
 }
+
+Ant& Ant::operator=(const Ant& ant)
+{
+    Entity::operator=(ant);
+    m_life = ant.m_life; 
+    m_carried_object = ant.m_carried_object;
+    m_target_angle = ant.m_target_angle;
+    m_rotateCd = ant.m_rotateCd;
+    return *this;
+}
+

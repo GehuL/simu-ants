@@ -98,7 +98,7 @@ namespace simu
             void init() override;
 
             void save(std::ofstream& file);
-            void load(std::ifstream& file);
+            void load(const std::string& file);
 
         private:
             World();

@@ -5,6 +5,12 @@
 
 using namespace simu;
 
+Entity::Entity(const long id, const Entity& en) : m_id(id), 
+m_type(en.m_type), m_pos(en.m_pos), 
+m_velocity(en.m_velocity), m_angle(en.m_angle)
+{
+}
+
 Entity::Entity(const long id, const std::string type) : m_id(id), m_type(type),  m_angle(0) 
 {
     m_pos = (Vector2) {0.f, 0.f};
@@ -73,4 +79,13 @@ void simu::from_json(const json& j, simu::Entity& p)
     j.at("velX").get_to( p.m_velocity.y);
     j.at("velY") .get_to( p.m_velocity.y);
     j.at("angle").get_to( p.m_angle);
+}
+
+Entity& Entity::operator=(const Entity& en)
+{
+    m_type = en.m_type; 
+    m_pos = en.m_pos;
+    m_velocity = en.m_velocity;
+    m_angle = en.m_angle;
+    return *this;
 }

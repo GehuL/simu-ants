@@ -20,6 +20,7 @@ namespace simu
         public:
             friend class World;
 
+            Entity(const long id, const Entity& entity);
             Entity(const long id, const std::string type = "entity");
 
             virtual ~Entity();
@@ -45,6 +46,8 @@ namespace simu
 
             friend void to_json(json& j, const Entity& p);
             friend void from_json(const json& j, Entity& p);
+
+            Entity& operator=(const Entity& en);
 
         private:
             const long m_id;
