@@ -24,7 +24,7 @@ std::vector<double> FeedForwardNeuralNetwork::activate(const std::vector<double>
     for (const auto& neuron : m_neurons) {
         double value = 0.0;
 
-        std::cout << "Neuron " << neuron.neuron_id << " processing inputs..." << std::endl;
+        
 
         for (const NeuronInput& input : neuron.inputs) {
             std::cout << "Neuron " << neuron.neuron_id << " has input from neuron " << input.input_id << "\n";

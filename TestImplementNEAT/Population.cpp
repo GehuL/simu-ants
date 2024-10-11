@@ -155,7 +155,6 @@ std::vector<neat::Individual> Population::reproduce() {
         neat::Individual& p2 = rng.choose_random(old_members, reproduction_cutoff);
         neat::Neat neat_instance;
         Genome offspring = neat_instance.crossover(p1.genome, p2.genome);  // Vous devez définir `crossover`
-        std::cout<<"ok"<<std::endl;
         mutate(offspring);  // Vous devez définir `mutate`
         new_generation.push_back(neat::Individual(offspring));
     }
