@@ -63,39 +63,52 @@ std::vector<std::vector<int>> feed_forward_layer(
     const std::vector<neat::LinkGene>& links) {
     
     std::unordered_set<int> known_neurons(inputs.begin(), inputs.end());
+    std::unordered_set<int> output_neurons(outputs.begin(), outputs.end()); // Neurones de sortie
     std::vector<std::vector<int>> layers;
 
-    // Première couche (neurones d'entrée)
+    // Ajouter la première couche (neurones d'entrée)
     layers.push_back(inputs);
     known_neurons.insert(inputs.begin(), inputs.end());
-
-    std::cout << "Added input layer" << std::endl;
 
     bool added_new_layer = true;
     while (added_new_layer) {
         added_new_layer = false;
         std::vector<int> new_layer;
 
-        // Chercher des neurones cachés à ajouter à la couche
+        // Parcourir les liens pour ajouter des neurones cachés
         for (const auto& link : links) {
-            if (known_neurons.count(link.link_id.input_id) && !known_neurons.count(link.link_id.output_id)) {
-                std::cout << "Adding neuron " << link.link_id.output_id 
-                          << " to the new layer (linked from " << link.link_id.input_id << ")" << std::endl;
+            // Vérifier que le neurone de sortie du lien n'est pas un neurone de sortie
+            if (known_neurons.count(link.link_id.input_id) && 
+                !known_neurons.count(link.link_id.output_id) &&
+                !output_neurons.count(link.link_id.output_id)) { // Exclure les neurones de sortie
                 new_layer.push_back(link.link_id.output_id);
                 known_neurons.insert(link.link_id.output_id);
             }
         }
 
+        // Ajouter la nouvelle couche s'il y a des neurones à ajouter
         if (!new_layer.empty()) {
             layers.push_back(new_layer);
             added_new_layer = true;
         }
     }
 
-    // Ajout de la couche de sortie
+    // Ajouter la dernière couche (neurones de sortie uniquement)
     layers.push_back(outputs);
+
+    for (size_t layer_idx = 0; layer_idx < layers.size(); ++layer_idx) {
+    std::cout << "Layer " << layer_idx << ": ";
+    for (int neuron_id : layers[layer_idx]) {
+        std::cout << neuron_id << " ";
+    }
+    std::cout << std::endl;
+}
+
+
     return layers;
 }
+
+
 
 
 
@@ -129,7 +142,9 @@ for (int id : inputs) {
 std::cout << "\nOutput IDs: ";
 for (int id : outputs) {
     std::cout << id << " ";
+    
 }
+std::cout << std::endl;
   
     // Organiser les neurones en couches
     std::vector<std::vector<int>> layers = feed_forward_layer(inputs, outputs, genome.links);
