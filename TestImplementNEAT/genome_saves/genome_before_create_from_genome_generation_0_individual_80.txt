@@ -1,0 +1,42 @@
+Genome ID: 80
+Neurons:
+Neuron ID: 0, Bias: 0
+Neuron ID: 1, Bias: 0
+Neuron ID: 2, Bias: 0
+Neuron ID: 3, Bias: 0
+Neuron ID: 4, Bias: 0
+Neuron ID: 5, Bias: 0
+Neuron ID: 6, Bias: 0
+Neuron ID: 7, Bias: 0
+Neuron ID: 8, Bias: 0
+Neuron ID: 9, Bias: 0
+Neuron ID: 10, Bias: 0
+Links:
+Link from neuron 0 to neuron 7 with weight 0.487313 (enabled)
+Link from neuron 1 to neuron 7 with weight 1.14235 (enabled)
+Link from neuron 2 to neuron 7 with weight -0.761786 (enabled)
+Link from neuron 3 to neuron 7 with weight -0.549934 (enabled)
+Link from neuron 4 to neuron 7 with weight -0.255117 (enabled)
+Link from neuron 7 to neuron 5 with weight -0.312489 (enabled)
+Link from neuron 7 to neuron 6 with weight -0.778349 (enabled)
+Link from neuron 0 to neuron 8 with weight -0.0214773 (enabled)
+Link from neuron 1 to neuron 8 with weight -0.76589 (enabled)
+Link from neuron 2 to neuron 8 with weight -0.468108 (enabled)
+Link from neuron 3 to neuron 8 with weight -1.66249 (enabled)
+Link from neuron 4 to neuron 8 with weight -1.12615 (enabled)
+Link from neuron 8 to neuron 5 with weight 0.99665 (enabled)
+Link from neuron 8 to neuron 6 with weight 1.00628 (enabled)
+Link from neuron 0 to neuron 9 with weight 0.815605 (enabled)
+Link from neuron 1 to neuron 9 with weight -1.02848 (enabled)
+Link from neuron 2 to neuron 9 with weight 1.02081 (enabled)
+Link from neuron 3 to neuron 9 with weight 1.07372 (enabled)
+Link from neuron 4 to neuron 9 with weight -0.471686 (enabled)
+Link from neuron 9 to neuron 5 with weight 0.544752 (enabled)
+Link from neuron 9 to neuron 6 with weight 0.858869 (enabled)
+Link from neuron 0 to neuron 10 with weight 1.37226 (enabled)
+Link from neuron 1 to neuron 10 with weight 1.21808 (enabled)
+Link from neuron 2 to neuron 10 with weight 0.759498 (enabled)
+Link from neuron 3 to neuron 10 with weight -0.744561 (enabled)
+Link from neuron 4 to neuron 10 with weight 0.0468866 (enabled)
+Link from neuron 10 to neuron 5 with weight -1.16796 (enabled)
+Link from neuron 10 to neuron 6 with weight -0.209354 (enabled)

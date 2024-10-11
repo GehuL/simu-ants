@@ -1,0 +1,41 @@
+Genome ID: 0
+Neurons:
+Neuron ID: 0, Bias: 0
+Neuron ID: 1, Bias: -1.36812
+Neuron ID: 2, Bias: -1.49562
+Neuron ID: 3, Bias: -0.583054
+Neuron ID: 4, Bias: 0
+Neuron ID: 5, Bias: -0.306294
+Neuron ID: 6, Bias: 1.17741
+Neuron ID: 7, Bias: -0.625808
+Neuron ID: 8, Bias: 0
+Neuron ID: 9, Bias: 0
+Neuron ID: 10, Bias: -1.10528
+Links:
+Link from neuron 0 to neuron 7 with weight -1.9567 (enabled)
+Link from neuron 1 to neuron 7 with weight -0.149594 (enabled)
+Link from neuron 2 to neuron 7 with weight -0.284112 (enabled)
+Link from neuron 3 to neuron 7 with weight 0.461314 (enabled)
+Link from neuron 4 to neuron 7 with weight -1.20034 (enabled)
+Link from neuron 7 to neuron 5 with weight 1.64209 (enabled)
+Link from neuron 7 to neuron 6 with weight -0.343142 (enabled)
+Link from neuron 0 to neuron 8 with weight 0.0651659 (enabled)
+Link from neuron 1 to neuron 8 with weight -1.32523 (enabled)
+Link from neuron 2 to neuron 8 with weight -1.00975 (enabled)
+Link from neuron 3 to neuron 8 with weight -0.819571 (enabled)
+Link from neuron 4 to neuron 8 with weight -1.13502 (enabled)
+Link from neuron 8 to neuron 5 with weight -0.544091 (enabled)
+Link from neuron 8 to neuron 6 with weight -1.78704 (enabled)
+Link from neuron 1 to neuron 9 with weight 0.0388928 (enabled)
+Link from neuron 2 to neuron 9 with weight 0.786963 (enabled)
+Link from neuron 3 to neuron 9 with weight 0.307229 (enabled)
+Link from neuron 4 to neuron 9 with weight -0.380583 (enabled)
+Link from neuron 9 to neuron 5 with weight 1.4945 (enabled)
+Link from neuron 9 to neuron 6 with weight -0.281839 (enabled)
+Link from neuron 0 to neuron 10 with weight -1.06267 (enabled)
+Link from neuron 1 to neuron 10 with weight 2.20998 (enabled)
+Link from neuron 2 to neuron 10 with weight 1.91092 (enabled)
+Link from neuron 3 to neuron 10 with weight -0.883783 (enabled)
+Link from neuron 4 to neuron 10 with weight -1.80031 (enabled)
+Link from neuron 10 to neuron 5 with weight -1.48197 (enabled)
+Link from neuron 10 to neuron 6 with weight -1.48896 (enabled)

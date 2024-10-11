@@ -1,0 +1,26 @@
+Genome ID: 0
+Neurons:
+Neuron ID: 0, Bias: 0.570199
+Neuron ID: 1, Bias: 0.412223
+Neuron ID: 2, Bias: 0.00314832
+Neuron ID: 3, Bias: 1.28785
+Neuron ID: 4, Bias: 0
+Neuron ID: 5, Bias: -0.129349
+Neuron ID: 6, Bias: 0.853306
+Neuron ID: 7, Bias: 0.361117
+Neuron ID: 8, Bias: -2.08785
+Links:
+Link from neuron 0 to neuron 7 with weight 1.92396 (enabled)
+Link from neuron 1 to neuron 7 with weight 0.440916 (enabled)
+Link from neuron 2 to neuron 7 with weight 1.71831 (enabled)
+Link from neuron 3 to neuron 7 with weight 1.57947 (enabled)
+Link from neuron 4 to neuron 7 with weight -0.229205 (enabled)
+Link from neuron 7 to neuron 5 with weight -0.105107 (enabled)
+Link from neuron 7 to neuron 6 with weight -1.66106 (enabled)
+Link from neuron 0 to neuron 8 with weight 0.497009 (enabled)
+Link from neuron 1 to neuron 8 with weight 0.756611 (enabled)
+Link from neuron 2 to neuron 8 with weight -0.0108058 (enabled)
+Link from neuron 3 to neuron 8 with weight 2.71317 (enabled)
+Link from neuron 4 to neuron 8 with weight 0.780928 (enabled)
+Link from neuron 8 to neuron 5 with weight -0.200967 (enabled)
+Link from neuron 8 to neuron 6 with weight -2.22386 (enabled)

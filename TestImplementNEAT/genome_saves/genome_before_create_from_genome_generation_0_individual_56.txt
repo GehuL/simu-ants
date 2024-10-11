@@ -1,0 +1,42 @@
+Genome ID: 56
+Neurons:
+Neuron ID: 0, Bias: 0
+Neuron ID: 1, Bias: 0
+Neuron ID: 2, Bias: 0
+Neuron ID: 3, Bias: 0
+Neuron ID: 4, Bias: 0
+Neuron ID: 5, Bias: 0
+Neuron ID: 6, Bias: 0
+Neuron ID: 7, Bias: 0
+Neuron ID: 8, Bias: 0
+Neuron ID: 9, Bias: 0
+Neuron ID: 10, Bias: 0
+Links:
+Link from neuron 0 to neuron 7 with weight -0.318807 (enabled)
+Link from neuron 1 to neuron 7 with weight 0.787899 (enabled)
+Link from neuron 2 to neuron 7 with weight -1.16635 (enabled)
+Link from neuron 3 to neuron 7 with weight 2.5871 (enabled)
+Link from neuron 4 to neuron 7 with weight -0.494475 (enabled)
+Link from neuron 7 to neuron 5 with weight 0.450377 (enabled)
+Link from neuron 7 to neuron 6 with weight 0.0753305 (enabled)
+Link from neuron 0 to neuron 8 with weight 1.20711 (enabled)
+Link from neuron 1 to neuron 8 with weight 0.961146 (enabled)
+Link from neuron 2 to neuron 8 with weight -0.905507 (enabled)
+Link from neuron 3 to neuron 8 with weight -0.0977783 (enabled)
+Link from neuron 4 to neuron 8 with weight 0.282293 (enabled)
+Link from neuron 8 to neuron 5 with weight 0.437596 (enabled)
+Link from neuron 8 to neuron 6 with weight -0.944889 (enabled)
+Link from neuron 0 to neuron 9 with weight 0.326322 (enabled)
+Link from neuron 1 to neuron 9 with weight 0.881411 (enabled)
+Link from neuron 2 to neuron 9 with weight -1.30331 (enabled)
+Link from neuron 3 to neuron 9 with weight 2.89419 (enabled)
+Link from neuron 4 to neuron 9 with weight 0.0920408 (enabled)
+Link from neuron 9 to neuron 5 with weight 1.07521 (enabled)
+Link from neuron 9 to neuron 6 with weight -2.31523 (enabled)
+Link from neuron 0 to neuron 10 with weight 0.227852 (enabled)
+Link from neuron 1 to neuron 10 with weight 1.17787 (enabled)
+Link from neuron 2 to neuron 10 with weight 0.981148 (enabled)
+Link from neuron 3 to neuron 10 with weight -1.6356 (enabled)
+Link from neuron 4 to neuron 10 with weight -1.42728 (enabled)
+Link from neuron 10 to neuron 5 with weight -0.466531 (enabled)
+Link from neuron 10 to neuron 6 with weight -1.45201 (enabled)

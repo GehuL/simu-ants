@@ -1,0 +1,42 @@
+Genome ID: 0
+Neurons:
+Neuron ID: 0, Bias: -0.115143
+Neuron ID: 1, Bias: -1.99676
+Neuron ID: 2, Bias: 0.948007
+Neuron ID: 3, Bias: 0
+Neuron ID: 4, Bias: 0.517894
+Neuron ID: 5, Bias: -1.45284
+Neuron ID: 6, Bias: 0.494009
+Neuron ID: 7, Bias: 0
+Neuron ID: 8, Bias: 0
+Neuron ID: 9, Bias: -1.91205
+Neuron ID: 10, Bias: -0.968882
+Links:
+Link from neuron 0 to neuron 7 with weight -1.76981 (enabled)
+Link from neuron 1 to neuron 7 with weight -0.969927 (enabled)
+Link from neuron 2 to neuron 7 with weight 0.0864272 (enabled)
+Link from neuron 3 to neuron 7 with weight 1.26116 (enabled)
+Link from neuron 4 to neuron 7 with weight -0.310404 (enabled)
+Link from neuron 7 to neuron 5 with weight -1.46244 (enabled)
+Link from neuron 7 to neuron 6 with weight -0.226858 (enabled)
+Link from neuron 0 to neuron 8 with weight -0.86377 (enabled)
+Link from neuron 1 to neuron 8 with weight -0.158944 (enabled)
+Link from neuron 2 to neuron 8 with weight 3.26339 (enabled)
+Link from neuron 3 to neuron 8 with weight 0.0766006 (enabled)
+Link from neuron 4 to neuron 8 with weight 0.97457 (enabled)
+Link from neuron 8 to neuron 5 with weight -0.125958 (enabled)
+Link from neuron 8 to neuron 6 with weight -0.297198 (enabled)
+Link from neuron 0 to neuron 9 with weight -0.147461 (enabled)
+Link from neuron 1 to neuron 9 with weight -0.755681 (enabled)
+Link from neuron 2 to neuron 9 with weight 1.28819 (enabled)
+Link from neuron 3 to neuron 9 with weight 0.701949 (enabled)
+Link from neuron 4 to neuron 9 with weight 0.96217 (enabled)
+Link from neuron 9 to neuron 5 with weight -0.152607 (enabled)
+Link from neuron 9 to neuron 6 with weight -2.49033 (enabled)
+Link from neuron 0 to neuron 10 with weight -0.147656 (enabled)
+Link from neuron 1 to neuron 10 with weight 0.238181 (enabled)
+Link from neuron 2 to neuron 10 with weight 0.803855 (enabled)
+Link from neuron 3 to neuron 10 with weight -1.23283 (enabled)
+Link from neuron 4 to neuron 10 with weight -1.10965 (enabled)
+Link from neuron 10 to neuron 5 with weight -1.48197 (enabled)
+Link from neuron 10 to neuron 6 with weight -2.04265 (enabled)

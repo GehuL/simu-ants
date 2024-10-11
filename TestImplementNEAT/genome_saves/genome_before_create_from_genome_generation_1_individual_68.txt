@@ -1,0 +1,10 @@
+Genome ID: 0
+Neurons:
+Neuron ID: 0, Bias: -0.069598
+Neuron ID: 1, Bias: 2.3044
+Neuron ID: 2, Bias: 0
+Neuron ID: 3, Bias: -0.222494
+Neuron ID: 4, Bias: 2.80574
+Neuron ID: 5, Bias: 0.750196
+Neuron ID: 6, Bias: 0.903324
+Links:

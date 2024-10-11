@@ -1,0 +1,42 @@
+Genome ID: 17
+Neurons:
+Neuron ID: 0, Bias: 0
+Neuron ID: 1, Bias: 0
+Neuron ID: 2, Bias: 0
+Neuron ID: 3, Bias: 0
+Neuron ID: 4, Bias: 0
+Neuron ID: 5, Bias: 0
+Neuron ID: 6, Bias: 0
+Neuron ID: 7, Bias: 0
+Neuron ID: 8, Bias: 0
+Neuron ID: 9, Bias: 0
+Neuron ID: 10, Bias: 0
+Links:
+Link from neuron 0 to neuron 7 with weight -1.50085 (enabled)
+Link from neuron 1 to neuron 7 with weight -0.939022 (enabled)
+Link from neuron 2 to neuron 7 with weight 1.21934 (enabled)
+Link from neuron 3 to neuron 7 with weight 0.910767 (enabled)
+Link from neuron 4 to neuron 7 with weight -0.712391 (enabled)
+Link from neuron 7 to neuron 5 with weight 1.15318 (enabled)
+Link from neuron 7 to neuron 6 with weight 0.243425 (enabled)
+Link from neuron 0 to neuron 8 with weight 0.249709 (enabled)
+Link from neuron 1 to neuron 8 with weight 0.6972 (enabled)
+Link from neuron 2 to neuron 8 with weight 0.18601 (enabled)
+Link from neuron 3 to neuron 8 with weight 1.64139 (enabled)
+Link from neuron 4 to neuron 8 with weight 1.73415 (enabled)
+Link from neuron 8 to neuron 5 with weight 1.06571 (enabled)
+Link from neuron 8 to neuron 6 with weight 0.256109 (enabled)
+Link from neuron 0 to neuron 9 with weight 0.00646632 (enabled)
+Link from neuron 1 to neuron 9 with weight 0.0691615 (enabled)
+Link from neuron 2 to neuron 9 with weight -0.842839 (enabled)
+Link from neuron 3 to neuron 9 with weight -0.217774 (enabled)
+Link from neuron 4 to neuron 9 with weight -0.443355 (enabled)
+Link from neuron 9 to neuron 5 with weight 0.458717 (enabled)
+Link from neuron 9 to neuron 6 with weight -0.190426 (enabled)
+Link from neuron 0 to neuron 10 with weight -1.35777 (enabled)
+Link from neuron 1 to neuron 10 with weight -0.784582 (enabled)
+Link from neuron 2 to neuron 10 with weight 0.461499 (enabled)
+Link from neuron 3 to neuron 10 with weight -1.81781 (enabled)
+Link from neuron 4 to neuron 10 with weight 0.0188565 (enabled)
+Link from neuron 10 to neuron 5 with weight -0.24742 (enabled)
+Link from neuron 10 to neuron 6 with weight 0.0138697 (enabled)
