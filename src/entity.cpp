@@ -53,30 +53,29 @@ std::string Entity::toString() const
     return "{type:" + getType() + ", id:" + std::to_string(m_id) + "}";
 }
 
+void Entity::save(json &j) const
+{
+    j["type"] =  getType(); 
+    j["posX"] =  m_pos.x;
+    j["posY"] =  m_pos.y;
+    j["velX"] =  m_velocity.y;
+    j["velY"] =  m_velocity.y;
+    j["angle"] =  m_angle;
+}
+
+void Entity::load(const json &j)
+{
+    j.at("posX").get_to(m_pos.x);
+    j.at("posY").get_to(m_pos.y);
+    j.at("velX").get_to(m_velocity.y);
+    j.at("velY") .get_to(m_velocity.y);
+    j.at("angle").get_to(m_angle);
+}
+
 std::ostream& simu::operator<<(std::ostream& os, Entity& entity)
 {
     os << entity.toString();
     return os;
-}
-
-void simu::to_json(json& j, const simu::Entity& p) 
-{
-    // j["type"] = typeid(p).name(); // A PROSCRIRE ! DEPEND DE L'ENVIRONNEMENT !
-    j["type"] = p.getType(); 
-    j["posX"] = p.m_pos.x;
-    j["posY"] = p.m_pos.y;
-    j["velX"] = p.m_velocity.y;
-    j["velY"] = p.m_velocity.y;
-    j["angle"] = p.m_angle;
-}
-
-void simu::from_json(const json& j, simu::Entity& p)
-{
-    j.at("posX").get_to(p.m_pos.x);
-    j.at("posY").get_to( p.m_pos.y);
-    j.at("velX").get_to( p.m_velocity.y);
-    j.at("velY") .get_to( p.m_velocity.y);
-    j.at("angle").get_to( p.m_angle);
 }
 
 Entity& Entity::operator=(const Entity& en)

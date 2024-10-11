@@ -13,13 +13,16 @@ namespace simu
     {
         public:
 
-            Ant(const long id, const Ant& ant);
             Ant(const long id = -1);
+            Ant(const long id, const Ant& ant);
 
             virtual ~Ant(){};
 
             void update() override;
             void draw() override;
+
+            void save(json& json) const override;
+            void load(const json& json) override;
 
             Tile getCarriedObject() const { return m_carried_object; };
 
@@ -35,9 +38,6 @@ namespace simu
             void take();     // Porte un objet sur elle (nourriture/mur)
             void put();       // Déposer l'objet qu'elle porte
 
-            friend void to_json(json& j, const Ant& p);
-            friend void from_json(const json& j, Ant& p);
-
             Ant& operator=(const Ant& en);
 
         private:
@@ -51,8 +51,29 @@ namespace simu
             int m_rotateCd;
     };
 
-    void to_json(json& j, const Ant& p) ;
-    void from_json(const json& j, Ant& p);
+    class Test: public Entity
+    {
+        public:
+            Test(const long id = -1) : Entity(id) {};
+            Test(const long id, const Test& ant): Entity(id) {};
+
+            virtual ~Test(){};
+
+            std::string getType() const override { return "test"; };
+
+            void update() override {};
+            void draw() override {};
+
+            Test& operator=(const Test& en) 
+            {
+                Entity::operator=(en); 
+                m_test = en.m_test;
+                return *this;
+            };
+
+        private:
+            std::string m_test = "this is a test";
+    };
 }
 
 #endif

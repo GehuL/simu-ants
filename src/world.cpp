@@ -25,6 +25,7 @@ void World::init()
     m_grid.reset();
 
     spawnEntities<Ant>(10);
+    spawnEntities<Test>(10);
 }
 
 void World::save(std::ofstream &file)
@@ -35,12 +36,13 @@ void World::save(std::ofstream &file)
     // TODO: Sauvegarder n'importe quel type enfant de Entity
     // TODO: Sauvegarder la seed de la génération de nombre aléatoire
     // TODO: Sauvegarder la grille
-
     json j;
     for(auto& en : m_entities)
     {
         Entity& a = *en.get();
-        j += dynamic_cast<Ant&>(a);
+        json ja;
+        a.save(ja);
+        j += ja;
     }
     file << j;
     TRACELOG(LOG_INFO, "Saved !");
@@ -58,18 +60,16 @@ void World::load(const std::string& filename)
         auto file = std::ifstream(filename, std::ios_base::in);
         
         json j = json::parse(file);
-        
-        // Charge toutes les entités
-        std::vector<Ant> ants = j;
+        m_entities.clear(); // On peut clear si pas d'exception avant
 
-        m_entities.clear();
-        auto it = spawnEntities<Ant>(ants.size());
-
-        // Si pas d'erreur de chargement, on peut copier 
-        for(size_t i = 0; i < ants.size(); i++)
+        for(size_t i = 0; i < j.size(); i++)
         {
-            std::shared_ptr<Ant> en = std::dynamic_pointer_cast<Ant>(*(it + i));
-            *en.get() = ants[i];
+            std::string typestr = j[i]["type"];
+            entities_t t = entityFactory(typestr);
+            std::visit([=](auto e) mutable {
+                std::cout << e << std::endl;
+                 this->spawnEntity<decltype(e)>();
+            }, t);
         }
 
         file.close();

@@ -10,6 +10,7 @@
 #include "raylib.h"
 #include "tiles.h"
 #include "others.h"
+#include "variant"
 
 using json = nlohmann::json;
 
@@ -20,14 +21,20 @@ namespace simu
         public:
             friend class World;
 
-            Entity(const long id, const Entity& entity);
             Entity(const long id = -1);
+            Entity(const long id, const Entity& entity);
 
             virtual ~Entity();
 
             virtual void update() = 0;
             virtual void draw() = 0;
 
+            virtual void save(json& json) const;
+            virtual void load(const json& json);
+        
+            friend void to_json(json& j, const Entity& p) { p.save(j); };
+            friend void from_json(const json& j, Entity& p) { p.load(j); };
+            
             virtual std::string getType() const { return "entity"; };
 
             Tile getTileOn() const;
@@ -38,16 +45,12 @@ namespace simu
 
             const long getId() const { return m_id; };
 
-            Vector2 getPos() const{ return m_pos; };
+            Vector2 getPos() const { return m_pos; };
             Vector2 getVel() const { return m_velocity; };
 
             const float getAngle() const { return m_angle; };
 
             std::string toString() const;
-
-            friend void to_json(json& j, const Entity& p);
-            friend void from_json(const json& j, Entity& p);
-
             Entity& operator=(const Entity& en);
 
         private:
@@ -61,6 +64,8 @@ namespace simu
     void to_json(json& j, const Entity& p);
     void from_json(const json& j, Entity& p);
 
+    std::ostream &operator<<(std::ostream& os, Entity& entity);
+   
     /*class Carriable
     {
         public:
@@ -76,8 +81,6 @@ namespace simu
             std::weak_ptr<Entity> m_carrier;
             bool is_carried;
     };*/
-
-    std::ostream &operator<<(std::ostream& os, Entity& entity);
 }
 
 #endif

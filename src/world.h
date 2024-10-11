@@ -8,16 +8,40 @@
 #include <algorithm>
 #include <array>
 #include <fstream>
+#include <variant>
 
 #include "engine.h"
 #include "entity.h"
 #include "tiles.h"
+
+#include "entity.h"
+#include "Ant.h"
 
 #define TEMPLATE_CONDITION(T) std::enable_if_t<std::is_base_of<Entity, T>::value && !std::is_same<Entity, T>::value>
 #define CHECK_TEMPLATE_ST(T) static_assert(std::is_base_of<Entity, T>::value && !std::is_same<Entity, T>::value, "T doit etre une class fille de Entity");
 
 namespace simu
 {
+    using entities_t = std::variant<Ant, Test>;
+
+    template<size_t index = std::variant_size_v<entities_t>>
+    entities_t entityFactory(const std::string& entity_type) {
+        if constexpr (index == 0) {
+            throw std::runtime_error("Type d'entité non trouvé !");
+        } else {
+            // On récupère le type courant du variant
+            using current_type = std::variant_alternative_t<index - 1, entities_t>;
+
+            // Si le type courant correspond à entity_type, on retourne une instance de ce type
+            if (current_type().getType() == entity_type) {
+                return current_type();
+            } else {
+                // Sinon, on continue la récursion avec l'index précédent
+                return entityFactory<index - 1>(entity_type);
+            }
+        }
+    }
+
     class World : public Engine
     {
         public:
@@ -52,7 +76,7 @@ namespace simu
                 // Retourne l'itérateur correspondant à l'ancienne fin (avant ajout des nouveaux éléments)
                 return m_entities.begin() + en_cnt;
             }
-
+            
             template<class T, class = TEMPLATE_CONDITION(T)>
             std::weak_ptr<T> spawnEntity()
             {

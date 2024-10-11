@@ -80,6 +80,24 @@ void Ant::draw()
      }
 }
 
+void Ant::save(json &json) const
+{
+    Entity::save(json);
+    json["life"] = m_life;
+    json["carried_object"] = m_carried_object.type;
+    json["target_angle"] = m_target_angle;
+    json["rotateCd"] = m_rotateCd;
+}
+
+void Ant::load(const json &json)
+{
+    Entity::load(json);
+    json.at("life").get_to(m_life);
+    json.at("carried_object").get_to(m_carried_object.type);
+    json.at("target_angle").get_to(m_target_angle);
+    json.at("rotateCd").get_to(m_rotateCd);
+}
+
 void simu::Ant::eat()
 {
     Tile tile = getWorld().getGrid().getTile(m_pos.x, m_pos.y);
@@ -147,24 +165,6 @@ void Ant::move()
 {
     m_velocity = Vector2Rotate(m_velocity, m_angle);
     m_pos = Vector2Add(m_pos, m_velocity);
-}
-
-void simu::to_json(json &j, const Ant &p)
-{
-    to_json(j, static_cast<const Entity&>(p));
-    j["life"] = p.m_life;
-    j["carried_object"] = p.m_carried_object.type;
-    j["target_angle"] = p.m_target_angle;
-    j["rotateCd"] = p.m_rotateCd;
-}
-
-void simu::from_json(const json &j, Ant &p)
-{
-    from_json(j, static_cast<Entity&>(p));
-    j.at("life").get_to(p.m_life);
-    j.at("carried_object").get_to(p.m_carried_object.type);
-    j.at("target_angle").get_to(p.m_target_angle);
-    j.at("rotateCd").get_to(p.m_rotateCd);
 }
 
 Ant& Ant::operator=(const Ant& ant)

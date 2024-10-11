@@ -198,7 +198,7 @@ CFLAGS += -Wall -std=c++17 -D_DEFAULT_SOURCE -Wno-missing-braces
 ifeq ($(BUILD_MODE),DEBUG)
     CFLAGS += -g -O0
 else
-    CFLAGS += -s -O2
+    CFLAGS += -s -O3
 endif
 
 # Additional flags for compiler (if desired)
