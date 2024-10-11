@@ -68,7 +68,7 @@ Genome Population::new_genome() {
     // Ajouter des liens entre les neurones d'entrée et de sortie
     for (int i = 0; i < config.num_inputs; ++i) {
         for (int output_id = 0; output_id < config.num_outputs; ++output_id) {
-            genome.add_link(new_link(i, config.num_inputs + output_id));
+            //genome.add_link(new_link(i, config.num_inputs + output_id));
         }
     }
 

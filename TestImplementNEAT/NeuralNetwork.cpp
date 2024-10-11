@@ -69,6 +69,8 @@ std::vector<std::vector<int>> feed_forward_layer(
     layers.push_back(inputs);
     known_neurons.insert(inputs.begin(), inputs.end());
 
+    std::cout << "Added input layer" << std::endl;
+
     bool added_new_layer = true;
     while (added_new_layer) {
         added_new_layer = false;
