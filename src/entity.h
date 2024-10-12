@@ -26,8 +26,8 @@ namespace simu
 
             virtual ~Entity();
 
-            virtual void update() = 0;
-            virtual void draw() = 0;
+            virtual void update() {};
+            virtual void draw() {};
 
             virtual void save(json& json) const;
             virtual void load(const json& json);

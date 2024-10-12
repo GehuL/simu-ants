@@ -17,17 +17,19 @@
 #include "entity.h"
 #include "Ant.h"
 
-#define TEMPLATE_CONDITION(T) std::enable_if_t<std::is_base_of<Entity, T>::value && !std::is_same<Entity, T>::value>
-#define CHECK_TEMPLATE_ST(T) static_assert(std::is_base_of<Entity, T>::value && !std::is_same<Entity, T>::value, "T doit etre une class fille de Entity");
+// #define TEMPLATE_CONDITION(T) std::enable_if_t<std::is_base_of<Entity, T>::value && !std::is_same<Entity, T>::value>
+#define TEMPLATE_CONDITION(T) std::enable_if_t<std::is_base_of<Entity, T>::value>
+#define CHECK_TEMPLATE_ST(T) static_assert(std::is_base_of<Entity, T>::value);// && !std::is_same<Entity, T>::value, "T doit etre une class fille de Entity");
 
 namespace simu
 {
+    // Liste des entités enregistrés 
     using entities_t = std::variant<Ant, Test>;
 
     template<size_t index = std::variant_size_v<entities_t>>
     entities_t entityFactory(const std::string& entity_type) {
         if constexpr (index == 0) {
-            throw std::runtime_error("Type d'entité non trouvé !");
+            throw std::runtime_error("Impossible de charger l'entité " + entity_type);
         } else {
             // On récupère le type courant du variant
             using current_type = std::variant_alternative_t<index - 1, entities_t>;

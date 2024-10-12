@@ -25,7 +25,6 @@ void World::init()
     m_grid.reset();
 
     spawnEntities<Ant>(10);
-    spawnEntities<Test>(10);
 }
 
 void World::save(std::ofstream &file)
@@ -52,34 +51,43 @@ void World::load(const std::string& filename)
 {
     TRACELOG(LOG_INFO, "Loading simulation..");
     
-    // TODO: Charger n'importe quel type enfant de Entity
+    // TODO: Optimiser la fonction
     // TODO: Charger la seed de la génération de nombre aléatoire
     // TODO: Charger la grille
+    // TODO: Ne pas alterer la simulation si une erreur durant le fichier
     try
     {
         auto file = std::ifstream(filename, std::ios_base::in);
         
         json j = json::parse(file);
-        m_entities.clear(); // On peut clear si pas d'exception avant
 
+        std::vector<std::shared_ptr<Entity>> entities_tmp;
+        entities_tmp.resize(j.size());
+
+        // Instantie la bonne class en fonction du type json
         for(size_t i = 0; i < j.size(); i++)
         {
             std::string typestr = j[i]["type"];
             entities_t t = entityFactory(typestr);
-            std::visit([=](auto e) mutable {
-                std::cout << e << std::endl;
-                 this->spawnEntity<decltype(e)>();
+            std::visit([&](auto e) mutable {
+                using EntityType = std::decay_t<decltype(e)>;
+                auto en = std::make_shared<EntityType>(m_entity_cnt++);
+                en.get()->load(j[i]);
+                entities_tmp[i] = en;
             }, t);
         }
+
+        // Si on arrive ici c'est qu'il n'y a pas eu d'erreurs
+        m_entities.clear();
+        m_entities = std::move(entities_tmp);
 
         file.close();
 
         TRACELOG(LOG_INFO, "Loaded !");
-    }catch(const json::exception& e)
+    } catch(const json::exception& e)
     {
         TRACELOG(LOG_ERROR, "Erreur de chargement du fichier %s: %s", filename, e.what());
-    }
-    catch(const std::ifstream::failure& e)
+    } catch(const std::runtime_error& e)
     {
         TRACELOG(LOG_ERROR, "Erreur de chargement du fichier %s: %s", filename, e.what());
     }
