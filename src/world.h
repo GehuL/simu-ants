@@ -56,27 +56,29 @@ namespace simu
              * @return La position du premier élément ajouté. Renvoie end() si il y a une erreur (count <= 0)
              */
             template<class T, class = TEMPLATE_CONDITION(T)>
-            std::vector<std::shared_ptr<simu::Entity>>::iterator spawnEntities(size_t count)
+            std::vector<std::weak_ptr<simu::Entity>> spawnEntities(size_t count)
             {
                 CHECK_TEMPLATE_ST(T)
 
                 if(count <= 0)
-                    return m_entities.end();
+                    return std::vector<std::weak_ptr<Entity>>();
 
                 const size_t en_cnt = m_entities.size();
 
                 // Redimensionne le vecteur pour ajouter "count" nouveaux éléments
                 m_entities.resize(en_cnt + count); 
+                std::vector<std::weak_ptr<Entity>> newlies(m_entities.size());
 
                 // Itère à partir de l'ancienne fin, jusqu'à la nouvelle fin
                 for (size_t i = en_cnt; i < m_entities.size(); ++i)
                 {
                     m_entities[i] = std::make_shared<T>(m_entity_cnt);
+                    newlies[i] = m_entities[i];
                     m_entity_cnt++;
                 }
 
                 // Retourne l'itérateur correspondant à l'ancienne fin (avant ajout des nouveaux éléments)
-                return m_entities.begin() + en_cnt;
+                return newlies;
             }
             
             template<class T, class = TEMPLATE_CONDITION(T)>
