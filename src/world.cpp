@@ -12,12 +12,18 @@ World World::world;
 
 World::World() : m_entity_cnt(0), m_grid(50, 5)
 {
+
 }
 
 void World::init()
 {
     Engine::init();
 
+    m_seed = GetRandomValue(0, std::numeric_limits<int>::max());
+    SetRandomSeed(m_seed);
+
+    TRACELOG(LOG_INFO, "seed: %d", m_seed);
+    
     float offset = (GetScreenWidth() - m_grid.getGridWidth() * m_grid.getTileSize()) / 2.f;
     m_camera.offset = (Vector2){offset, offset};
 
@@ -45,6 +51,7 @@ void World::save(const std::string& filename)
         }
 
         j["grid"] = m_grid;
+        j["seed"] = m_seed;
 
         auto file = std::ofstream(filename, std::ios_base::out);
         file << j;
@@ -94,6 +101,12 @@ void World::load(const std::string& filename)
 
         // Lecture de la grille
         j.at("grid").get_to(m_grid);
+        
+        if(j.find("seed") != j.end())
+        {
+            m_seed = j.at("seed");
+            SetRandomSeed(m_seed);
+        }
 
         // Si on arrive ici c'est qu'il n'y a pas eu d'erreurs
         m_entities.clear();

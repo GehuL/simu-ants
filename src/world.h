@@ -139,6 +139,8 @@ namespace simu
             void updateTick() override;
         
             long m_entity_cnt;
+            unsigned int m_seed;
+
             std::vector<std::shared_ptr<Entity>> m_entities;
 
             Grid m_grid;
