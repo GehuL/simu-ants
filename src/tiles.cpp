@@ -72,20 +72,19 @@ void Grid::setTile(Tile tile, int x, int y)
     m_grid[y*m_gridWidth + x] = tile;
 }
 
-Tile Grid::getTile(int x, int y) const
+Tile Grid::getTile(Vector2i pos) const
 {
-    if(!isValid(x, y))
+    if(!isValid(pos.x, pos.y))
         return BORDER;
-    else
-       return m_grid[y*m_gridWidth + x];
+    return m_grid[pos.y*m_gridWidth + pos.x];
 }
 
-Tile Grid::getTile(float x, float y)
+Tile Grid::getTile(Vector2f pos) const
 {
-    int tileX = x / getTileSize();
-    int tileY = y / getTileSize();
+    int tileX = pos.x / getTileSize();
+    int tileY = pos.y / getTileSize();
 
-    return getTile(tileX, tileY);
+    return getTile((Vector2i) {tileX, tileY} );
 }
 
 void Grid::setTile(Tile tile, float x, float y)
@@ -93,7 +92,7 @@ void Grid::setTile(Tile tile, float x, float y)
     int tileX = x / getTileSize();
     int tileY = y / getTileSize();
 
-    if(getTile(tileX, tileY).type != Type::BORDER)
+    if(getTile((Vector2i) {tileX, tileY}).type != Type::BORDER)
         setTile(tile, tileX, tileY);
 }
 
@@ -106,6 +105,7 @@ Vector2i Grid::toTileCoord(float x, float y) const
 
 void simu::to_json(json &json, const Grid &grid)
 {
+    // TODO: Compresser les données
     unsigned char* encoded = base64_encode((const unsigned char*)(grid.m_grid), grid.getTileNumber() * sizeof(Tile), NULL);
     std::string data((char*) encoded);
     json["width"] = grid.getGridWidth();
@@ -115,6 +115,7 @@ void simu::to_json(json &json, const Grid &grid)
 
 void simu::from_json(const json & json, Grid & grid)
 {
+    // TODO: Décompresser les données
     auto rowdata = json.at("data");
     
     if(!rowdata.is_string())
@@ -135,5 +136,6 @@ void simu::from_json(const json & json, Grid & grid)
     if(grid.m_grid)
         delete[] grid.m_grid;
     
+    grid.m_gridWidth = gridWidth;
     grid.m_grid = reinterpret_cast<Tile*>(decoded);
 }

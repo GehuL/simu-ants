@@ -23,13 +23,13 @@ Entity::~Entity()
 
 Tile Entity::getTileOn() const
 {
-    return getWorld().getGrid().getTile(m_pos.x, m_pos.y);
+    return getWorld().getGrid().getTile(m_pos);
 }
 
 Tile Entity::getTileFacing() const
 {
     Vector2i facingTilePos = getTileFacingPos();
-    return getWorld().getGrid().getTile(facingTilePos.x, facingTilePos.y);;
+    return getWorld().getGrid().getTile(facingTilePos);
 }
 
 Vector2i simu::Entity::getTileFacingPos() const

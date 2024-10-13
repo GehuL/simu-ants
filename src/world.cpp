@@ -10,7 +10,7 @@ using json = nlohmann::json;
 
 World World::world;
 
-World::World() : m_entity_cnt(0), m_grid(500, 5)
+World::World() : m_entity_cnt(0), m_grid(50, 5)
 {
 }
 
@@ -140,7 +140,7 @@ void World::handleMouse()
 
 void World::handleKeyboard()
 {
-    constexpr float camera_speed = 3.5f; 
+    constexpr float camera_speed = 5.0f; 
 
     if (IsKeyDown(KEY_DOWN)) m_camera.offset.y -= camera_speed;
     if (IsKeyDown(KEY_UP)) m_camera.offset.y += camera_speed;

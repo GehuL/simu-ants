@@ -36,7 +36,7 @@ void Ant::update()
 
     // Tuile dans la direction de la fourmis
     Vector2i facingPos = getTileFacingPos();
-    Tile facingTile = getWorld().getGrid().getTile(facingPos.x, facingPos.y);
+    Tile facingTile = getWorld().getGrid().getTile(facingPos);
 
     if(facingTile.type == Type::BORDER || facingTile.type == Type::GROUND)
     {
@@ -100,7 +100,7 @@ void Ant::load(const json &json)
 
 void simu::Ant::eat()
 {
-    Tile tile = getWorld().getGrid().getTile(m_pos.x, m_pos.y);
+    Tile tile = getWorld().getGrid().getTile(m_pos);
     
     if(tile.type == Type::FOOD)
     {
@@ -113,7 +113,7 @@ void simu::Ant::eat()
 
 void Ant::pheromone()
 {
-    Tile tile = getWorld().getGrid().getTile(m_pos.x, m_pos.y);
+    Tile tile = getWorld().getGrid().getTile(m_pos);
     if(tile.type == Type::AIR || tile.type == Type::PHEROMONE)
     {
         getWorld().getGrid().setTile(PHEROMONE, m_pos.x, m_pos.y);
@@ -135,7 +135,7 @@ void Ant::take()
     Grid& grid = getWorld().getGrid();
 
     Vector2i facingTilePos = getTileFacingPos();
-    Tile facingTile = grid.getTile(static_cast<int>(facingTilePos.x), static_cast<int>(facingTilePos.y));
+    Tile facingTile = grid.getTile(facingTilePos);
 
     if(facingTile.type == Type::FOOD || facingTile.type == Type::GROUND)
     {
@@ -152,7 +152,7 @@ void Ant::put()
     Grid& grid = getWorld().getGrid();
 
     Vector2i facingTilePos = getTileFacingPos();
-    Tile facingTile = grid.getTile(facingTilePos.x, facingTilePos.y);
+    Tile facingTile = grid.getTile(facingTilePos);
 
     if(facingTile.type == Type::AIR || facingTile.type == Type::PHEROMONE)
     {
