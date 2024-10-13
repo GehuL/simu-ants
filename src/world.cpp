@@ -32,7 +32,6 @@ void World::save(const std::string& filename)
     TRACELOG(LOG_INFO, "Saving simulation..");
  
     // TODO: Sauvegarder la seed de la génération de nombre aléatoire
-    // TODO: Sauvegarder la grille
     try
     {
         json j;
@@ -64,7 +63,6 @@ void World::load(const std::string& filename)
     
     // TODO: Optimiser la fonction
     // TODO: Charger la seed de la génération de nombre aléatoire
-    // TODO: Charger la grille
     try
     {
         auto file = std::ifstream(filename, std::ios_base::in);
@@ -115,6 +113,7 @@ void World::load(const std::string& filename)
 
 void World::handleMouse()
 {
+    // TODO: Interpoler les points pour tracer des lignes
     Vector2 pos = GetScreenToWorld2D(GetMousePosition(), m_camera);
     if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)) // PUT WALL
     {

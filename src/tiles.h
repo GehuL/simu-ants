@@ -31,6 +31,7 @@ namespace simu
     const Tile PHEROMONE = (Tile) {Type::PHEROMONE, PINK};
     const Tile BORDER = (Tile) {Type::BORDER, WHITE};
 
+    // TODO: Implémenter des chunks pour optimiser le rendu graphique
     class Grid
     {
         public:
