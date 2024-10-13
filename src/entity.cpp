@@ -18,7 +18,7 @@ Entity::Entity(const long id) : m_id(id), m_angle(0)
 
 Entity::~Entity()
 {
-    std::cout << "Destroyed " << *this << std::endl;
+    // std::cout << "Destroyed " << *this << std::endl;
 }
 
 Tile Entity::getTileOn() const

@@ -1,5 +1,7 @@
 #include "tiles.h"
-#include <stdexcept>
+
+#include <memory.h>
+#include "external/base64.h"
 
 using namespace simu;
 
@@ -45,12 +47,12 @@ void Grid::update()
 
 }
 
-bool const Grid::isValid(int x, int y)
+bool Grid::isValid(int x, int y) const
 {
     return x >= 0 && x < m_gridWidth && y >= 0 && y < m_gridWidth;
 }
 
-void const Grid::check(int x, int y)
+void Grid::check(int x, int y) const 
 {
     if(!isValid(x, y))
         throw std::range_error("Out of range");
@@ -61,7 +63,7 @@ void Grid::reset()
     if(m_grid != nullptr)
         delete[] m_grid;
      
-    m_grid = new Tile[m_gridWidth*m_gridWidth]();
+    m_grid = new Tile[m_gridWidth*m_gridWidth] {AIR};
 }
 
 void Grid::setTile(Tile tile, int x, int y)
@@ -70,7 +72,7 @@ void Grid::setTile(Tile tile, int x, int y)
     m_grid[y*m_gridWidth + x] = tile;
 }
 
-Tile const Grid::getTile(int x, int y)
+Tile Grid::getTile(int x, int y) const
 {
     if(!isValid(x, y))
         return BORDER;
@@ -95,9 +97,43 @@ void Grid::setTile(Tile tile, float x, float y)
         setTile(tile, tileX, tileY);
 }
 
-Vector2i const Grid::toTileCoord(float x, float y)
+Vector2i Grid::toTileCoord(float x, float y) const
 {
     int tileX = x / getTileSize();
     int tileY = y / getTileSize();
     return (Vector2i) {tileX, tileY};
+}
+
+void simu::to_json(json &json, const Grid &grid)
+{
+    unsigned char* encoded = base64_encode((const unsigned char*)(grid.m_grid), grid.getTileNumber() * sizeof(Tile), NULL);
+    std::string data((char*) encoded);
+    json["width"] = grid.getGridWidth();
+    json["data"] = data;
+    delete[] encoded;
+}
+
+void simu::from_json(const json & json, Grid & grid)
+{
+    auto rowdata = json.at("data");
+    
+    if(!rowdata.is_string())
+        throw std::runtime_error("Impossible de charger la grille: La grille est corrompu");
+
+    int gridWidth = json.at("width");
+    
+    std::string data;
+    rowdata.get_to(data);
+
+    size_t decoded_len = 0;
+    unsigned char* decoded = base64_decode((const unsigned char*) data.c_str(), data.length(), &decoded_len);
+
+    int tilesNumber = decoded_len / sizeof(Tile);
+    if(gridWidth*gridWidth != tilesNumber) // Test que la grille est bien carré
+        throw std::runtime_error("Impossible de charger la grille: La grille est corrompu");
+    
+    if(grid.m_grid)
+        delete[] grid.m_grid;
+    
+    grid.m_grid = reinterpret_cast<Tile*>(decoded);
 }

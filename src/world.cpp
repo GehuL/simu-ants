@@ -3,14 +3,14 @@
 
 #include "utils.h"
 #include "ant.h"
-#include "json.hpp"
+#include "external/json.hpp"
 
 using namespace simu;
 using json = nlohmann::json;
 
 World World::world;
 
-World::World() : m_entity_cnt(0), m_grid(100, 5)
+World::World() : m_entity_cnt(0), m_grid(500, 5)
 {
 }
 
@@ -27,60 +27,80 @@ void World::init()
     spawnEntities<Ant>(10);
 }
 
-void World::save(std::ofstream &file)
+void World::save(const std::string& filename)
 {
     TRACELOG(LOG_INFO, "Saving simulation..");
  
-    // TODO: Traiter les exceptions
-    // TODO: Sauvegarder n'importe quel type enfant de Entity
     // TODO: Sauvegarder la seed de la génération de nombre aléatoire
     // TODO: Sauvegarder la grille
-    json j;
-    for(auto& en : m_entities)
+    try
     {
-        Entity& a = *en.get();
-        json ja;
-        a.save(ja);
-        j += ja;
-    }
-    file << j;
-    TRACELOG(LOG_INFO, "Saved !");
+        json j;
+
+        for(auto& en : m_entities)
+        {
+            Entity& a = *en.get();
+            json ja;
+            a.save(ja);
+            j["entities"] += ja;
+        }
+
+        j["grid"] = m_grid;
+
+        auto file = std::ofstream(filename, std::ios_base::out);
+        file << j;
+        file.close();
+
+        TRACELOG(LOG_INFO, "File saved to %s", filename.c_str());
+    }catch(const json::exception& e)
+    {
+        TRACELOG(LOG_ERROR, "Erreur de chargement du fichier %s: %s", filename, e.what());
+    } 
 }
 
 void World::load(const std::string& filename)
 {
-    TRACELOG(LOG_INFO, "Loading simulation..");
+    TRACELOG(LOG_INFO, "Loading file %s", filename.c_str());
     
     // TODO: Optimiser la fonction
     // TODO: Charger la seed de la génération de nombre aléatoire
     // TODO: Charger la grille
-    // TODO: Ne pas alterer la simulation si une erreur durant le fichier
     try
     {
         auto file = std::ifstream(filename, std::ios_base::in);
         
         json j = json::parse(file);
-
+        
+        // Lecture des entités
+        auto entities_json = j.at("entities");
         std::vector<std::shared_ptr<Entity>> entities_tmp;
-        entities_tmp.resize(j.size());
 
-        // Instantie la bonne class en fonction du type json
-        for(size_t i = 0; i < j.size(); i++)
+        if(entities_json.is_array())
         {
-            std::string typestr = j[i]["type"];
-            entities_t t = entityFactory(typestr);
-            std::visit([&](auto e) mutable {
-                using EntityType = std::decay_t<decltype(e)>;
-                auto en = std::make_shared<EntityType>(m_entity_cnt++);
-                en.get()->load(j[i]);
-                entities_tmp[i] = en;
-            }, t);
+            entities_tmp.resize(entities_json.size());
+
+            // Instantie la bonne class en fonction du type json
+            for(size_t i = 0; i < entities_json.size(); i++)
+            {
+                std::string typestr = entities_json[i]["type"];
+                entities_t t = entityFactory(typestr);
+                std::visit([&](auto e) mutable {
+                    using EntityType = std::decay_t<decltype(e)>;
+                    auto en = std::make_shared<EntityType>(m_entity_cnt++);
+                    auto en_j = entities_json[i];
+                    en.get()->load(en_j);
+                    entities_tmp[i] = en;
+                }, t);
+            }
         }
+
+        // Lecture de la grille
+        j.at("grid").get_to(m_grid);
 
         // Si on arrive ici c'est qu'il n'y a pas eu d'erreurs
         m_entities.clear();
-        m_entities = std::move(entities_tmp);
-
+        m_entities = std::move(entities_tmp); // On peut altérer la partie
+       
         file.close();
 
         TRACELOG(LOG_INFO, "Loaded !");
@@ -132,11 +152,7 @@ void World::handleKeyboard()
     if(IsKeyPressed(KEY_P)) setPause(!isPaused());
 
     if(IsKeyPressed(KEY_S))
-    {
-        auto file = std::ofstream("simu-save.json", std::ios_base::out);
-        save(file);
-        file.close();
-    }
+        save("simu-save.json");
 
     if(IsKeyPressed(KEY_R))
         load("simu-save.json");

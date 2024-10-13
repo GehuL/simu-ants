@@ -125,7 +125,7 @@ namespace simu
             
             void init() override;
 
-            void save(std::ofstream& file);
+            void save(const std::string& file);
             void load(const std::string& file);
 
         private:

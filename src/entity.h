@@ -5,7 +5,7 @@
 #include <ostream>
 #include <iostream>
 
-#include "json.hpp"
+#include "external/json.hpp"
 
 #include "raylib.h"
 #include "tiles.h"
