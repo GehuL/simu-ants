@@ -10,7 +10,7 @@ using json = nlohmann::json;
 
 World World::world;
 
-World::World() : m_entity_cnt(0), m_grid(50, 5)
+World::World() : m_entity_cnt(0), m_grid(113, 5)
 {
 
 }
@@ -37,7 +37,6 @@ void World::save(const std::string& filename)
 {
     TRACELOG(LOG_INFO, "Saving simulation..");
  
-    // TODO: Sauvegarder la seed de la génération de nombre aléatoire
     try
     {
         json j;
@@ -69,7 +68,6 @@ void World::load(const std::string& filename)
     TRACELOG(LOG_INFO, "Loading file %s", filename.c_str());
     
     // TODO: Optimiser la fonction
-    // TODO: Charger la seed de la génération de nombre aléatoire
     try
     {
         auto file = std::ifstream(filename, std::ios_base::in);

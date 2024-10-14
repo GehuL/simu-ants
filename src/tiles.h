@@ -66,6 +66,7 @@ namespace simu
         private:
             int m_gridWidth;
             int m_tileSize;
+
             Tile *m_grid;
     };
 

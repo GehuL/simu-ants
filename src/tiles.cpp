@@ -1,9 +1,9 @@
 #include "tiles.h"
-
-#include <memory.h>
-#include "external/base64.h"
-
+#include "utils.h"
 using namespace simu;
+
+// On utilise le système d'allocation de raylib pour cette class! 
+
 
 Grid::Grid(const int gridWidth, const int tileSize) : m_gridWidth(gridWidth), m_tileSize(tileSize)
 {
@@ -13,19 +13,29 @@ Grid::Grid(const int gridWidth, const int tileSize) : m_gridWidth(gridWidth), m_
 Grid::~Grid()
 {
     if(m_grid != nullptr)
-        delete[] m_grid;
+        MemFree(m_grid);
 }
 
 void Grid::draw()
 {
+    // DrawTexture();
+
     for(int y = 0; y < m_gridWidth; y++)
     {
         for(int x = 0; x < m_gridWidth; x++)
         {
             DrawRectangle(x*m_tileSize, y*m_tileSize, m_tileSize, m_tileSize, m_grid[y*m_gridWidth + x].color);
-            DrawRectangleLinesEx((Rectangle){static_cast<float>(x*m_tileSize), static_cast<float>(y*m_tileSize), static_cast<float>(m_tileSize) + 1, static_cast<float>(m_tileSize) + 1}, 0.5f, GRAY);
         }
     }
+    // TODO: Utiliser une Texture2D pour optimiser le rendu
+
+    // Draw vertical lines
+    for(int i = 0; i < m_gridWidth; i++)
+    {
+        DrawLine(i*m_tileSize, 0, i*m_tileSize, m_tileSize*m_gridWidth, GRAY);
+        DrawLine(0, i*m_tileSize, m_tileSize*m_gridWidth, i*m_tileSize, GRAY);
+    }
+
 }
 
 void Grid::update()
@@ -61,9 +71,9 @@ void Grid::check(int x, int y) const
 void Grid::reset()
 {
     if(m_grid != nullptr)
-        delete[] m_grid;
+        MemFree(m_grid);
      
-    m_grid = new Tile[m_gridWidth*m_gridWidth] {AIR};
+    m_grid = (Tile*) MemAlloc(m_gridWidth*m_gridWidth*sizeof(Tile));
 }
 
 void Grid::setTile(Tile tile, int x, int y)
@@ -106,11 +116,18 @@ Vector2i Grid::toTileCoord(float x, float y) const
 void simu::to_json(json &json, const Grid &grid)
 {
     // TODO: Compresser les données
-    unsigned char* encoded = base64_encode((const unsigned char*)(grid.m_grid), grid.getTileNumber() * sizeof(Tile), NULL);
-    std::string data((char*) encoded);
+    int compressed_len = 0, encoded_len = 0;
+    unsigned char* compressed = CompressData((const unsigned char*)(grid.m_grid), grid.getTileNumber() * sizeof(Tile), &compressed_len);
+    char* encoded = EncodeDataBase64((const unsigned char*)(compressed), compressed_len, &encoded_len);
+    encoded[encoded_len - 1] = '\0';
+    
     json["width"] = grid.getGridWidth();
-    json["data"] = data;
-    delete[] encoded;
+    json["data"] = encoded;
+
+    // TRACELOG(LOG_INFO, "%s", json["data"].dump());
+    // 16540, 12420
+    MemFree(encoded);
+    MemFree(compressed);
 }
 
 void simu::from_json(const json & json, Grid & grid)
@@ -126,16 +143,20 @@ void simu::from_json(const json & json, Grid & grid)
     std::string data;
     rowdata.get_to(data);
 
-    size_t decoded_len = 0;
-    unsigned char* decoded = base64_decode((const unsigned char*) data.c_str(), data.length(), &decoded_len);
+    int decoded_len = 0, decompressed_len = 0;
+    unsigned char* decoded = DecodeDataBase64((const unsigned char*) data.c_str(), &decoded_len);
+    unsigned char* decompressed = DecompressData(decoded, decoded_len, &decompressed_len);
 
-    int tilesNumber = decoded_len / sizeof(Tile);
+    if(decoded != NULL)
+        MemFree(decoded);
+
+    int tilesNumber = decompressed_len / sizeof(Tile);
     if(gridWidth*gridWidth != tilesNumber) // Test que la grille est bien carré
         throw std::runtime_error("Impossible de charger la grille: La grille est corrompu");
     
     if(grid.m_grid)
-        delete[] grid.m_grid;
+        MemFree(grid.m_grid);
     
     grid.m_gridWidth = gridWidth;
-    grid.m_grid = reinterpret_cast<Tile*>(decoded);
+    grid.m_grid = reinterpret_cast<Tile*>(decompressed);
 }
