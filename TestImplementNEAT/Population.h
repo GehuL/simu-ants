@@ -23,13 +23,16 @@ public:
     // Méthode pour obtenir les individus
      std::vector<neat::Individual>& get_individuals();
 
+     
+
 private:
     NeatConfig config;
     RNG &rng;
     std::vector<neat::Individual> individuals;  // Vecteur d'individus
     neat::Individual best_individual;
 
-    int next_genome_id();
+    int next_genome_id;
+    int generate_next_genome_id();
     Genome new_genome();
     neat::NeuronGene new_neuron(int neuron_id);
     neat::LinkGene new_link(int input_id, int output_id);

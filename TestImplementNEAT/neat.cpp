@@ -40,8 +40,8 @@ LinkGene Neat::crossover_link(const LinkGene &a, const LinkGene &b) {
     return LinkGene{link_id, weight, is_enabled};
 }
 
-Genome Neat::crossover(const Individual &dominant, const Individual &recessive) {
-    Genome offspring{m_genome_indexer.next(), dominant.genome.get_num_inputs(), dominant.genome.get_num_outputs()};
+Genome Neat::crossover(const Individual &dominant, const Individual &recessive, int child_genome_id) {
+    Genome offspring{child_genome_id, dominant.genome.get_num_inputs(), dominant.genome.get_num_outputs()};
 
     for (const auto &dominant_neuron : dominant.genome.neurons) {
         int neuron_id = dominant_neuron.neuron_id;
@@ -62,10 +62,10 @@ Genome Neat::crossover(const Individual &dominant, const Individual &recessive) 
             offspring.add_link(crossover_link(dominant_link, *recessive_link));
         }
     }
-    
 
-    return offspring; // N'oublie pas de retourner le génome fils !
+    return offspring;
 }
+
 
 // Constructeur de LinkMutator
 LinkMutator::LinkMutator() {}

@@ -82,7 +82,7 @@ public:
 
     LinkGene crossover_link(const LinkGene &a, const LinkGene &b) ;
 
-    Genome crossover(const Individual &dominant, const Individual &recessive);
+    Genome crossover(const Individual &dominant, const Individual &recessive, int child_genome_id);
 private:
     GenomeIndexer m_genome_indexer;
     

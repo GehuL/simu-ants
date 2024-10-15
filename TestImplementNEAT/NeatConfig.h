@@ -15,7 +15,7 @@ struct NeatConfig {
     double probability_mutate_neuron_bias = 0.7;     // Probabilité de muter le biais d'un neurone
 
     // Seuil de survie pour la sélection
-    double survival_threshold = 0.6;  // Pourcentage d'individus qui survivent à chaque génération
+    double survival_threshold = 0.3;  // Pourcentage d'individus qui survivent à chaque génération
 };
 
 #endif // NEATCONFIG_H
