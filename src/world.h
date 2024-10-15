@@ -15,7 +15,7 @@
 #include "tiles.h"
 
 #include "entity.h"
-#include "Ant.h"
+#include "ant.h"
 
 // #define TEMPLATE_CONDITION(T) std::enable_if_t<std::is_base_of<Entity, T>::value && !std::is_same<Entity, T>::value>
 #define TEMPLATE_CONDITION(T) std::enable_if_t<std::is_base_of<Entity, T>::value>
@@ -124,6 +124,7 @@ namespace simu
             Grid& getGrid() { return m_grid; };
             
             void init() override;
+            void unload() override;
 
             void save(const std::string& file);
             void load(const std::string& file);

@@ -10,7 +10,7 @@ using json = nlohmann::json;
 
 World World::world;
 
-World::World() : m_entity_cnt(0), m_grid(113, 5)
+World::World() : m_entity_cnt(0), m_grid(500, 5)
 {
 
 }
@@ -19,6 +19,8 @@ void World::init()
 {
     Engine::init();
 
+    m_grid.reset();
+
     m_seed = GetRandomValue(0, std::numeric_limits<int>::max());
     SetRandomSeed(m_seed);
 
@@ -26,11 +28,17 @@ void World::init()
     
     float offset = (GetScreenWidth() - m_grid.getGridWidth() * m_grid.getTileSize()) / 2.f;
     m_camera.offset = (Vector2){offset, offset};
+    m_camera.zoom = 1.0;
 
     m_entities.clear();
     m_grid.reset();
 
     spawnEntities<Ant>(10);
+}
+
+void World::unload()
+{
+    m_grid.unload();
 }
 
 void World::save(const std::string& filename)

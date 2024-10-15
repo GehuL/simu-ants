@@ -40,13 +40,18 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
         {
             // Update logic
             lag += start - lastUpdateTime;
+            lastUpdateTime = GetTime();
+
+            if(lag / m_tickPeriod >= 100)
+                lag = m_tickPeriod; // Evite de faire cramer le PC de M. Kirgisov
+
             while(lag >= m_tickPeriod)
             {
                 updateTick();
                 lag -= m_tickPeriod;
                 tickCounter++;
-
-                if(m_noDelay)
+                
+                if(m_noDelay) 
                     break;
             }
         }
@@ -117,8 +122,9 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
             // TRACELOG(LOG_INFO, "waitTime: %lf ms", waitTime * 1000.0);
         }
         
-        lastUpdateTime = start;
     }
+    unload();
+
     CloseWindow();
     return 0;
 }

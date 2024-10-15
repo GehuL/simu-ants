@@ -29,7 +29,15 @@ namespace simu
             virtual void drawUI();
             virtual void updateTick();
 
+            /**
+             * Executé après le démarrage de raylib
+             */
             virtual void init() {};
+
+            /**
+             * Executé avant l'arrêt de raylib
+             */
+            virtual void unload() {};
 
         protected:
             Camera2D m_camera;
