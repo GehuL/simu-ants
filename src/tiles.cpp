@@ -38,14 +38,14 @@ void Grid::draw()
         {
             DrawRectangle(x*m_tileSize, y*m_tileSize, m_tileSize, m_tileSize, m_grid[y*m_gridWidth + x].color);
         }
-    }
+    } */
 
-    // Draw vertical lines
+    //Draw vertical lines
     for(int i = 0; i < m_gridWidth; i++)
     {
         DrawLine(i*m_tileSize, 0, i*m_tileSize, m_tileSize*m_gridWidth, GRAY);
         DrawLine(0, i*m_tileSize, m_tileSize*m_gridWidth, i*m_tileSize, GRAY);
-    }*/
+    }
 
 }
 
@@ -56,14 +56,14 @@ void Grid::update()
         for(int x = 0; x < m_gridWidth; x++)
         {
             Vector2i tilePos = (Vector2i) {x, y};
-            Tile tile = getTile(tilePos);
+            Tile tile = getTile<false>(tilePos);
             switch(tile.type)
             {
                 case Type::PHEROMONE:
                     tile.color.a -= 1;
                     if(tile.color.a <= 0)
                         tile = AIR;
-                    setTile(tile, tilePos.x, tilePos.y); 
+                    setTile<false>(tile, tilePos.x, tilePos.y); 
                 break;
                 default:
                     continue;
@@ -96,37 +96,6 @@ void Grid::reset()
     m_img = GenImageColor(m_gridWidth, m_gridWidth, WHITE);
     m_tex = LoadTextureFromImage(m_img);
     SetTextureFilter(m_tex, TEXTURE_FILTER_POINT);
-}
-
-void Grid::setTile(Tile tile, int x, int y)
-{
-    check(x, y);
-    m_grid[y*m_gridWidth + x] = tile;
-    ImageDrawPixel(&m_img, x, y, tile.color);
-}
-
-Tile Grid::getTile(Vector2i pos) const
-{
-    if(!isValid(pos.x, pos.y))
-        return BORDER;
-    return m_grid[pos.y*m_gridWidth + pos.x];
-}
-
-Tile Grid::getTile(Vector2f pos) const
-{
-    int tileX = pos.x / getTileSize();
-    int tileY = pos.y / getTileSize();
-
-    return getTile((Vector2i) {tileX, tileY} );
-}
-
-void Grid::setTile(Tile tile, float x, float y)
-{
-    int tileX = x / getTileSize();
-    int tileY = y / getTileSize();
-
-    if(getTile((Vector2i) {tileX, tileY}).type != Type::BORDER)
-        setTile(tile, tileX, tileY);
 }
 
 Vector2i Grid::toTileCoord(float x, float y) const
