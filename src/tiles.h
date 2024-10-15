@@ -48,8 +48,6 @@ namespace simu
 
             void reset();
 
-
-
             /** @brief Renvoie la tuile en fonction de l'index x et y de la grille
               * @param check Active la vérification la validité des index. Le désactiver est à vos risque et péril
               * @return Renvoie la tuile à la position en paramètre. La tuile est de type BORDER si la positions 
@@ -112,9 +110,16 @@ namespace simu
                 {
                     check(x, y);
                 }
-
-                m_grid[y*m_gridWidth + x] = tile;
-                ImageDrawPixel(&m_img, x, y, tile.color);
+                const int idx = y*m_gridWidth + x; 
+                
+                Tile tileOn = getTile<false>((Vector2i) {x, y}); // Pas besoin de check 2 fois
+                // On évite d'ajouter un index qui est déjà présent
+                if(tile.type == Type::PHEROMONE && tileOn.type != Type::PHEROMONE) 
+                {
+                     m_updateBuff.push_back(idx);
+                }
+               
+                setTile(tile, idx);
             }
 
             Vector2i toTileCoord(float x, float y) const;
@@ -128,13 +133,20 @@ namespace simu
             void check(int x, int y) const;
         
         private:
+
+            // Met à jour le buffer du rendu et la grille. Ne vérifie pas l'index.
+            void setTile(Tile, int index); 
+
             int m_gridWidth;
             int m_tileSize;
 
             Tile *m_grid;
 
-            Texture2D m_tex;
-            Image m_img;
+            // Buffer pour savoir quelles sont les cases à mettre à jour au lieu de faire du polling sur toutes les cases
+            std::vector<int> m_updateBuff;
+
+            Texture2D m_tex;    // Buffer de rendu pour optimiser les FPS
+            Image m_img;        // Buffer de rendu pour optimiser les FPS
     };
 
     void to_json(json& json, const Grid& grid);

@@ -18,27 +18,25 @@ Grid::~Grid()
 
 void Grid::unload()
 {
+    if(m_grid != nullptr)
+        MemFree(m_grid);
+    
+    m_updateBuff.clear();
+    m_grid = nullptr;
+
     UnloadImage(m_img);
     UnloadTexture(m_tex);
 }
 
 void Grid::draw()
 {
-    // TODO: Utiliser une Texture2D pour optimiser le rendu
+    // TODO: Utiliser UpdateTextureRec pour mettre à jour que certains pixels
     UpdateTexture(m_tex, m_img.data);
 
     const int gridWidthPixel = getTileSize() * m_gridWidth;
     DrawTexturePro(m_tex, (Rectangle) {0, 0, (float) m_tex.width, (float) m_tex.width}, 
                         (Rectangle) {0, 0, (float) gridWidthPixel, (float) gridWidthPixel}, 
                         (Vector2){0, 0}, 0, WHITE);
- 
-    /*for(int y = 0; y < m_gridWidth; y++)
-    {
-        for(int x = 0; x < m_gridWidth; x++)
-        {
-            DrawRectangle(x*m_tileSize, y*m_tileSize, m_tileSize, m_tileSize, m_grid[y*m_gridWidth + x].color);
-        }
-    } */
 
     //Draw vertical lines
     for(int i = 0; i < m_gridWidth; i++)
@@ -46,31 +44,34 @@ void Grid::draw()
         DrawLine(i*m_tileSize, 0, i*m_tileSize, m_tileSize*m_gridWidth, GRAY);
         DrawLine(0, i*m_tileSize, m_tileSize*m_gridWidth, i*m_tileSize, GRAY);
     }
-
 }
 
 void Grid::update()
 {
-    for(int y = 0; y < m_gridWidth; y++)
+    for(auto it = m_updateBuff.begin(); it != m_updateBuff.end(); it++)
     {
-        for(int x = 0; x < m_gridWidth; x++)
+        int index = *it;
+        Tile* tile = &m_grid[index];
+
+        switch(tile->type)
         {
-            Vector2i tilePos = (Vector2i) {x, y};
-            Tile tile = getTile<false>(tilePos);
-            switch(tile.type)
-            {
-                case Type::PHEROMONE:
-                    tile.color.a -= 1;
-                    if(tile.color.a <= 0)
-                        tile = AIR;
-                    setTile<false>(tile, tilePos.x, tilePos.y); 
-                break;
-                default:
-                    continue;
-            }
+            case Type::PHEROMONE:
+               
+                if(tile->color.a <= 0)
+                {
+                    *tile = AIR;
+                    setTile(AIR, index);
+                    m_updateBuff.erase(it);
+                }else
+                {
+                    tile->color.a -= 1;
+                    setTile(*tile, index);
+                }
+            break;
+            default:
+                m_updateBuff.erase(it);
         }
     }
-
 }
 
 bool Grid::isValid(int x, int y) const
@@ -84,14 +85,18 @@ void Grid::check(int x, int y) const
         throw std::range_error("Out of range");
 }
 
+void Grid::setTile(Tile tile, int index)
+{
+    m_grid[index] = tile;
+    ImageDrawPixel(&m_img, index % m_gridWidth, index / m_gridWidth, tile.color); // Met à jour le buffer de rendu
+}
+
 void Grid::reset()
 {
-    if(m_grid != nullptr)
-        MemFree(m_grid);
-     
-    m_grid = (Tile*) MemAlloc(m_gridWidth*m_gridWidth*sizeof(Tile));
-
     unload();
+
+    m_grid = (Tile*) MemAlloc(getTileNumber() * sizeof(Tile));
+    m_updateBuff.reserve(getTileNumber());
 
     m_img = GenImageColor(m_gridWidth, m_gridWidth, WHITE);
     m_tex = LoadTextureFromImage(m_img);
@@ -117,7 +122,6 @@ void simu::to_json(json &json, const Grid &grid)
     json["data"] = encoded;
 
     // TRACELOG(LOG_INFO, "%s", json["data"].dump());
-    // 16540, 12420
     MemFree(encoded);
     MemFree(compressed);
 }
@@ -125,6 +129,7 @@ void simu::to_json(json &json, const Grid &grid)
 void simu::from_json(const json & json, Grid & grid)
 {
     // TODO: Décompresser les données
+    // TODO: Ajouter les phéromones dans m_updateBuffer
     auto rowdata = json.at("data");
     
     if(!rowdata.is_string())
