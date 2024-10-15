@@ -38,6 +38,8 @@ namespace simu
             Grid(const int gridWidth, const int tileSize);
             ~Grid();
 
+            void unload();
+
             void update();
             void draw();
 
@@ -68,6 +70,10 @@ namespace simu
             int m_tileSize;
 
             Tile *m_grid;
+
+
+            Texture2D m_tex;
+            Image m_img;
     };
 
     void to_json(json& json, const Grid& grid);

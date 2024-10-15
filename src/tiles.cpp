@@ -7,7 +7,7 @@ using namespace simu;
 
 Grid::Grid(const int gridWidth, const int tileSize) : m_gridWidth(gridWidth), m_tileSize(tileSize)
 {
-    reset();
+
 }
 
 Grid::~Grid()
@@ -16,42 +16,58 @@ Grid::~Grid()
         MemFree(m_grid);
 }
 
+void Grid::unload()
+{
+    UnloadImage(m_img);
+    UnloadTexture(m_tex);
+}
+
 void Grid::draw()
 {
-    // DrawTexture();
+    // TODO: Utiliser une Texture2D pour optimiser le rendu
+    UpdateTexture(m_tex, m_img.data);
 
-    for(int y = 0; y < m_gridWidth; y++)
+    const int gridWidthPixel = getTileSize() * m_gridWidth;
+    DrawTexturePro(m_tex, (Rectangle) {0, 0, (float) m_tex.width, (float) m_tex.width}, 
+                        (Rectangle) {0, 0, (float) gridWidthPixel, (float) gridWidthPixel}, 
+                        (Vector2){0, 0}, 0, WHITE);
+ 
+    /*for(int y = 0; y < m_gridWidth; y++)
     {
         for(int x = 0; x < m_gridWidth; x++)
         {
             DrawRectangle(x*m_tileSize, y*m_tileSize, m_tileSize, m_tileSize, m_grid[y*m_gridWidth + x].color);
         }
     }
-    // TODO: Utiliser une Texture2D pour optimiser le rendu
 
     // Draw vertical lines
     for(int i = 0; i < m_gridWidth; i++)
     {
         DrawLine(i*m_tileSize, 0, i*m_tileSize, m_tileSize*m_gridWidth, GRAY);
         DrawLine(0, i*m_tileSize, m_tileSize*m_gridWidth, i*m_tileSize, GRAY);
-    }
+    }*/
 
 }
 
 void Grid::update()
 {
-    for(int i = 0; i < getTileNumber(); i++)
+    for(int y = 0; y < m_gridWidth; y++)
     {
-        Tile* tile = &m_grid[i];
-        switch(tile->type)
+        for(int x = 0; x < m_gridWidth; x++)
         {
-            case Type::PHEROMONE:
-                tile->color.a -= 1;
-                if(tile->color.a <= 0)
-                    *tile = AIR; 
-            break;
-            default:
-                continue;
+            Vector2i tilePos = (Vector2i) {x, y};
+            Tile tile = getTile(tilePos);
+            switch(tile.type)
+            {
+                case Type::PHEROMONE:
+                    tile.color.a -= 1;
+                    if(tile.color.a <= 0)
+                        tile = AIR;
+                    setTile(tile, tilePos.x, tilePos.y); 
+                break;
+                default:
+                    continue;
+            }
         }
     }
 
@@ -74,12 +90,19 @@ void Grid::reset()
         MemFree(m_grid);
      
     m_grid = (Tile*) MemAlloc(m_gridWidth*m_gridWidth*sizeof(Tile));
+
+    unload();
+
+    m_img = GenImageColor(m_gridWidth, m_gridWidth, WHITE);
+    m_tex = LoadTextureFromImage(m_img);
+    SetTextureFilter(m_tex, TEXTURE_FILTER_POINT);
 }
 
 void Grid::setTile(Tile tile, int x, int y)
 {
     check(x, y);
     m_grid[y*m_gridWidth + x] = tile;
+    ImageDrawPixel(&m_img, x, y, tile.color);
 }
 
 Tile Grid::getTile(Vector2i pos) const
