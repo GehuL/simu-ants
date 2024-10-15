@@ -42,8 +42,8 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
             lag += start - lastUpdateTime;
             lastUpdateTime = GetTime();
 
-            if(lag / m_tickPeriod >= 100)
-                lag = m_tickPeriod; // Evite de faire cramer le PC de M. Kirgisov
+            if(lag / m_tickPeriod >= 100) // Evite de faire cramer le PC de M. Kirgisov
+                lag = m_tickPeriod; 
 
             while(lag >= m_tickPeriod)
             {
@@ -113,15 +113,20 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
         }
     
         double delta = GetTime() - start;
+      
         // Différence de temps libre entre update et draw (drawDelta inclue le temps de l'affichage de l'UI)
-        double waitTime = MIN(m_framePeriod - delta, m_tickPeriod - delta);
-        if(!m_noDelay && waitTime >= 0.0) // Il reste du temps pour mettre en pause 
+        double waitTime = 0.0;
+        if(m_pause)
+            waitTime = m_framePeriod - delta;
+        else
+            waitTime = MIN(m_framePeriod - delta, m_tickPeriod - delta);
+       
+        if(waitTime >= 0.0) // Il reste du temps pour mettre en pause 
         {
             // Désactiver le waitTime permet d'augmenter la priorité du processus 
             WaitTime(waitTime);
             // TRACELOG(LOG_INFO, "waitTime: %lf ms", waitTime * 1000.0);
         }
-        
     }
     unload();
 
