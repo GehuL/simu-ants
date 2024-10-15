@@ -10,7 +10,7 @@ using json = nlohmann::json;
 
 World World::world;
 
-World::World() : m_entity_cnt(0), m_grid(113, 5)
+World::World() : m_entity_cnt(0), m_grid(517, 5)
 {
 
 }

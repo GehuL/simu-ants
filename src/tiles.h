@@ -63,7 +63,11 @@ namespace simu
             bool isValid(int x, int y) const;
             void check(int x, int y) const;
         
+            friend void compressGrid(const Grid& grid, std::string& output);
+            friend void decompressGrid(Grid& grid, std::string& data, int gridWidth);
+        
         private:
+
             int m_gridWidth;
             int m_tileSize;
 
@@ -72,6 +76,22 @@ namespace simu
 
     void to_json(json& json, const Grid& grid);
     void from_json(const json& json, Grid& grid);
+
+    /**@brief Encode (base 64) et compresse (DEFLATE algo) les données de la grille pour être mis dans un txt
+         * @param output Les données compressés et encodés
+         * @grid La grille à compresser
+         * @throw Lève une exception si une erreur à eu lieu (mémoire insuffisante, erreur de compression)
+         * Si une erreur à lieu, la grille n'est pas modifié
+         */
+    void compressGrid(const Grid& grid, std::string& output);
+
+    /**@brief Decode (base 64) et decompresse (DEFLATE algo) des donnéespour charger la grille
+     * @param data Les données compressées et encodées d'une grille
+     * @param La largeur de la grille en nombre de tuile
+     * @throw Lève une exception si une erreur a eu lieu (mémoire insuffisante, erreur de decompression, données corrompues)
+     * Si une erreur à lieu, la grille n'est pas modifié
+     */
+    void decompressGrid(Grid& grid, std::string& data, int gridWidth);
 }
 
 #endif
