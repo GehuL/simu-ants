@@ -165,7 +165,9 @@ std::vector<neat::Individual> Population::reproduce() {
     
     while (spawn_size-- > 0) {
         neat::Individual& p1 = rng.choose_random(old_members, reproduction_cutoff);
+        std::cout << "Parent 1: " << p1.genome.get_genome_id() << std::endl;
         neat::Individual& p2 = rng.choose_random(old_members, reproduction_cutoff);
+        std::cout << "Parent 2: " << p2.genome.get_genome_id() << std::endl;
 
         neat::Neat neat_instance;
         // Passez un ID unique lors de la création de l'enfant
