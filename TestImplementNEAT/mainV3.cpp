@@ -19,7 +19,7 @@ int main() {
     Population population(config, rng);
 
     // Nombre maximal de générations
-    int max_generations = 10;
+    int max_generations = 5;
 
     // Exécutez l'algorithme NEAT
     auto best_individual = population.runV2(compute_fitness, max_generations);

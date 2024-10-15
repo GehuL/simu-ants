@@ -41,7 +41,7 @@ std::vector<double> get_game_state() {
     std::uniform_real_distribution<> dist(0.0, 1.0); // Distribution aléatoire entre 0.0 et 1.0
     
     // Remplir le vecteur avec des nombres aléatoires
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < 2; ++i) {
         game_state.push_back(dist(gen));
     }
 

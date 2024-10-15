@@ -10,6 +10,11 @@ class RNG {
 public:
     RNG() : gen(rd()) {}  // Initialisation du générateur
 
+    bool next_bool() {
+        std::uniform_int_distribution<> dis(0, 1);  // Génère un entier 0 ou 1
+        return dis(gen);  // Retourne un booléen aléatoire
+    }
+
     // Génère un entier aléatoire entre min et max (inclus)
     int next_int(int min, int max) {
         std::uniform_int_distribution<int> dist(min, max);

@@ -105,37 +105,53 @@ void Population::mutate(Genome &genome) {
     
     // Probabilité d'ajouter un lien
     if (rng.next_double() < config.probability_add_link) {
+        std::cout << "Adding link for " << genome.get_genome_id() << std::endl;
         neat::mutate_add_link(genome);
     }
 
     // Probabilité de supprimer un lien
     if (rng.next_double() < config.probability_remove_link) {
+        std::cout << "Removing link for " << genome.get_genome_id() << std::endl;
         neat::mutate_remove_link(genome);
     }
 
     // Probabilité d'ajouter un neurone
     if (rng.next_double() < config.probability_add_neuron) {
+        std::cout << "Adding neuron for " << genome.get_genome_id() << std::endl;
         neat::mutate_add_neuron(genome);
     }
 
     // Probabilité de supprimer un neurone
     if (rng.next_double() < config.probability_remove_neuron) {
+        std::cout << "Removing neuron for " << genome.get_genome_id() << std::endl;
         neat::mutate_remove_neuron(genome);
     }
 
-    // Appliquer la mutation non structurelle aux poids des liens
-    for (auto &link : genome.links) {
-        if (rng.next_double() < config.probability_mutate_link_weight) {
-            link.weight = neat::mutate_delta(link.weight);  // Muter le poids du lien
-        }
-    }
+    // Choisir un lien ou un neurone aléatoirement pour la mutation
+bool mutate_link = rng.next_bool();  // Choisir entre muter un lien ou un neurone
 
-    // Appliquer la mutation non structurelle aux biais des neurones
-    for (auto &neuron : genome.neurons) {
-        if (rng.next_double() < config.probability_mutate_neuron_bias) {
-            neuron.bias = neat::mutate_delta(neuron.bias);  // Muter le biais du neurone
-        }
+if (mutate_link && !genome.links.empty()) {
+    // Choisir un lien aléatoire
+    int link_index = rng.next_int(0, genome.links.size() - 1);
+    auto &link = genome.links[link_index];
+
+    // Appliquer la mutation si la probabilité le permet
+    if (rng.next_double() < config.probability_mutate_link_weight) {
+        std::cout << "Mutating link weight for " << genome.get_genome_id() << std::endl;
+        link.weight = neat::mutate_delta(link.weight);  // Muter le poids du lien
     }
+} else if (!genome.neurons.empty()) {
+    // Choisir un neurone aléatoire
+    int neuron_index = rng.next_int(0, genome.neurons.size() - 1);
+    auto &neuron = genome.neurons[neuron_index];
+
+    // Appliquer la mutation si la probabilité le permet
+    if (rng.next_double() < config.probability_mutate_neuron_bias) {
+        std::cout << "Mutating neuron bias for " << genome.get_genome_id() << std::endl;
+        neuron.bias = neat::mutate_delta(neuron.bias);  // Muter le biais du neurone
+    }
+}
+
 }
 
 
@@ -152,7 +168,9 @@ std::vector<neat::Individual> Population::reproduce() {
         RNG rng;
         // Récupérer les parents
         neat::Individual& p1 = rng.choose_random(old_members, reproduction_cutoff);
+        std::cout << "Parent 1 id: " << p1.genome.get_genome_id() << std::endl;
         neat::Individual& p2 = rng.choose_random(old_members, reproduction_cutoff);
+        std::cout << "Parent 2 id: " << p2.genome.get_genome_id() << std::endl;
         neat::Neat neat_instance;
         Genome offspring = neat_instance.crossover(p1.genome, p2.genome);  // Vous devez définir `crossover`
         mutate(offspring);  // Vous devez définir `mutate`

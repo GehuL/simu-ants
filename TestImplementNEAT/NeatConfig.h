@@ -2,8 +2,8 @@
 #define NEATCONFIG_H
 
 struct NeatConfig {
-    int population_size = 100;        // Taille de la population
-    int num_inputs = 5;               // Nombre d'entrées
+    int population_size = 6;        // Taille de la population
+    int num_inputs = 3;               // Nombre d'entrées
     int num_outputs = 2;              // Nombre de sorties
 
     // Probabilités de mutation
@@ -15,7 +15,7 @@ struct NeatConfig {
     double probability_mutate_neuron_bias = 0.7;     // Probabilité de muter le biais d'un neurone
 
     // Seuil de survie pour la sélection
-    double survival_threshold = 0.2;  // Pourcentage d'individus qui survivent à chaque génération
+    double survival_threshold = 0.6;  // Pourcentage d'individus qui survivent à chaque génération
 };
 
 #endif // NEATCONFIG_H
