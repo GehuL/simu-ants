@@ -5,14 +5,14 @@ using namespace simu;
 // On utilise le système d'allocation de raylib pour cette class! 
 
 
-Grid::Grid(const int gridWidth, const int tileSize) : m_gridWidth(gridWidth), m_tileSize(tileSize)
+Grid::Grid(const int gridWidth, const int tileSize) : m_grid(NULL), m_gridWidth(gridWidth), m_tileSize(tileSize)
 {
     reset();
 }
 
 Grid::~Grid()
 {
-    if(m_grid != nullptr)
+    if(m_grid != NULL)
         MemFree(m_grid);
 }
 
@@ -72,7 +72,7 @@ void Grid::check(int x, int y) const
 
 void Grid::reset()
 {
-    if(m_grid != nullptr)
+    if(m_grid != NULL)
         MemFree(m_grid);
      
     m_grid = (Tile*) MemAlloc(m_gridWidth*m_gridWidth*sizeof(Tile));
@@ -147,7 +147,7 @@ void simu::compressGrid(const Grid& grid, std::string& output)
 void simu::decompressGrid(Grid& grid, std::string &data, int gridWidth)
 {
     int decoded_len = 0, decompressed_len = 0;
-    unsigned char* decoded = DecodeDataBase64((const unsigned char*) data.c_str(), &decoded_len);
+    unsigned char* decoded = DecodeDataBase64(reinterpret_cast<const unsigned char*>(data.c_str()), &decoded_len);
     unsigned char* decompressed = DecompressData(decoded, decoded_len, &decompressed_len);
     
     grid.m_gridWidth = gridWidth;
