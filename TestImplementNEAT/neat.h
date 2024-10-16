@@ -18,6 +18,11 @@ struct NeuronGene {
     double bias;
     Activation activation;  // Enum ou fonction d'activation
 
+    bool is_hidden(int neuron_id, const NeatConfig &config) const {
+    return neuron_id >= config.num_inputs + config.num_outputs;
+}
+
+
 
     
 };

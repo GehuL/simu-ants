@@ -233,23 +233,32 @@ void mutate_add_neuron(Genome &genome)
 }
 
 void mutate_remove_neuron(Genome &genome) {
-    if (genome.neurons.empty()) {
-        return;
+    // Vérifier qu'il reste au moins 2 neurones cachés
+    int hidden_neuron_count = std::count_if(genome.neurons.begin(), genome.neurons.end(), 
+        [](const NeuronGene &neuron) { 
+            NeatConfig config;
+            return neuron.is_hidden(neuron.neuron_id,config);  // Assurez-vous que la méthode is_hidden() est définie pour détecter les neurones cachés
+        });
+
+    if (hidden_neuron_count < 2) {
+        return;  // Ne rien faire s'il reste moins de 2 neurones cachés
     }
-    
+
+    // Choisir un neurone caché aléatoire
     RNG rng;
     auto neuron_it = choose_random_hidden(genome.neurons);
 
     // Effacer les liens qui pointent vers ce neurone
     genome.links.erase(std::remove_if(genome.links.begin(), genome.links.end(), 
         [neuron_it](const LinkGene &link) {
-            return link.has_neuron(*neuron_it);  // Utilisez le neurone dereferencé
+            return link.has_neuron(*neuron_it);  // Utilisez le neurone déférencé
         }),
         genome.links.end());
 
     // Supprimer le neurone
     genome.neurons.erase(neuron_it);  // Utilisez l'itérateur ici
 }
+
 
 double clamp(double x){
     DoubleConfig config;

@@ -1,23 +1,14 @@
 Genome ID: 26
 Neurons:
 Neuron ID: 0, Bias: 0
-Neuron ID: 1, Bias: -2.07076
+Neuron ID: 1, Bias: 0
 Neuron ID: 2, Bias: 0
 Neuron ID: 3, Bias: 0
 Neuron ID: 4, Bias: 0
-Neuron ID: 5, Bias: -0.568214
 Neuron ID: 6, Bias: 0
-Neuron ID: 0, Bias: 0
 Links:
-Link from neuron 0 to neuron 5 with weight -0.910717 (enabled)
-Link from neuron 1 to neuron 5 with weight 0.0697292 (enabled)
-Link from neuron 2 to neuron 5 with weight -0.334545 (enabled)
-Link from neuron 5 to neuron 3 with weight 0.177066 (enabled)
-Link from neuron 5 to neuron 4 with weight 0.248236 (enabled)
-Link from neuron 0 to neuron 6 with weight 0.0607481 (enabled)
-Link from neuron 1 to neuron 6 with weight 0.523448 (enabled)
-Link from neuron 2 to neuron 6 with weight 0.153877 (enabled)
-Link from neuron 6 to neuron 3 with weight -0.137379 (enabled)
-Link from neuron 6 to neuron 4 with weight 0.52579 (enabled)
-Link from neuron 1 to neuron 0 with weight 1 (enabled)
-Link from neuron 0 to neuron 5 with weight 0.0697292 (enabled)
+Link from neuron 0 to neuron 6 with weight 0.955371 (enabled)
+Link from neuron 1 to neuron 6 with weight 0.0912853 (enabled)
+Link from neuron 2 to neuron 6 with weight -0.0386976 (enabled)
+Link from neuron 6 to neuron 3 with weight -1.73259 (enabled)
+Link from neuron 6 to neuron 4 with weight 0.237622 (enabled)
