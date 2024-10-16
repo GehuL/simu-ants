@@ -7,14 +7,26 @@ Neuron ID: 3, Bias: 0
 Neuron ID: 4, Bias: 0
 Neuron ID: 5, Bias: 0
 Neuron ID: 6, Bias: 0
+Neuron ID: 7, Bias: 0
+Neuron ID: 8, Bias: 0
 Links:
-Link from neuron 0 to neuron 5 with weight -0.560099 (enabled)
-Link from neuron 1 to neuron 5 with weight 0.742476 (enabled)
-Link from neuron 2 to neuron 5 with weight -0.567353 (enabled)
-Link from neuron 5 to neuron 3 with weight 0.895354 (enabled)
-Link from neuron 5 to neuron 4 with weight 0.256778 (enabled)
-Link from neuron 0 to neuron 6 with weight -0.00102111 (enabled)
-Link from neuron 1 to neuron 6 with weight 0.44818 (enabled)
-Link from neuron 2 to neuron 6 with weight -1.096 (enabled)
-Link from neuron 6 to neuron 3 with weight 0.523694 (enabled)
-Link from neuron 6 to neuron 4 with weight -0.0809525 (enabled)
+Link from neuron 0 to neuron 5 with weight 0.46792 (enabled)
+Link from neuron 1 to neuron 5 with weight 2.64744 (enabled)
+Link from neuron 2 to neuron 5 with weight -1.51651 (enabled)
+Link from neuron 5 to neuron 3 with weight 1.5022 (enabled)
+Link from neuron 5 to neuron 4 with weight 1.12872 (enabled)
+Link from neuron 0 to neuron 6 with weight 0.100547 (enabled)
+Link from neuron 1 to neuron 6 with weight -1.88854 (enabled)
+Link from neuron 2 to neuron 6 with weight -0.0358138 (enabled)
+Link from neuron 6 to neuron 3 with weight 0.683388 (enabled)
+Link from neuron 6 to neuron 4 with weight -0.480167 (enabled)
+Link from neuron 0 to neuron 7 with weight 0.199267 (enabled)
+Link from neuron 1 to neuron 7 with weight 1.27218 (enabled)
+Link from neuron 2 to neuron 7 with weight 2.37175 (enabled)
+Link from neuron 7 to neuron 3 with weight 0.681689 (enabled)
+Link from neuron 7 to neuron 4 with weight 0.366036 (enabled)
+Link from neuron 0 to neuron 8 with weight 0.130939 (enabled)
+Link from neuron 1 to neuron 8 with weight -0.38065 (enabled)
+Link from neuron 2 to neuron 8 with weight 0.645383 (enabled)
+Link from neuron 8 to neuron 3 with weight -2.81111 (enabled)
+Link from neuron 8 to neuron 4 with weight -1.22545 (enabled)

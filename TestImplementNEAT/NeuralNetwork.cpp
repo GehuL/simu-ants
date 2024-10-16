@@ -27,7 +27,7 @@ std::vector<double> FeedForwardNeuralNetwork::activate(const std::vector<double>
         
 
         for (const NeuronInput& input : neuron.inputs) {
-            //std::cout << "Neuron " << neuron.neuron_id << " has input from neuron " << input.input_id << "\n";
+            std::cout << "Neuron " << neuron.neuron_id << " has input from neuron " << input.input_id << "\n";
 
             // Vérifier si l'input_id existe dans 'values'
             if (values.find(input.input_id) == values.end()) {

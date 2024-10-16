@@ -220,7 +220,15 @@ void mutate_add_neuron(Genome &genome)
     }
 
     neat::LinkGene link_to_split = rng.choose_random(genome.links);  // Choisir un lien à diviser
-    link_to_split.is_enabled = false;  // Désactiver le lien existant
+
+    // Désactiver le lien existant
+    link_to_split.is_enabled = false;
+
+    // Retirer le lien divisé en fonction de son LinkId
+    genome.links.erase(std::remove_if(genome.links.begin(), genome.links.end(),
+        [&link_to_split](const neat::LinkGene &link) {
+            return link.link_id == link_to_split.link_id;
+        }), genome.links.end());
 
     NeuronMutator neuron_mutator;  // Instancier NeuronMutator
     neat::NeuronGene new_neuron = neuron_mutator.new_neuron();  // Créer un nouveau neurone
@@ -235,6 +243,7 @@ void mutate_add_neuron(Genome &genome)
     // Ajouter un lien du nouveau neurone au neurone de sortie
     genome.add_link(neat::LinkGene{{new_neuron.neuron_id, link_id.output_id}, weight, true});  
 }
+
 
 
 void mutate_remove_neuron(Genome &genome) {

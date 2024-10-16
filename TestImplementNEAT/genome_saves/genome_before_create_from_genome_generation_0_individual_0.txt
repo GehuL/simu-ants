@@ -8,13 +8,13 @@ Neuron ID: 4, Bias: 0
 Neuron ID: 5, Bias: 0
 Neuron ID: 6, Bias: 0
 Links:
-Link from neuron 0 to neuron 5 with weight -0.978633 (enabled)
-Link from neuron 1 to neuron 5 with weight 1.53555 (enabled)
-Link from neuron 2 to neuron 5 with weight 0.036529 (enabled)
-Link from neuron 5 to neuron 3 with weight 0.486514 (enabled)
-Link from neuron 5 to neuron 4 with weight -1.4049 (enabled)
-Link from neuron 0 to neuron 6 with weight 0.58719 (enabled)
-Link from neuron 1 to neuron 6 with weight -0.10619 (enabled)
-Link from neuron 2 to neuron 6 with weight 0.265673 (enabled)
-Link from neuron 6 to neuron 3 with weight -0.393941 (enabled)
-Link from neuron 6 to neuron 4 with weight -0.395309 (enabled)
+Link from neuron 0 to neuron 5 with weight 1.10872 (enabled)
+Link from neuron 1 to neuron 5 with weight -0.201494 (enabled)
+Link from neuron 2 to neuron 5 with weight -0.491608 (enabled)
+Link from neuron 5 to neuron 3 with weight 1.10431 (enabled)
+Link from neuron 5 to neuron 4 with weight -0.254866 (enabled)
+Link from neuron 0 to neuron 6 with weight 0.180512 (enabled)
+Link from neuron 1 to neuron 6 with weight 0.106677 (enabled)
+Link from neuron 2 to neuron 6 with weight -0.0698207 (enabled)
+Link from neuron 6 to neuron 3 with weight -0.787066 (enabled)
+Link from neuron 6 to neuron 4 with weight 0.251885 (enabled)
