@@ -218,19 +218,24 @@ void mutate_add_neuron(Genome &genome)
     if (genome.links.empty()) {
         return;
     }
+
     neat::LinkGene link_to_split = rng.choose_random(genome.links);  // Choisir un lien à diviser
     link_to_split.is_enabled = false;  // Désactiver le lien existant
 
     NeuronMutator neuron_mutator;  // Instancier NeuronMutator
     neat::NeuronGene new_neuron = neuron_mutator.new_neuron();  // Créer un nouveau neurone
+    new_neuron.neuron_id = genome.generate_next_neuron_id();  // Générer un nouvel ID de neurone
     genome.add_neuron(new_neuron);  // Ajouter le nouveau neurone
 
     neat::LinkId link_id = link_to_split.link_id;
     double weight = link_to_split.weight;
 
-    genome.add_link(neat::LinkGene{{link_id.input_id}, 1.0, true});  // Ajouter un lien du neurone d'entrée au nouveau neurone
-    genome.add_link(neat::LinkGene{{new_neuron.neuron_id, link_id.output_id}, weight, true});  // Ajouter un lien du nouveau neurone au neurone de sortie
+    // Ajouter un lien du neurone d'entrée au nouveau neurone
+    genome.add_link(neat::LinkGene{{link_id.input_id, new_neuron.neuron_id}, 1.0, true});  
+    // Ajouter un lien du nouveau neurone au neurone de sortie
+    genome.add_link(neat::LinkGene{{new_neuron.neuron_id, link_id.output_id}, weight, true});  
 }
+
 
 void mutate_remove_neuron(Genome &genome) {
     // Vérifier qu'il reste au moins 2 neurones cachés

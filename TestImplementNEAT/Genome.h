@@ -27,6 +27,8 @@ public:
     int get_num_outputs() const;
     int get_genome_id() const;
 
+    int generate_next_neuron_id();
+
     std::vector<int> make_input_ids() const;
     std::vector<int> make_output_ids() const;
 

@@ -20,6 +20,17 @@ int Genome::get_genome_id() const {
     return genome_id;  // Retourne l'ID du génome
 }
 
+int Genome::generate_next_neuron_id() {
+    int max_id = 0;
+    for (const auto& neuron : neurons) {
+        if (neuron.neuron_id > max_id) {
+            max_id = neuron.neuron_id;
+        }
+    }
+    return max_id + 1;
+}
+
+
 void Genome::add_neuron(const neat::NeuronGene &neuron) {
     neurons.push_back(neuron);
 }
