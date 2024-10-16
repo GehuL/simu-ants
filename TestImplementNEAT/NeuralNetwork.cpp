@@ -1,5 +1,6 @@
 #include "NeuralNetwork.h"
 #include <unordered_set>
+#include <algorithm>
 #include <iostream>
 
 std::vector<double> FeedForwardNeuralNetwork::activate(const std::vector<double>& inputs) {
@@ -27,7 +28,7 @@ std::vector<double> FeedForwardNeuralNetwork::activate(const std::vector<double>
         
 
         for (const NeuronInput& input : neuron.inputs) {
-            std::cout << "Neuron " << neuron.neuron_id << " has input from neuron " << input.input_id << "\n";
+            //std::cout << "Neuron " << neuron.neuron_id << " has input from neuron " << input.input_id << "\n";
 
             // Vérifier si l'input_id existe dans 'values'
             if (values.find(input.input_id) == values.end()) {
@@ -62,51 +63,27 @@ std::vector<std::vector<int>> feed_forward_layer(
     const std::vector<int>& outputs, 
     const std::vector<neat::LinkGene>& links) {
     
-    std::unordered_set<int> known_neurons(inputs.begin(), inputs.end());
-    std::unordered_set<int> output_neurons(outputs.begin(), outputs.end()); // Neurones de sortie
-    std::vector<std::vector<int>> layers;
-
-    // Ajouter la première couche (neurones d'entrée)
-    layers.push_back(inputs);
-    known_neurons.insert(inputs.begin(), inputs.end());
-
-    bool added_new_layer = true;
-    while (added_new_layer) {
-        added_new_layer = false;
-        std::vector<int> new_layer;
-
-        // Parcourir les liens pour ajouter des neurones cachés
-        for (const auto& link : links) {
-            // Vérifier que le neurone de sortie du lien n'est pas un neurone de sortie
-            if (known_neurons.count(link.link_id.input_id) && 
-                !known_neurons.count(link.link_id.output_id) &&
-                !output_neurons.count(link.link_id.output_id)) { // Exclure les neurones de sortie
-                new_layer.push_back(link.link_id.output_id);
-                known_neurons.insert(link.link_id.output_id);
-            }
-        }
-
-        // Ajouter la nouvelle couche s'il y a des neurones à ajouter
-        if (!new_layer.empty()) {
-            layers.push_back(new_layer);
-            added_new_layer = true;
-        }
+    // Identifie les couches de neurones
+    std::vector<std::vector<int>> layers = identify_neuron_layers(inputs, outputs, links);
+    
+    // Trie les neurones par couches (si nécessaire)
+    for (auto& layer : layers) {
+        layer = sort_neurons_by_layer(layer, outputs, links);
     }
 
-    // Ajouter la dernière couche (neurones de sortie uniquement)
-    layers.push_back(outputs);
-
-    for (size_t layer_idx = 0; layer_idx < layers.size(); ++layer_idx) {
-    std::cout << "Layer " << layer_idx << ": ";
-    for (int neuron_id : layers[layer_idx]) {
-        std::cout << neuron_id << " ";
+    std::cout << "Layers: ";
+    for (const auto& layer : layers) {
+        std::cout << "{ ";
+        for (int neuron_id : layer) {
+            std::cout << neuron_id << " ";
+        }
+        std::cout << "} ";
     }
-    std::cout << std::endl;
-}
-
 
     return layers;
 }
+
+
 
 
 
@@ -180,5 +157,102 @@ std::cout << std::endl;
 
     // Retourner le réseau de neurones créé à partir du génome
     return FeedForwardNeuralNetwork{std::move(inputs), std::move(outputs), std::move(neurons)};
+}
+
+std::vector<int> sort_neurons_by_layer(
+    const std::vector<int>& inputs,
+    const std::vector<int>& outputs,
+    const std::vector<neat::LinkGene>& links) {
+    
+    // Stocker les niveaux des neurones
+    std::unordered_map<int, int> neuron_layers;
+    
+    // Les neurones d'entrée sont dans la première couche
+    for (int input_id : inputs) {
+        neuron_layers[input_id] = 0;
+    }
+
+    bool changed = true;
+    while (changed) {
+        changed = false;
+
+        for (const auto& link : links) {
+            int input_neuron = link.link_id.input_id;
+            int output_neuron = link.link_id.output_id;
+
+            // Si l'entrée est déjà classée, assurez-vous que la sortie est au niveau supérieur
+            if (neuron_layers.count(input_neuron)) {
+                int input_layer = neuron_layers[input_neuron];
+                int expected_output_layer = input_layer + 1;
+                
+                // Si la sortie n'est pas encore classée ou si elle est à un niveau plus bas que nécessaire
+                if (!neuron_layers.count(output_neuron) || neuron_layers[output_neuron] < expected_output_layer) {
+                    neuron_layers[output_neuron] = expected_output_layer;
+                    changed = true;
+                }
+            }
+        }
+    }
+
+    // Collecter et trier les neurones par leur couche
+    std::vector<int> sorted_neurons;
+    for (const auto& neuron_layer : neuron_layers) {
+        sorted_neurons.push_back(neuron_layer.first);
+    }
+    
+    // Optionnel : trier par niveau de neurone (cela dépend de la façon dont tu veux les ordonner)
+    std::sort(sorted_neurons.begin(), sorted_neurons.end(), 
+              [&](int a, int b) { return neuron_layers[a] < neuron_layers[b]; });
+    
+    return sorted_neurons;
+}
+
+std::vector<std::vector<int>> identify_neuron_layers(
+    const std::vector<int>& inputs, 
+    const std::vector<int>& outputs, 
+    const std::vector<neat::LinkGene>& links) {
+    
+    // Un ensemble pour garder la trace des neurones déjà connus (traités)
+    std::unordered_set<int> known_neurons(inputs.begin(), inputs.end());
+    
+    // Un autre ensemble pour identifier les neurones de sortie
+    std::unordered_set<int> output_neurons(outputs.begin(), outputs.end());
+
+    // Vecteur final des couches
+    std::vector<std::vector<int>> layers;
+
+    // La première couche est composée des neurones d'entrée
+    layers.push_back(inputs);
+
+    // Parcourir les couches tant qu'on ajoute de nouveaux neurones
+    bool added_new_layer = true;
+    while (added_new_layer) {
+        added_new_layer = false;
+        std::vector<int> new_layer;
+
+        // Parcourir les liens pour trouver les nouveaux neurones à ajouter à la prochaine couche
+        for (const auto& link : links) {
+            // Si le neurone d'entrée de ce lien est déjà connu et que la sortie ne l'est pas encore
+            if (known_neurons.count(link.link_id.input_id) && 
+                !known_neurons.count(link.link_id.output_id) &&
+                !output_neurons.count(link.link_id.output_id)) {
+                
+                // Ajouter le neurone de sortie à la nouvelle couche
+                new_layer.push_back(link.link_id.output_id);
+                known_neurons.insert(link.link_id.output_id);
+                added_new_layer = true;
+            }
+        }
+
+        // Si une nouvelle couche a été créée, l'ajouter aux couches
+        if (!new_layer.empty()) {
+            layers.push_back(new_layer);
+        }
+    }
+
+    // Ajouter la couche des neurones de sortie à la fin
+    layers.push_back(outputs);
+
+    return layers;
 }
 

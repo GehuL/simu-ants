@@ -45,4 +45,18 @@ std::vector<std::vector<int>> feed_forward_layer(
     const std::vector<int>& outputs, 
     const std::vector<neat::LinkGene>& links);
 
+
+//Test implémentations nouveau feed_forward_layer
+std::vector<int> sort_neurons_by_layer(
+    const std::vector<int>& inputs,
+    const std::vector<int>& outputs,
+    const std::vector<neat::LinkGene>& links);
+
+std::vector<std::vector<int>> identify_neuron_layers(
+    const std::vector<int>& inputs, 
+    const std::vector<int>& outputs, 
+    const std::vector<neat::LinkGene>& links);
+
+
+
 #endif // NEURALNETWORK_H
