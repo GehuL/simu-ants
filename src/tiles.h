@@ -19,6 +19,7 @@ namespace simu
         BORDER,  
     };
 
+    // TODO: Optimiser l'occupation en mémoire de la grille 
     struct Tile
     {
         Type type;
@@ -31,7 +32,6 @@ namespace simu
     const Tile PHEROMONE = (Tile) {Type::PHEROMONE, PINK};
     const Tile BORDER = (Tile) {Type::BORDER, WHITE};
 
-    // TODO: Implémenter des chunks pour optimiser le rendu graphique
     class Grid
     {
         public:
@@ -89,15 +89,7 @@ namespace simu
                 const int tileX = x / getTileSize();
                 const int tileY = y / getTileSize();
 
-                if constexpr(_check)
-                {
-                    if(getTile<_check>((Vector2i) {tileX, tileY}).type != Type::BORDER)
-                        setTile<_check>(tile, tileX, tileY);
-                }else
-                {
-                    setTile<_check>(tile, tileX, tileY);
-                }
-    
+                setTile<_check>(tile, tileX, tileY);
             }
 
             /** @brief Pose une tuile a partir des coordonnées de la grille
@@ -106,13 +98,13 @@ namespace simu
             template<bool _check = true>
             void setTile(Tile tile, int x, int y)
             {
-                if constexpr(_check)
-                {
-                    check(x, y);
-                }
+                Tile tileOn = getTile<_check>((Vector2i) {x, y});
+               
+               if constexpr(_check) // Si check est activé, sinon il y aurait du avoir une erreur
+                    if(tileOn.type == Type::BORDER)
+                        return;    
+
                 const int idx = y*m_gridWidth + x; 
-                
-                Tile tileOn = getTile<false>((Vector2i) {x, y}); // Pas besoin de check 2 fois
                 // On évite d'ajouter un index qui est déjà présent
                 if(tile.type == Type::PHEROMONE && tileOn.type != Type::PHEROMONE) 
                 {
@@ -146,7 +138,7 @@ namespace simu
             std::vector<int> m_updateBuff;
 
             Texture2D m_tex;    // Buffer de rendu pour optimiser les FPS
-            Image m_img;        // Buffer de rendu pour optimiser les FPS
+            Image m_img;        // Buffer de rendu pour optimiser les FPS 
     };
 
     void to_json(json& json, const Grid& grid);
