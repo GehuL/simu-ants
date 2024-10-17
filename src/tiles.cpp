@@ -1,5 +1,6 @@
 #include "tiles.h"
 #include "utils.h"
+
 using namespace simu;
 
 // On utilise le système d'allocation de raylib pour cette class! 
@@ -41,8 +42,8 @@ void Grid::draw()
     //Draw vertical lines
     for(int i = 0; i < m_gridWidth; i++)
     {
-        DrawLine(i*m_tileSize, 0, i*m_tileSize, m_tileSize*m_gridWidth, GRAY);
-        DrawLine(0, i*m_tileSize, m_tileSize*m_gridWidth, i*m_tileSize, GRAY);
+        DrawLine(i*m_tileSize, 0, i*m_tileSize, m_tileSize*m_gridWidth, Color{ 130, 130, 130, 115 });
+        DrawLine(0, i*m_tileSize, m_tileSize*m_gridWidth, i*m_tileSize, Color{ 130, 130, 130, 115 });
     }
 }
 
@@ -61,7 +62,8 @@ void Grid::update()
                 {
                     *tile = AIR;
                     setTile(AIR, index);
-                    m_updateBuff.erase(it);
+                    erase(m_updateBuff, it);
+                    it--;
                 }else
                 {
                     tile->color.a -= 1;
@@ -69,7 +71,8 @@ void Grid::update()
                 }
             break;
             default:
-                m_updateBuff.erase(it);
+                erase(m_updateBuff, it);
+                it--;
         }
     }
 }
