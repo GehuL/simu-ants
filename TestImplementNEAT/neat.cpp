@@ -183,33 +183,90 @@ void mutate_add_link(Genome &genome)
 {
     int input_id = choose_random_input_or_hidden_neuron(genome.neurons);
     int output_id = choose_random_output_or_hidden_neuron(genome.neurons);
+
+    if (input_id == -1 || output_id == -1) {
+        return; // Gérer l'erreur si aucun neurone valide n'est trouvé
+    }
+
     LinkId link_id{input_id, output_id};
 
+    // Vérifier si le lien existe déjà
     auto existing_link = genome.find_link(link_id);
     if (existing_link) {
-        existing_link->is_enabled = true;
+        // Réactiver le lien existant s'il n'est pas déjà activé
+        if (!existing_link->is_enabled) {
+            existing_link->is_enabled = true;
+        }
         return;
-}
-    //Only support feedforward networks
-    if (would_create_cycle(genome.links,input_id,output_id)) {
-        return;
-        
     }
+
+    // Ne supporte que les réseaux feedforward
+    // Vérifier si l'ajout du lien créerait un cycle
+    if (would_create_cycle(genome.links, input_id, output_id)) {
+        return; // Ne pas ajouter le lien si cela crée un cycle
+    }
+
+    // Créer le nouveau lien
     LinkMutator link_mutator; // Instancier link_mutator
     neat::LinkGene new_link = link_mutator.new_value(input_id, output_id);
     genome.add_link(new_link);
 }
 
-void mutate_remove_link(Genome &genome)
-{
-    RNG rng;
 
+void mutate_remove_link(Genome &genome) {
+    RNG rng;
+    NeatConfig config;
+
+    // Si le génome n'a pas de liens, rien à faire
     if (genome.links.empty()) {
         return;
     }
-    auto to_remove = rng.choose_random(genome.links);  // Choisir un lien à supprimer
+
+    // Identifier les liens critiques
+    std::unordered_set<neat::LinkId, neat::LinkIdHash> essential_links;
+
+    // Ajouter les liens d'entrée aux neurones cachés
+    for (const auto& neuron : genome.neurons) {
+        if (neuron.neuron_id < config.num_inputs) {  // Neurones d'entrée
+            for (const auto& link : genome.links) {
+                if (link.link_id.input_id == neuron.neuron_id) {
+                    essential_links.insert(link.link_id);
+                }
+            }
+        }
+    }
+
+    // Ajouter les liens des neurones cachés aux neurones de sortie
+    for (const auto& neuron : genome.neurons) {
+        if (neuron.neuron_id >= config.num_inputs && 
+            neuron.neuron_id < config.num_inputs + config.num_outputs) { // Neurones de sortie
+            for (const auto& link : genome.links) {
+                if (link.link_id.output_id == neuron.neuron_id) {
+                    essential_links.insert(link.link_id);
+                }
+            }
+        }
+    }
+
+    // Filtrer les liens non essentiels
+    std::vector<LinkGene> removable_links;
+    for (const auto& link : genome.links) {
+        if (essential_links.find(link.link_id) == essential_links.end()) {
+            removable_links.push_back(link);
+        }
+    }
+
+    // Si aucun lien n'est remplaçable, on sort
+    if (removable_links.empty()) {
+        return;
+    }
+
+    // Choisir un lien à supprimer parmi ceux qui ne sont pas essentiels
+    auto to_remove = rng.choose_random(removable_links);
     genome.links.erase(std::remove(genome.links.begin(), genome.links.end(), to_remove), genome.links.end());
 }
+
+
 
 void mutate_add_neuron(Genome &genome)
 {

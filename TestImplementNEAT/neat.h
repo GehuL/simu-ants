@@ -2,11 +2,13 @@
 #ifndef NEAT_H
 #define NEAT_H
 
+#include <unordered_set>
 #include <vector>
 #include "Activation.h"
 #include "Genome.h" 
 #include "GenomeIndexer.h"
 #include "NeatConfig.h"
+
 
 namespace neat {
 
@@ -36,6 +38,13 @@ struct LinkId {
         bool operator==(const LinkId& other) const {
             return input_id == other.input_id && output_id == other.output_id;
         }
+};
+
+// Spécialisation de std::hash pour LinkId
+struct LinkIdHash {
+    std::size_t operator()(const LinkId& link_id) const {
+        return std::hash<int>()(link_id.input_id) ^ std::hash<int>()(link_id.output_id);
+    }
 };
 
 // Structure représentant une connexion entre deux neurones
