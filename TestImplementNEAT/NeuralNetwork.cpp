@@ -4,8 +4,11 @@
 #include <iostream>
 
 std::vector<double> FeedForwardNeuralNetwork::activate(const std::vector<double>& inputs) {
+    /*
     std::cout << "Inputs size: " << inputs.size() << "\n";
     std::cout << "m_input_ids size: " << m_input_ids.size() << "\n";
+    */
+
     assert(inputs.size() == m_input_ids.size());
 
     std::unordered_map<int, double> values;
@@ -70,7 +73,7 @@ std::vector<std::vector<int>> feed_forward_layer(
     for (auto& layer : layers) {
         layer = sort_neurons_by_layer(layer, outputs, links);
     }
-
+/*
     std::cout << "Layers: ";
     for (const auto& layer : layers) {
         std::cout << "{ ";
@@ -79,6 +82,7 @@ std::vector<std::vector<int>> feed_forward_layer(
         }
         std::cout << "} ";
     }
+*/
 
     return layers;
 }
@@ -111,7 +115,8 @@ FeedForwardNeuralNetwork create_from_genome(const Genome &genome) {
     // Utiliser les méthodes adéquates pour obtenir les identifiants d'entrée et de sortie
     std::vector<int> inputs = genome.make_input_ids();
     std::vector<int> outputs = genome.make_output_ids();
-
+    
+/*
     std::cout << "Input IDs: ";
 for (int id : inputs) {
     std::cout << id << " ";
@@ -122,6 +127,7 @@ for (int id : outputs) {
     
 }
 std::cout << std::endl;
+*/
   
     // Organiser les neurones en couches
     std::vector<std::vector<int>> layers = feed_forward_layer(inputs, outputs, genome.links);

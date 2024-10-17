@@ -3,6 +3,7 @@
 #define NEAT_H
 
 #include <unordered_set>
+#include <unordered_map>
 #include <vector>
 #include "Activation.h"
 #include "Genome.h" 
@@ -126,6 +127,7 @@ std::vector<NeuronGene>::const_iterator choose_random_hidden(std::vector<NeuronG
 
 void mutate_add_link(Genome &genome);
 
+void dfs(int neuron_id, const std::unordered_map<int, std::vector<int>>& graph,std::unordered_set<int>& visited);
 void mutate_remove_link(Genome &genome);
 
 void mutate_add_neuron(Genome &genome);

@@ -4,7 +4,7 @@
 #include "ComputeFitness.h"
 #include "Genome.h"
 #include <iostream>
-#include <algorithm>  // Pour std::max_element
+#include <algorithm>  
 
 // Constructeur de la classe Population
 Population::Population(NeatConfig config, RNG &rng) : config{config}, rng{rng},next_genome_id{0} {
@@ -58,25 +58,11 @@ Genome Population::new_genome() {
             genome.add_link(new_link(hidden_id, config.num_inputs + output_id));
         }
 
-        /*
-        // (Facultatif) Ajouter des liens entre neurones cachés (création d'une couche intermédiaire plus complexe)
-        for (int j = 0; j < i; ++j) {
-            int other_hidden_id = config.num_inputs + config.num_outputs + j;
-            genome.add_link(new_link(hidden_id, other_hidden_id));
-             // Ajoute les liens bidirectionnels si souhaité
-        }
-        */
+        
 
     }
 
-    /*
-    // Ajouter des liens entre les neurones d'entrée et de sortie
-    for (int i = 0; i < config.num_inputs; ++i) {
-        for (int output_id = 0; output_id < config.num_outputs; ++output_id) {
-            genome.add_link(new_link(i, config.num_inputs + output_id));
-        }
-    }
-    */
+    
 
     return genome;
 }

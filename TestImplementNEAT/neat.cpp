@@ -213,6 +213,24 @@ void mutate_add_link(Genome &genome)
 }
 
 
+void dfs(int neuron_id, const std::unordered_map<int, std::vector<int>>& graph, std::unordered_set<int>& visited) {
+    // Vérifiez si neuron_id existe dans le graphe
+    auto it = graph.find(neuron_id);
+    if (it == graph.end()) {
+        std::cerr << "Erreur : Neuron ID " << neuron_id << " introuvable dans le graphe." << std::endl;
+        return;  // Sortir de la fonction si le neurone n'est pas trouvé
+    }
+
+    // Continuez avec l'accès aux voisins
+    visited.insert(neuron_id);
+    for (int neighbor : it->second) {
+        if (visited.find(neighbor) == visited.end()) {
+            dfs(neighbor, graph, visited);
+        }
+    }
+}
+
+
 void mutate_remove_link(Genome &genome) {
     RNG rng;
     NeatConfig config;
@@ -248,6 +266,13 @@ void mutate_remove_link(Genome &genome) {
         }
     }
 
+    // Ajouter les liens entre neurones cachés
+    for (const auto& link : genome.links) {
+        if (link.link_id.input_id >= config.num_inputs && link.link_id.output_id >= config.num_inputs) {
+            essential_links.insert(link.link_id);
+        }
+    }
+
     // Filtrer les liens non essentiels
     std::vector<LinkGene> removable_links;
     for (const auto& link : genome.links) {
@@ -266,6 +291,55 @@ void mutate_remove_link(Genome &genome) {
     genome.links.erase(std::remove(genome.links.begin(), genome.links.end(), to_remove), genome.links.end());
 }
 
+/*
+void mutate_remove_link(Genome &genome) {
+    RNG rng;
+    NeatConfig config;
+
+    // Si le génome n'a pas de liens, rien à faire
+    if (genome.links.empty()) {
+        return;
+    }
+
+    // Construire le graphe des neurones
+    std::unordered_map<int, std::vector<int>> graph;
+    for (const auto& link : genome.links) {
+        graph[link.link_id.input_id].push_back(link.link_id.output_id);
+    }
+
+    // Effectuer un DFS pour identifier les neurones atteignables
+    std::unordered_set<int> visited;
+    for (int i = 0; i < config.num_inputs; ++i) {
+        if (graph.find(i) != graph.end()) {
+            dfs(i, graph, visited);
+        }
+    }
+
+    // Identifier les liens essentiels basés sur les neurones visités
+    std::unordered_set<neat::LinkId, neat::LinkIdHash> essential_links;
+    for (const auto& link : genome.links) {
+        if (visited.find(link.link_id.input_id) != visited.end() &&
+            visited.find(link.link_id.output_id) != visited.end()) {
+            essential_links.insert(link.link_id);
+        }
+    }
+
+    // Filtrer les liens non essentiels
+    std::vector<LinkGene> removable_links;
+    for (const auto& link : genome.links) {
+        if (essential_links.find(link.link_id) == essential_links.end()) {
+            removable_links.push_back(link);
+        }
+    }
+
+    // Choisir un lien à supprimer parmi ceux qui ne sont pas essentiels
+    if (!removable_links.empty()) {
+        auto to_remove = rng.choose_random(removable_links);
+        genome.links.erase(std::remove(genome.links.begin(), genome.links.end(), to_remove), genome.links.end());
+    }
+}
+
+*/
 
 
 void mutate_add_neuron(Genome &genome)
