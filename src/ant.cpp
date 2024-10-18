@@ -28,11 +28,11 @@ void Ant::update()
     {
         m_rotateCd = GetRandomValue(30, 100);
         m_angle += GetRandomValue(-100, 100) * 0.01f * PI / 4;
-        m_velocity = Vector2Rotate((Vector2){1.0, 0.0}, m_angle);
+        rotate(m_angle);
     }
     
     Vector2 lastPos = m_pos;
-    m_pos = Vector2Add(m_pos, m_velocity);
+    moveForward();
 
     // Tuile dans la direction de la fourmis
     Vector2i facingPos = getTileFacingPos();
@@ -98,7 +98,17 @@ void Ant::load(const json &json)
     json.at("rotateCd").get_to(m_rotateCd);
 }
 
-void simu::Ant::eat()
+void Ant::rotate(float angle)
+{
+    m_velocity = Vector2Rotate((Vector2) {1.0, 0.0}, angle);
+}
+
+void Ant::moveForward()
+{
+    m_pos = Vector2Add(m_pos, m_velocity);
+}
+
+void Ant::eat()
 {
     Tile tile = getWorld().getGrid().getTile(m_pos);
     
@@ -159,12 +169,6 @@ void Ant::put()
         grid.setTile(this->m_carried_object, facingTilePos.x, facingTilePos.y);
         this->m_carried_object = AIR;
     }     
-}
-
-void Ant::move()
-{
-    m_velocity = Vector2Rotate(m_velocity, m_angle);
-    m_pos = Vector2Add(m_pos, m_velocity);
 }
 
 Ant& Ant::operator=(const Ant& ant)

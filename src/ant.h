@@ -31,18 +31,18 @@ namespace simu
             std::string getType() const override { return "ant"; };
 
             // ------ ACTIONS IA -------
-            void eat();       // Mange sur sa position (si il y a quelque chose)
-            void pheromone(); // Pose un phéromone sur sa position
-            void beat();      // Mord l'entité devant elle
+            void rotate(float angle);  // Définie la direction et le sens de la fourmis
+            void moveForward();        // Se déplace devant elle (en fonction de son angle)
+            void eat();                // Mange sur sa position (si il y a quelque chose)
+            void pheromone();          // Pose un phéromone sur sa position
+            void beat();               // Mord l'entité devant elle
 
-            void take();     // Porte un objet sur elle (nourriture/mur)
-            void put();       // Déposer l'objet qu'elle porte
+            void take();               // Porte un objet sur elle (nourriture/mur)
+            void put();                // Déposer l'objet qu'elle porte
 
             Ant& operator=(const Ant& en);
 
         private:
-
-            void move(); // Se déplace en fonction de son angle
 
             float m_life;
             Tile m_carried_object; 

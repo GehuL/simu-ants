@@ -25,7 +25,7 @@ void World::init()
     TRACELOG(LOG_INFO, "seed: %d", m_seed);
     
     // m_grid.init(500);
-    // m_grid.fromImage("maze.png");
+    m_grid.fromImage("maze.png");
     m_entities.clear();
 
     // Centre la caméra
