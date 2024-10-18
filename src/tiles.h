@@ -28,9 +28,13 @@ namespace simu
 
     const Tile AIR = (Tile) {Type::AIR, WHITE};
     const Tile GROUND = (Tile) {Type::GROUND, BROWN};
+    const Tile WALL = (Tile) {Type::GROUND, BLACK}; // Considère un mur comme le sol (utilisé pour le labyrinthe)
     const Tile FOOD = (Tile) {Type::FOOD, YELLOW};
     const Tile PHEROMONE = (Tile) {Type::PHEROMONE, PINK};
     const Tile BORDER = (Tile) {Type::BORDER, WHITE};
+
+    Tile fromColor(const Color& color);
+    bool operator==(const Color &c1, const Color &c2);
 
     class Grid
     {
@@ -45,6 +49,8 @@ namespace simu
 
             friend void to_json(json& json, const Grid& grid);
             friend void from_json(const json& json, Grid& grid);
+
+            void fromImage(const std::string& file);
 
             void reset();
 
@@ -100,11 +106,12 @@ namespace simu
             {
                 Tile tileOn = getTile<_check>((Vector2i) {x, y});
                
-               if constexpr(_check) // Si check est activé, sinon il y aurait du avoir une erreur
+                if constexpr(_check) // Si check est activé, sinon il y aurait du avoir une erreur
                     if(tileOn.type == Type::BORDER)
                         return;    
 
                 const int idx = y*m_gridWidth + x; 
+                
                 // On évite d'ajouter un index qui est déjà présent
                 if(tile.type == Type::PHEROMONE && tileOn.type != Type::PHEROMONE) 
                 {

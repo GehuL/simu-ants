@@ -19,8 +19,6 @@ void World::init()
 {
     Engine::init();
 
-    m_grid.reset();
-
     m_seed = GetRandomValue(0, std::numeric_limits<int>::max());
     SetRandomSeed(m_seed);
 
@@ -31,7 +29,9 @@ void World::init()
     m_camera.zoom = 1.0;
 
     m_entities.clear();
-    m_grid.reset();
+
+    // m_grid.reset();
+    m_grid.fromImage("maze.png");
 
     spawnEntities<Ant>(10);
 }

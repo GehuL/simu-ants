@@ -113,6 +113,7 @@ Vector2i Grid::toTileCoord(float x, float y) const
     return (Vector2i) {tileX, tileY};
 }
 
+
 void simu::to_json(json &json, const Grid &grid)
 {
     // TODO: Compresser les données
@@ -159,4 +160,44 @@ void simu::from_json(const json & json, Grid & grid)
     
     grid.m_gridWidth = gridWidth;
     grid.m_grid = reinterpret_cast<Tile*>(decompressed);
+}
+
+void Grid::fromImage(const std::string& file)
+{
+    Image image = LoadImage(file.c_str());
+
+    if(image.data == NULL)
+        throw std::runtime_error("Impossible de charger le fichier");
+    else if(image.width != image.height)
+        throw std::runtime_error("Width and height must be equals");
+
+    unload();
+
+    m_img = image;
+    m_tex = LoadTextureFromImage(m_img);
+    SetTextureFilter(m_tex, TEXTURE_FILTER_POINT);
+    
+    m_gridWidth = m_img.width;
+    m_grid = (Tile*) MemAlloc(sizeof(Tile) * getTileNumber());
+
+    for(int y = 0; y < m_img.height; y++)
+    {
+        for(int x = 0; x < m_img.width; x++)
+        {
+            Color color = GetImageColor(m_img, x, y);
+            Tile tile = fromColor(color);
+            setTile<false>(tile, x, y);
+        }
+    }
+}
+
+Tile simu::fromColor(const Color& color)
+{
+    std::array<Tile, 4> tiles {AIR, GROUND, FOOD, WALL};
+    return *std::find_if(tiles.begin(), tiles.end(), [color](auto t) { return t.color == color;});
+}
+
+bool simu::operator==(const Color &c1, const Color &c2)
+{
+    return c1.r == c2.r && c1.g == c2.g && c1.b == c2.b;
 }
