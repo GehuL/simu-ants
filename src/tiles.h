@@ -50,6 +50,10 @@ namespace simu
             friend void to_json(json& json, const Grid& grid);
             friend void from_json(const json& json, Grid& grid);
 
+            /** @brief Charge la grille depuis une image au format supporté par la version de raylib (SVG, PNG, JPG, BMP, GIF...). L'image doit être carré
+             *  @param file Chemin et nom du fichier avec extension
+             *  @throw std::runtime_eror si le fichier n'est pas trouvé, ne peut pas à être lu, l'extension n'est pas supporté ou que l'image n'est pas carré.
+             */
             void fromImage(const std::string& file);
 
             void reset();
