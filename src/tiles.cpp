@@ -6,7 +6,7 @@ using namespace simu;
 // On utilise le système d'allocation de raylib pour cette class! 
 
 
-Grid::Grid(const int gridWidth, const int tileSize) : m_gridWidth(gridWidth), m_tileSize(tileSize)
+Grid::Grid(const int tileSize) : m_gridWidth(0), m_tileSize(tileSize)
 {
 
 }
@@ -31,6 +31,9 @@ void Grid::unload()
 
 void Grid::draw()
 {
+    if(m_gridWidth <= 0)
+        return;
+
     // TODO: Utiliser UpdateTextureRec pour mettre à jour que certains pixels
     UpdateTexture(m_tex, m_img.data);
 
@@ -42,8 +45,8 @@ void Grid::draw()
     //Draw vertical lines
     for(int i = 0; i < m_gridWidth; i++)
     {
-        DrawLine(i*m_tileSize, 0, i*m_tileSize, m_tileSize*m_gridWidth, Color{ 130, 130, 130, 115 });
-        DrawLine(0, i*m_tileSize, m_tileSize*m_gridWidth, i*m_tileSize, Color{ 130, 130, 130, 115 });
+        DrawLine(i*m_tileSize, 0, i*m_tileSize, m_tileSize*m_gridWidth, GRID_COLOR);
+        DrawLine(0, i*m_tileSize, m_tileSize*m_gridWidth, i*m_tileSize, GRID_COLOR);
     }
 }
 
@@ -94,9 +97,14 @@ void Grid::setTile(Tile tile, int index)
     ImageDrawPixel(&m_img, index % m_gridWidth, index / m_gridWidth, tile.color); // Met à jour le buffer de rendu
 }
 
-void Grid::reset()
+void Grid::init(int gridWidth)
 {
+    if(gridWidth <= 0)
+        return;
+
     unload();
+
+    m_gridWidth = gridWidth;
 
     m_grid = (Tile*) MemAlloc(getTileNumber() * sizeof(Tile));
     m_updateBuff.reserve(getTileNumber());

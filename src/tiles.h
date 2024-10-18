@@ -36,10 +36,12 @@ namespace simu
     Tile fromColor(const Color& color);
     bool operator==(const Color &c1, const Color &c2);
 
+    constexpr Color GRID_COLOR { 130, 130, 130, 115 }; 
+
     class Grid
     {
         public:
-            Grid(const int gridWidth, const int tileSize);
+            Grid(const int tileSize);
             ~Grid();
 
             void unload();
@@ -56,7 +58,10 @@ namespace simu
              */
             void fromImage(const std::string& file);
 
-            void reset();
+            /** @brief Construit une grille constitué d'air par défaut 
+             *  @param gridWidth Largeur et longueur de la grille
+             */
+            void init(int gridWidth);
 
             /** @brief Renvoie la tuile en fonction de l'index x et y de la grille
               * @param check Active la vérification la validité des index. Le désactiver est à vos risque et péril

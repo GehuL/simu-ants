@@ -10,7 +10,7 @@ using json = nlohmann::json;
 
 World World::world;
 
-World::World() : m_entity_cnt(0), m_grid(500, 5)
+World::World() : m_entity_cnt(0), m_grid(5)
 {
 
 }
@@ -24,14 +24,14 @@ void World::init()
 
     TRACELOG(LOG_INFO, "seed: %d", m_seed);
     
+    // m_grid.init(500);
+    // m_grid.fromImage("maze.png");
+    m_entities.clear();
+
+    // Centre la caméra
     float offset = (GetScreenWidth() - m_grid.getGridWidth() * m_grid.getTileSize()) / 2.f;
     m_camera.offset = (Vector2){offset, offset};
     m_camera.zoom = 1.0;
-
-    m_entities.clear();
-
-    // m_grid.reset();
-    m_grid.fromImage("maze.png");
 
     spawnEntities<Ant>(10);
 }
