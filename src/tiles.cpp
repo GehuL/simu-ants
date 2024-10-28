@@ -19,11 +19,11 @@ Grid::~Grid()
 
 void Grid::unload()
 {
-    if(m_grid != nullptr)
+    if(m_grid != NULL)
         MemFree(m_grid);
     
     m_updateBuff.clear();
-    m_grid = nullptr;
+    m_grid = NULL;
 
     UnloadImage(m_img);
     UnloadTexture(m_tex);
@@ -139,8 +139,9 @@ void simu::from_json(const json & json, Grid & grid)
     
     if(!rowdata.is_string())
         throw std::runtime_error("Impossible de charger la grille: La grille est corrompu");
-    std::string rowdata = json.at("data");
-    decompressGrid(grid, rowdata, json.at("width"));
+    
+    std::string data = rowdata.template get<std::string>();
+    decompressGrid(grid, data, json.at("width"));
 }
 
 void simu::compressGrid(const Grid& grid, std::string& output)
