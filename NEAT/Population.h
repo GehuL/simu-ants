@@ -117,7 +117,7 @@ neat::Individual Population::runV2(FitnessFn compute_fitness, int max_generation
     return best_individual;
 }
 // TODO : Créer la méthode has_reached_goal pour vérifier si une fourmi a atteint l'arrivée
-faut créer méthode has_reached_goal ligne 91
+
 
 
 
