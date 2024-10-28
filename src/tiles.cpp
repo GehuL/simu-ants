@@ -13,7 +13,7 @@ Grid::Grid(const int tileSize) : m_gridWidth(0), m_tileSize(tileSize)
 
 Grid::~Grid()
 {
-    if(m_grid != nullptr)
+    if(m_grid != NULL)
         MemFree(m_grid);
 }
 
@@ -124,18 +124,11 @@ Vector2i Grid::toTileCoord(float x, float y) const
 
 void simu::to_json(json &json, const Grid &grid)
 {
-    // TODO: Compresser les données
-    int compressed_len = 0, encoded_len = 0;
-    unsigned char* compressed = CompressData((const unsigned char*)(grid.m_grid), grid.getTileNumber() * sizeof(Tile), &compressed_len);
-    char* encoded = EncodeDataBase64((const unsigned char*)(compressed), compressed_len, &encoded_len);
-    encoded[encoded_len - 1] = '\0';
-    
     json["width"] = grid.getGridWidth();
-    json["data"] = encoded;
 
-    // TRACELOG(LOG_INFO, "%s", json["data"].dump());
-    MemFree(encoded);
-    MemFree(compressed);
+    std::string data;
+    compressGrid(grid, data);
+    json["data"] = data;
 }
 
 void simu::from_json(const json & json, Grid & grid)
@@ -146,18 +139,39 @@ void simu::from_json(const json & json, Grid & grid)
     
     if(!rowdata.is_string())
         throw std::runtime_error("Impossible de charger la grille: La grille est corrompu");
+    std::string rowdata = json.at("data");
+    decompressGrid(grid, rowdata, json.at("width"));
+}
 
-    int gridWidth = json.at("width");
-    
-    std::string data;
-    rowdata.get_to(data);
+void simu::compressGrid(const Grid& grid, std::string& output)
+{
+    int compressed_len = 0, encoded_len = 0;
+    unsigned char* compressed = CompressData((const unsigned char*)(grid.m_grid), grid.getTileNumber() * sizeof(Tile), &compressed_len);
+    char* encoded = EncodeDataBase64((const unsigned char*)(compressed), compressed_len, &encoded_len);
+    encoded = (char*) MemRealloc((void*) (encoded), encoded_len + 1);
+    encoded[encoded_len] = '\0';
 
+    output = encoded;
+
+    MemFree(encoded);
+    MemFree(compressed);
+}
+
+void simu::decompressGrid(Grid& grid, std::string &data, int gridWidth)
+{
     int decoded_len = 0, decompressed_len = 0;
-    unsigned char* decoded = DecodeDataBase64((const unsigned char*) data.c_str(), &decoded_len);
+    unsigned char* decoded = DecodeDataBase64(reinterpret_cast<const unsigned char*>(data.c_str()), &decoded_len);
     unsigned char* decompressed = DecompressData(decoded, decoded_len, &decompressed_len);
+    
+    grid.m_gridWidth = gridWidth;
 
-    if(decoded != NULL)
+    if(decoded)
         MemFree(decoded);
+
+    if(grid.m_grid)
+        MemFree(grid.m_grid);
+
+    grid.m_grid = reinterpret_cast<Tile*>(decompressed);
 
     int tilesNumber = decompressed_len / sizeof(Tile);
     if(gridWidth*gridWidth != tilesNumber) // Test que la grille est bien carré
