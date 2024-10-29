@@ -13,8 +13,6 @@
 #include "engine.h"
 #include "entity.h"
 #include "tiles.h"
-
-#include "entity.h"
 #include "ant.h"
 
 // #define TEMPLATE_CONDITION(T) std::enable_if_t<std::is_base_of<Entity, T>::value && !std::is_same<Entity, T>::value>
@@ -23,6 +21,9 @@
 
 namespace simu
 {
+    class WorldListener;
+
+
     // Liste des entités enregistrés 
     using entities_t = std::variant<Ant, Test>;
 
@@ -43,6 +44,7 @@ namespace simu
             }
         }
     }
+
 
     class World : public Engine
     {
@@ -75,7 +77,7 @@ namespace simu
                     m_entities[i] = std::make_shared<T>(m_entity_cnt);
                     newlies[i] = m_entities[i];
                     m_entity_cnt++;
-                }
+                }   
 
                 // Retourne l'itérateur correspondant à l'ancienne fin (avant ajout des nouveaux éléments)
                 return newlies;
@@ -121,6 +123,11 @@ namespace simu
                 return it != m_entities.end() ;
             }
 
+            void setListener(std::shared_ptr<WorldListener> listener)
+            {
+                m_listener = listener;
+            }
+
             Grid& getGrid() { return m_grid; };
             
             void init() override;
@@ -142,12 +149,24 @@ namespace simu
             long m_entity_cnt;
             unsigned int m_seed;
 
+            std::shared_ptr<WorldListener> m_listener;
             std::vector<std::shared_ptr<Entity>> m_entities;
 
             Grid m_grid;
 
             int m_cursorTileIndex;
             const std::array<const Tile, 3> m_cursorTiles = {GROUND, FOOD, PHEROMONE};  
+    };
+
+    class WorldListener
+    {
+        public:
+            virtual ~WordListener() {};
+            virtual void onInit() = 0;
+            virtual void onUnload() = 0;
+            virtual void onUpdate() = 0;
+            virtual void onEntitySpawn(std::weak_ptr<Entity>& en) = 0;
+            virtual void onEntityDied(std::weak_ptr<Entity>& en) = 0;
     };
 
     inline World& getWorld() { return simu::World::world; };
