@@ -161,12 +161,10 @@ namespace simu
     class WorldListener
     {
         public:
-            virtual ~WordListener() {};
+            virtual ~WorldListener() {};
             virtual void onInit() = 0;
             virtual void onUnload() = 0;
             virtual void onUpdate() = 0;
-            virtual void onEntitySpawn(std::weak_ptr<Entity>& en) = 0;
-            virtual void onEntityDied(std::weak_ptr<Entity>& en) = 0;
     };
 
     inline World& getWorld() { return simu::World::world; };

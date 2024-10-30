@@ -176,7 +176,6 @@ void Engine::drawAll()
 
 void Engine::updateTick()
 {
-
 }
 
 void Engine::setPause(bool pause)
@@ -190,7 +189,6 @@ void Engine::drawFrame()
 
 void Engine::drawUI()
 {
-    
 }
 
 void Engine::updateUI()

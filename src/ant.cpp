@@ -13,61 +13,13 @@ m_target_angle(ant.m_target_angle), m_rotateCd(ant.m_rotateCd)
 {
 }
 
-Ant::Ant(const long id) : Entity(id), m_life(100.f), m_carried_object(AIR)
+Ant::Ant(const long id) : Entity(id)
 {
 }
 
+
 void Ant::update()
 {
-    // if(m_life <= 0)
-    //     return;    
- 
-    // m_life -= 0.01f;
-
-    if(m_rotateCd-- <= 0)
-    {
-        m_rotateCd = GetRandomValue(30, 100);
-        m_angle += GetRandomValue(-100, 100) * 0.01f * PI / 4;
-        rotate(m_angle);
-    }
-    
-    Vector2 lastPos = m_pos;
-    moveForward();
-
-    // Tuile dans la direction de la fourmis
-    Vector2i facingPos = getTileFacingPos();
-    Tile facingTile = getWorld().getGrid().getTile(facingPos);
-
-    if(facingTile.type == Type::BORDER || facingTile.type == Type::GROUND)
-    {
-        // Vector2i posOn = getTilePosOn();
-        
-        // // Fait rebondir la fourmis selon son angle 
-        // if(facingPos.y != posOn.y)
-        // {
-        //     m_velocity.y *= -1;
-        // }
-        
-        // if(facingPos.x != posOn.x)
-        // {
-        //     m_velocity.x *= -1;
-        // } 
-        // // Tourne son angle par rapport à l'angle de son vecteur vitesse
-        // m_angle = Vector2Angle({1.0, 0.0}, m_velocity);
-        
-        // Fait revenir a son ancienne position car elle risque de foncer dans un mur
-        m_pos = lastPos;
-        m_rotateCd = 0; // Elle prendra une nouvelle décision
-    }
-
-
-    // if(facingTile.type == Type::GROUND || facingTile.type == Type::FOOD)
-    //     take();
-    
-    if(GetRandomValue(0, 40) == 0)
-        put();
-
-    pheromone();
 }
 
 void Ant::draw() 
@@ -105,7 +57,15 @@ void Ant::rotate(float angle)
 
 void Ant::moveForward()
 {
+    Vector2f lastPos = m_pos;
     m_pos = Vector2Add(m_pos, m_velocity);
+
+    Tile tileOn = getTileOn();
+    Tile tileAhead = getTileFacing();
+
+    if(tileAhead.type == Type::BORDER ||
+        tileAhead.type == Type::GROUND) 
+        m_pos = lastPos;
 }
 
 void Ant::eat()
@@ -181,3 +141,26 @@ Ant& Ant::operator=(const Ant& ant)
     return *this;
 }
 
+AntController::AntController(const std::weak_ptr<Ant> ant, const Genome& genome) : m_ant(ant), m_network(create_from_genome(genome)) {}
+AntController::AntController(const std::weak_ptr<Ant> ant) : m_ant(ant), m_network(create_from_genome(Genome())) {}
+
+void AntController::activate()
+{
+    if(!m_ant.expired())
+    {
+        auto ant = m_ant.lock();
+
+        // Variables de décisions
+        const std::vector<double> inputs = {
+        static_cast<double>(ant->getAngle()), 
+        static_cast<double>(ant->getTileOn().type), 
+        static_cast<double>(ant->getTileFacing().type)};
+
+        // Activation des sorties
+        auto outputs = m_network.activate(inputs);
+
+        // Décisions
+        ant->rotate(outputs[0]);
+        ant->moveForward();
+    }
+}

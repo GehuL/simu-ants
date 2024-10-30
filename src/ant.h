@@ -7,6 +7,9 @@
 #include "entity.h"
 #include "tiles.h"
 
+#include "../NEAT/Genome.h"
+#include "../NEAT/NeuralNetwork.h"
+
 namespace simu
 {
     class Ant : public Entity
@@ -43,9 +46,8 @@ namespace simu
             Ant& operator=(const Ant& en);
 
         private:
-
-            float m_life;
-            Tile m_carried_object; 
+            float m_life = 100.0;
+            Tile m_carried_object = AIR; 
 
             float m_target_angle;
             int m_rotateCd;
@@ -73,6 +75,21 @@ namespace simu
 
         private:
             std::string m_test = "this is a test";
+    };
+
+    class AntController
+    {
+        public:
+            AntController(const std::weak_ptr<Ant> ant);
+            AntController(const std::weak_ptr<Ant> ant, const Genome& genome);
+            
+            virtual ~AntController(){};
+
+            void activate();
+
+        private:
+            const std::weak_ptr<Ant> m_ant;
+            FeedForwardNeuralNetwork m_network;
     };
 }
 
