@@ -189,7 +189,7 @@ void World::drawUI()
 {
     handleKeyboard();
     handleMouse();
-
+    // TODO: Afficher coordonnées dans la grille et globale de la souris 
     DrawText(TextFormat("Entity: %d", m_entities.size()), 0, 100, 20, BLUE);
 }
 
