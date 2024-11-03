@@ -47,7 +47,27 @@ namespace simu
             float m_life;
             Tile m_carried_object; 
 
-            float m_target_angle;
+
+    };
+
+    /** Implémentation du comportement par défaut sans IA de la fourmis pour une démonstration.
+     */
+    class DemoAnt: public Ant
+    {
+        public:
+            DemoAnt(const long id = -1);
+            DemoAnt(const long id, const DemoAnt& ant);
+            virtual ~DemoAnt() {};
+
+            std::string getType() const override { return "demoAnt"; };
+
+            void update() override;
+            void save(json& json) const override;
+            void load(const json& json) override;
+
+            DemoAnt& operator=(const DemoAnt& en);
+
+        private:
             int m_rotateCd;
     };
 

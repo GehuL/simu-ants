@@ -8,8 +8,7 @@
 using namespace simu;
 
 Ant::Ant(const long id, const Ant& ant) : Entity(id, ant), m_life(ant.m_life), 
-m_carried_object(ant.m_carried_object), 
-m_target_angle(ant.m_target_angle), m_rotateCd(ant.m_rotateCd)
+m_carried_object(ant.m_carried_object)
 {
 }
 
@@ -17,58 +16,7 @@ Ant::Ant(const long id) : Entity(id), m_life(100.f), m_carried_object(AIR)
 {
 }
 
-void Ant::update()
-{
-    // if(m_life <= 0)
-    //     return;    
- 
-    // m_life -= 0.01f;
-
-    if(m_rotateCd-- <= 0)
-    {
-        m_rotateCd = GetRandomValue(30, 100);
-        m_angle += GetRandomValue(-100, 100) * 0.01f * PI / 4;
-        rotate(m_angle);
-    }
-    
-    Vector2 lastPos = m_pos;
-    moveForward();
-
-    // Tuile dans la direction de la fourmis
-    Vector2i facingPos = getTileFacingPos();
-    Tile facingTile = getWorld().getGrid().getTile(facingPos);
-
-    if(facingTile.type == Type::BORDER || facingTile.type == Type::GROUND)
-    {
-        // Vector2i posOn = getTilePosOn();
-        
-        // // Fait rebondir la fourmis selon son angle 
-        // if(facingPos.y != posOn.y)
-        // {
-        //     m_velocity.y *= -1;
-        // }
-        
-        // if(facingPos.x != posOn.x)
-        // {
-        //     m_velocity.x *= -1;
-        // } 
-        // // Tourne son angle par rapport à l'angle de son vecteur vitesse
-        // m_angle = Vector2Angle({1.0, 0.0}, m_velocity);
-        
-        // Fait revenir a son ancienne position car elle risque de foncer dans un mur
-        m_pos = lastPos;
-        m_rotateCd = 0; // Elle prendra une nouvelle décision
-    }
-
-
-    // if(facingTile.type == Type::GROUND || facingTile.type == Type::FOOD)
-    //     take();
-    
-    if(GetRandomValue(0, 40) == 0)
-        put();
-
-    pheromone();
-}
+void Ant::update() {}
 
 void Ant::draw() 
 {
@@ -85,8 +33,6 @@ void Ant::save(json &json) const
     Entity::save(json);
     json["life"] = m_life;
     json["carried_object"] = m_carried_object.type;
-    json["target_angle"] = m_target_angle;
-    json["rotateCd"] = m_rotateCd;
 }
 
 void Ant::load(const json &json)
@@ -94,8 +40,6 @@ void Ant::load(const json &json)
     Entity::load(json);
     json.at("life").get_to(m_life);
     json.at("carried_object").get_to(m_carried_object.type);
-    json.at("target_angle").get_to(m_target_angle);
-    json.at("rotateCd").get_to(m_rotateCd);
 }
 
 void Ant::rotate(float angle)
@@ -176,8 +120,59 @@ Ant& Ant::operator=(const Ant& ant)
     Entity::operator=(ant);
     m_life = ant.m_life; 
     m_carried_object = ant.m_carried_object;
-    m_target_angle = ant.m_target_angle;
-    m_rotateCd = ant.m_rotateCd;
     return *this;
 }
 
+DemoAnt::DemoAnt(const long id) : Ant(id) {}
+DemoAnt::DemoAnt(const long id, const DemoAnt &ant) : m_rotateCd(ant.m_rotateCd) {}
+
+void DemoAnt::update()
+{
+    if(m_rotateCd-- <= 0)
+    {
+        m_rotateCd = GetRandomValue(30, 100);
+        m_angle += GetRandomValue(-100, 100) * 0.01f * PI / 4;
+        rotate(m_angle);
+    }
+    
+    Vector2 lastPos = m_pos;
+    moveForward();
+
+    // Tuile dans la direction de la fourmis
+    Vector2i facingPos = getTileFacingPos();
+    Tile facingTile = getWorld().getGrid().getTile(facingPos);
+
+    if(facingTile.type == Type::BORDER || facingTile.type == Type::GROUND)
+    {
+        // Fait revenir a son ancienne position car elle risque de foncer dans un mur
+        m_pos = lastPos;
+        m_rotateCd = 0; // Elle prendra une nouvelle décision
+    }
+
+    // if(facingTile.type == Type::GROUND || facingTile.type == Type::FOOD)
+    //     take();
+    
+    if(GetRandomValue(0, 40) == 0)
+        put();
+
+    pheromone();
+}
+
+void DemoAnt::save(json &json) const
+{
+    Ant::save(json);
+    json["rotateCd"] = m_rotateCd;
+}
+
+void DemoAnt::load(const json &json)
+{
+    Ant::load(json);
+    json.at("rotateCd").get_to(m_rotateCd);
+}
+
+DemoAnt& DemoAnt::operator=(const DemoAnt& ant)
+{
+    Ant::operator=(ant);
+    m_rotateCd = ant.m_rotateCd;
+    return *this;
+}
