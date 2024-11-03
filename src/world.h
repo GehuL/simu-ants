@@ -25,7 +25,7 @@ namespace simu
 
 
     // Liste des entités enregistrés 
-    using entities_t = std::variant<Ant, Test>;
+    using entities_t = std::variant<Ant, Test, DemoAnt>;
 
     template<size_t index = std::variant_size_v<entities_t>>
     entities_t entityFactory(const std::string& entity_type) {
@@ -161,12 +161,10 @@ namespace simu
     class WorldListener
     {
         public:
-            virtual ~WordListener() {};
+            virtual ~WorldListener() {};
             virtual void onInit() = 0;
             virtual void onUnload() = 0;
             virtual void onUpdate() = 0;
-            virtual void onEntitySpawn(std::weak_ptr<Entity>& en) = 0;
-            virtual void onEntityDied(std::weak_ptr<Entity>& en) = 0;
     };
 
     inline World& getWorld() { return simu::World::world; };
