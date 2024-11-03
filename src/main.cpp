@@ -1,5 +1,5 @@
-#include "world.h"
-#include "ant.h"
+#include "engine/world.h"
+#include "engine/ant.h"
 
 int main(void)
 {   

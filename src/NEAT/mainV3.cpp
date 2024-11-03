@@ -1,4 +1,4 @@
-#include <iostream>
+/*#include <iostream>
 #include <vector>
 #include "Genome.h"
 #include "NeuralNetwork.h"
@@ -29,3 +29,4 @@ int main() {
 
     return 0;
 }
+*/

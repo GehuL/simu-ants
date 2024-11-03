@@ -68,7 +68,7 @@ neat::Individual Population::run(FitnessFn compute_fitness, int num_generations)
 
 template <typename FitnessFn>
 neat::Individual Population::runV2(FitnessFn compute_fitness, int max_generations) {
-    for (int generation = 0; generation < max_generations; ++generation) {
+   /*for (int generation = 0; generation < max_generations; ++generation) {
         bool all_reached_goal = true; // Supposition optimiste au début de chaque génération
 
         // Calcul de la fitness pour chaque individu
@@ -111,7 +111,7 @@ neat::Individual Population::runV2(FitnessFn compute_fitness, int max_generation
         individuals = reproduce();
 
         std::cout << "Generation " << generation + 1 << " completed. Best fitness: " << best_individual.fitness << std::endl;
-    }
+    }*/
 
     // Retourne le meilleur individu après toutes les générations
     return best_individual;

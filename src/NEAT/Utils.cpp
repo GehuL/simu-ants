@@ -31,7 +31,7 @@ void save(const Genome &genome, const std::string &filename) {
     std::cout << "Genome saved to " << filename << std::endl;
 }
 
-
+/*
 
 //TODO : Créer les méthodes get_ant_position_x, get_ant_position_y, get_altitude, get_distance_to_goal, move_ant_up, move_ant_down, move_ant_left, move_ant_right
 std::vector<double> get_game_state(int ant_id) {
@@ -67,3 +67,4 @@ void perform_actions(const std::vector<double>& actions, int ant_id) {
 
 
 
+*/

@@ -3,7 +3,7 @@
 
 #include "utils.h"
 #include "ant.h"
-#include "external/json.hpp"
+#include "../external/json.hpp"
 
 using namespace simu;
 using json = nlohmann::json;
@@ -19,14 +19,15 @@ void World::init()
 {
     Engine::init();
 
-    if(m_listener)
-        m_listener.get()->onInit();
+    m_entities.clear();
 
     m_seed = GetRandomValue(0, std::numeric_limits<int>::max());
     SetRandomSeed(m_seed);
 
     TRACELOG(LOG_INFO, "seed: %d", m_seed);
-    m_entities.clear();
+    
+    if(m_listener)
+        m_listener.get()->onInit();
     
     // Centre la caméra
     float offset = (GetScreenWidth() - m_grid.getGridWidth() * m_grid.getTileSize()) / 2.f;

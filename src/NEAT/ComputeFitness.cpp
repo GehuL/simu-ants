@@ -13,7 +13,7 @@ double ComputeFitness::operator()(const Genome &genome, int ant_id) const {
 
 // Méthode pour évaluer la fitness d'une fourmi spécifique (via son ant_id)
 double ComputeFitness::evaluate(const Genome &genome, int ant_id) const {
-    std::cout << "Evaluating genome ID: " << genome.get_genome_id() << " for ant " << ant_id << std::endl;
+  /*  std::cout << "Evaluating genome ID: " << genome.get_genome_id() << " for ant " << ant_id << std::endl;
 
     // Simuler l'exécution de la fourmi dans le labyrinthe
     // Récupérer la position de la fourmi identifiée par ant_id
@@ -41,6 +41,7 @@ double ComputeFitness::evaluate(const Genome &genome, int ant_id) const {
     if (has_reached_goal(ant_id)) {
         fitness += 100;  // Bonus si la fourmi a atteint l'objectif
     }
-
     return fitness;  // Retourner la fitness finale
+*/
+    return 0;
 }

@@ -4,7 +4,7 @@
 #include "raylib.h"
 #include "engine.h"
 #include "others.h"
-#include "external/json.hpp"
+#include "../external/json.hpp"
 
 namespace simu
 {
