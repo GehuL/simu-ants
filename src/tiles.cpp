@@ -164,23 +164,16 @@ void simu::decompressGrid(Grid& grid, std::string &data, int gridWidth)
     unsigned char* decoded = DecodeDataBase64(reinterpret_cast<const unsigned char*>(data.c_str()), &decoded_len);
     unsigned char* decompressed = DecompressData(decoded, decoded_len, &decompressed_len);
     
-    grid.m_gridWidth = gridWidth;
-
+    int tilesNumber = decompressed_len / sizeof(Tile);
+    if(gridWidth*gridWidth != tilesNumber) // Test que la grille est bien carré
+        throw std::runtime_error("Impossible de charger la grille: La grille est corrompu");
+    
     if(decoded)
         MemFree(decoded);
 
     if(grid.m_grid)
         MemFree(grid.m_grid);
-
-    grid.m_grid = reinterpret_cast<Tile*>(decompressed);
-
-    int tilesNumber = decompressed_len / sizeof(Tile);
-    if(gridWidth*gridWidth != tilesNumber) // Test que la grille est bien carré
-        throw std::runtime_error("Impossible de charger la grille: La grille est corrompu");
-    
-    if(grid.m_grid)
-        MemFree(grid.m_grid);
-    
+   
     grid.m_gridWidth = gridWidth;
     grid.m_grid = reinterpret_cast<Tile*>(decompressed);
 }
