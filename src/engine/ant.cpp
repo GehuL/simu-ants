@@ -149,7 +149,7 @@ void AntController::activate()
     if(!m_ant.expired())
     {
         auto ant = m_ant.lock();
-
+        
         // Variables de décisions
         const std::vector<double> inputs = {
         static_cast<double>(ant->getAngle()), 
