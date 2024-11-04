@@ -14,16 +14,13 @@ class Evolution : public WorldListener
 
             for(auto en : m_pop.get_individuals())
             {
-                auto ant = getWorld().spawnEntity<Ant>();
-                AntController controller(ant, en.genome);
-                m_controllers.push_back(controller);
+                auto ant = getWorld().spawnEntity<AntIA>();
             }
         };
 
         void onUpdate() override
         {
-            for(auto& c : m_controllers)
-                c.activate();
+
         };
 
         void onUnload() override
@@ -33,7 +30,6 @@ class Evolution : public WorldListener
 
     private:
         Population m_pop;
-        std::vector<AntController> m_controllers;
 };
 
 int main()

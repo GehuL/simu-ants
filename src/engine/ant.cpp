@@ -52,7 +52,6 @@ void Ant::moveForward()
     Vector2f lastPos = m_pos;
     m_pos = Vector2Add(m_pos, m_velocity);
 
-    Tile tileOn = getTileOn();
     Tile tileAhead = getTileFacing();
 
     if(tileAhead.type == Type::BORDER ||
@@ -187,8 +186,9 @@ DemoAnt& DemoAnt::operator=(const DemoAnt& ant)
 }
 
 // ==================[ANT IA]==================
-AntIA::AntIA(const long id) : Ant(id) {}
-AntIA::AntIA(const long id, const AntIA& ant) : Ant(id, ant) {}
+AntIA::AntIA(const long id) : Ant(id), m_network(create_from_genome(Genome(0, 3, 2))) {}
+AntIA::AntIA(const long id, const AntIA& ant) : Ant(id, ant), m_network(create_from_genome(Genome(0, 3, 2))) {}
+AntIA::AntIA(const long id, const Genome& genome) : Ant(id), m_network(create_from_genome(genome)){}
 
 void AntIA::save(json &json) const
 {
@@ -198,7 +198,18 @@ void AntIA::save(json &json) const
 
 void AntIA::update()
 {
-    // TODO: Activate neurones
+    // Variables de décisions
+    const std::vector<double> inputs = {
+    static_cast<double>(getAngle()), 
+    static_cast<double>(getTileOn().type), 
+    static_cast<double>(getTileFacing().type)};
+
+    // Activation des sorties
+    auto outputs = m_network.activate(inputs);
+
+    // Décisions
+    rotate(outputs[0]);
+    moveForward();
 }
 
 void AntIA::load(const json &json)

@@ -77,6 +77,8 @@ namespace simu
         public:
             AntIA(const long id = -1);
             AntIA(const long id, const AntIA& ant);
+            AntIA(const long id, const Genome& ant);
+
             virtual ~AntIA() {};
 
             const char* getType() const override { return "antIA"; };
@@ -89,6 +91,7 @@ namespace simu
 
         private:
             // TODO: Ajouter neural network
+            FeedForwardNeuralNetwork m_network;
     };
 
     class Test: public Entity
