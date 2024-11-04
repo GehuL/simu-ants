@@ -19,16 +19,14 @@ void World::init()
 {
     Engine::init();
 
-    m_entities.clear();
-
     m_seed = GetRandomValue(0, std::numeric_limits<int>::max());
     SetRandomSeed(m_seed);
 
     TRACELOG(LOG_INFO, "seed: %d", m_seed);
-    
+    m_entities.clear();
+
     if(m_listener)
         m_listener.get()->onInit();
-    
     // Centre la caméra
     float offset = (GetScreenWidth() - m_grid.getGridWidth() * m_grid.getTileSize()) / 2.f;
     m_camera.offset = (Vector2){offset, offset};
@@ -191,7 +189,7 @@ void World::drawUI()
 {
     handleKeyboard();
     handleMouse();
-
+    // TODO: Afficher coordonnées dans la grille et globale de la souris 
     DrawText(TextFormat("Entity: %d", m_entities.size()), 0, 100, 20, BLUE);
 }
 

@@ -19,7 +19,7 @@ namespace simu
             Ant(const long id = -1);
             Ant(const long id, const Ant& ant);
 
-            virtual ~Ant(){};
+            virtual ~Ant() {};
 
             void update() override;
             void draw() override;
@@ -30,8 +30,6 @@ namespace simu
             Tile getCarriedObject() const { return m_carried_object; };
 
             float getLife() const { return m_life; };
-
-            std::string getType() const override { return "ant"; };
 
             // ------ ACTIONS IA -------
             void rotate(float angle);  // Définie la direction et le sens de la fourmis
@@ -46,22 +44,62 @@ namespace simu
             Ant& operator=(const Ant& en);
 
         private:
-            float m_life = 100.0;
-            Tile m_carried_object = AIR; 
+            float m_life;
+            Tile m_carried_object; 
+    };
 
-            float m_target_angle;
+    /** Implémentation du comportement par défaut sans IA de la fourmis pour une démonstration.
+     */
+    class DemoAnt: public Ant
+    {
+        public:
+            DemoAnt(const long id = -1);
+            DemoAnt(const long id, const DemoAnt& ant);
+            virtual ~DemoAnt() {};
+
+            const char* getType() const override { return "demoAnt"; };
+
+            void update() override;
+            void save(json& json) const override;
+            void load(const json& json) override;
+
+            DemoAnt& operator=(const DemoAnt& en);
+
+        private:
             int m_rotateCd;
+    };
+
+    /**
+     * Implémentation du comportement de la fourmis géré par l'IA
+     */
+    class AntIA: public Ant
+    {
+        public:
+            AntIA(const long id = -1);
+            AntIA(const long id, const AntIA& ant);
+            virtual ~AntIA() {};
+
+            const char* getType() const override { return "antIA"; };
+
+            void update() override;
+            void save(json& json) const override;
+            void load(const json& json) override;
+
+            AntIA& operator=(const AntIA& en);
+
+        private:
+            // TODO: Ajouter neural network
     };
 
     class Test: public Entity
     {
         public:
             Test(const long id = -1) : Entity(id) {};
-            Test(const long id, const Test& ant): Entity(id) {};
+            Test(const long id, const Test& ant) : Entity(id, ant) {};
 
             virtual ~Test(){};
 
-            std::string getType() const override { return "test"; };
+            const char* getType() const override { return "test"; };
 
             void update() override {};
             void draw() override {};
@@ -75,21 +113,6 @@ namespace simu
 
         private:
             std::string m_test = "this is a test";
-    };
-
-    class AntController
-    {
-        public:
-            AntController(const std::weak_ptr<Ant> ant);
-            AntController(const std::weak_ptr<Ant> ant, const Genome& genome);
-            
-            virtual ~AntController(){};
-
-            void activate();
-
-        private:
-            const std::weak_ptr<Ant> m_ant;
-            FeedForwardNeuralNetwork m_network;
     };
 }
 

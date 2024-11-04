@@ -35,7 +35,7 @@ namespace simu
             friend void to_json(json& j, const Entity& p) { p.save(j); };
             friend void from_json(const json& j, Entity& p) { p.load(j); };
             
-            virtual std::string getType() const { return "entity"; };
+            virtual const char* getType() const = 0;
 
             Tile getTileOn() const;
             Tile getTileFacing() const;

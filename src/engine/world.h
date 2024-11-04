@@ -25,7 +25,7 @@ namespace simu
 
 
     // Liste des entités enregistrés 
-    using entities_t = std::variant<Ant, Test>;
+    using entities_t = std::variant<AntIA, Test, DemoAnt>;
 
     template<size_t index = std::variant_size_v<entities_t>>
     entities_t entityFactory(const std::string& entity_type) {
