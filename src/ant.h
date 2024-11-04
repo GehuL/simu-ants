@@ -41,8 +41,8 @@ namespace simu
             Ant& operator=(const Ant& en);
 
         private:
-            float m_life;
-            Tile m_carried_object; 
+            float m_life = 100.0;
+            Tile m_carried_object = AIR; 
     };
 
     /** Implémentation du comportement par défaut sans IA de la fourmis pour une démonstration.
@@ -63,7 +63,7 @@ namespace simu
             DemoAnt& operator=(const DemoAnt& en);
 
         private:
-            int m_rotateCd;
+            int m_rotateCd = 0;
     };
 
     /**
