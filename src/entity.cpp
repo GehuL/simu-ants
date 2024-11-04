@@ -50,7 +50,7 @@ Vector2i simu::Entity::getTilePosOn() const
 
 std::string Entity::toString() const
 {
-    return "{type:" + getType() + ", id:" + std::to_string(m_id) + "}";
+    return "{type:" + std::string(getType()) + ", id:" + std::to_string(m_id) + "}";
 }
 
 void Entity::save(json &j) const

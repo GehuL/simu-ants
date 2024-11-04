@@ -123,8 +123,9 @@ Ant& Ant::operator=(const Ant& ant)
     return *this;
 }
 
+// ==================[DEMO ANT]==================
 DemoAnt::DemoAnt(const long id) : Ant(id) {}
-DemoAnt::DemoAnt(const long id, const DemoAnt &ant) : m_rotateCd(ant.m_rotateCd) {}
+DemoAnt::DemoAnt(const long id, const DemoAnt &ant) : Ant(id, ant),  m_rotateCd(ant.m_rotateCd) {}
 
 void DemoAnt::update()
 {
@@ -174,5 +175,33 @@ DemoAnt& DemoAnt::operator=(const DemoAnt& ant)
 {
     Ant::operator=(ant);
     m_rotateCd = ant.m_rotateCd;
+    return *this;
+}
+
+// ==================[ANT IA]==================
+AntIA::AntIA(const long id) : Ant(id) {}
+AntIA::AntIA(const long id, const AntIA& ant) : Ant(id, ant) {}
+
+void AntIA::save(json &json) const
+{
+    Ant::save(json);
+    // TODO: Save genome
+}
+
+void AntIA::update()
+{
+    // TODO: Activate neurones
+}
+
+void AntIA::load(const json &json)
+{
+    Ant::load(json);
+    // TODO: Load genome
+}
+
+AntIA& AntIA::operator=(const AntIA& ant)
+{
+    Ant::operator=(ant);
+    // TODO: Copy genome
     return *this;
 }
