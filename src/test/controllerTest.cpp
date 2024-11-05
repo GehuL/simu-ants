@@ -1,12 +1,13 @@
 #include "../engine/world.h"
 #include "../NEAT/Population.h"
+#include "../NEAT/evolution.h"
 
 using namespace simu;
 
 class Evolution : public WorldListener
 {
     public:
-        Evolution(RNG& rng, NeatConfig config) : m_pop(config, rng) {};
+        Evolution(int reproductionPeriod) : m_reproductionPeriod(reproductionPeriod) {};
 
         void onInit() override
         {
@@ -20,7 +21,14 @@ class Evolution : public WorldListener
 
         void onUpdate() override
         {
-
+            if(m_reproductionPeriod <= m_reproductionTick)
+            {
+                // TODO: Reproduction
+                m_reproductionTick = 0;
+            }else
+            {
+                m_reproductionTick++;
+            }
         };
 
         void onUnload() override
@@ -29,7 +37,9 @@ class Evolution : public WorldListener
         };
 
     private:
-        Population m_pop;
+        GeneticTrainer m_trainer;
+        int m_reproductionTick;
+        int m_reproductionPeriod;
 };
 
 int main()

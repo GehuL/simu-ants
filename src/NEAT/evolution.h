@@ -2,8 +2,10 @@
 #define __EVOLUTION_H__
 
 #include <vector>
+#include "../engine/ant.h"
+#include "Genome.h"
 
-namespace simu
+namespace neat
 {
     /**
      * Interface permettant d'implémenter le processus d'evolution génétique 
@@ -45,29 +47,48 @@ namespace simu
             virtual std::vector<T>& mutate(const std::vector<T>& pop) = 0;
     };
 
-    template<typename T, typename = std::enable_if_t<std::is_base_of<AbstractGenetic, T>::value>>
+    // template<typename T, typename = std::enable_if_t<std::is_base_of<AbstractGenetic, T>::value>>
+    // class GeneticTrainer
+    // {
+    //     public:
+    //         GeneticTrainer() {};
+    //         GeneticTrainer(const std::vector<T>& population) : m_population(population) {};
+            
+    //         virtual ~GeneticTrainer() {};
+
+    //         const std::vector<T> train() {};
+
+    //         int getGenerationCount() { return m_genCount; };
+            
+    //         /**
+    //          * Renvoie la population actuelle
+    //          */
+    //         const std::vector<T> getPopulation() { return m_population; };
+
+    //     private:
+    //         int m_genCount;
+    //         T m_genetic;
+    //         std::vector<T> m_population;
+    // };
+
     class GeneticTrainer
     {
         public:
-            GeneticTrainer() {};
-            GeneticTrainer(const std::vector<T>& population) : m_population(population) {};
-            
-            virtual ~GeneticTrainer() {};
+            GeneticTrainer(std::function<double(AntIA)> fitness);
 
-            const std::vector<T> train() {};
-
-            int getGenerationCount() { return m_genCount; };
-            
             /**
-             * Renvoie la population actuelle
+             * @brief Renvoie la nouvelle génération de génome
              */
-            const std::vector<T> getPopulation() { return m_population; };
+            const std::vector<Individual>& train();
+
+            int generationCount() const { return m_genCount; }
 
         private:
+            std::function<double(AntIA)> m_fitness;
+            Population m_population;
             int m_genCount;
-            T m_genetic;
-            std::vector<T> m_population;
-    };
+
+    }
 }
 
 #endif

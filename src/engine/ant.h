@@ -83,6 +83,9 @@ namespace simu
 
             const char* getType() const override { return "antIA"; };
 
+            static constexpr inputCount() { return 3; } ;
+            static constexpr outputCount() { return 2; };
+
             void update() override;
             void save(json& json) const override;
             void load(const json& json) override;

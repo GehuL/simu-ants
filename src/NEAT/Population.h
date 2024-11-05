@@ -12,7 +12,7 @@
 
 class Population {
 public:
-    Population(NeatConfig config, RNG &rng);
+    Population(NeatConfig config, const RNG &rng);
 
     // Méthode run avec un template pour la fonction de fitness
     template <typename FitnessFn>
