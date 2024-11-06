@@ -6,7 +6,17 @@
 #include <iostream>
 #include <algorithm>  
 
-// Constructeur de la classe Population
+
+/**
+ * @brief Constructeur de la classe Population.
+ * 
+ * Ce constructeur initialise une population de génomes en utilisant les paramètres de configuration
+ * NEAT spécifiés et un générateur de nombres aléatoires. Chaque génome est initialisé avec des neurones
+ * d'entrée et de sortie, ainsi qu'un nombre aléatoire de neurones cachés.
+ * 
+ * @param config La configuration NEAT utilisée pour initialiser la population.
+ * @param rng Une référence à un générateur de nombres aléatoires.
+ */
 Population::Population(NeatConfig config, RNG &rng) : config{config}, rng{rng},next_genome_id{0} {
     for (int i = 0; i < config.population_size; ++i) {
         // Utiliser Individual au lieu de std::pair<Genome, bool>
@@ -16,18 +26,40 @@ Population::Population(NeatConfig config, RNG &rng) : config{config}, rng{rng},n
 
 
 
-// Méthode pour obtenir les individus
+
+/**
+ * @brief Retourne une référence à un vecteur contenant les individus de la population.
+ * 
+ * @return La référence à un vecteur d'individus.
+ */
 std::vector<neat::Individual>& Population::get_individuals() {
     return individuals;
 }
 
 
-// Méthode pour générer le prochain ID de génome
+/**
+ * @brief Génère le prochain identifiant unique de génome et l'incrémente.
+ *
+ * Cette méthode génère le prochain identifiant unique de génome en utilisant la variable
+ * next_genome_id, puis incrémente cette variable pour le prochain appel.
+ *
+ * @return L'identifiant unique du prochain génome.
+ */
 int Population::generate_next_genome_id() {
     return next_genome_id++;
 }
 
-// Méthode pour générer un nouveau génome avec des neurones cachés
+
+
+/**
+ * @brief Crée un nouveau génome avec des neurones et des liens.
+ * 
+ * Cette méthode crée un nouveau génome en initialisant les neurones d'entrée et de sortie,
+ * ainsi qu'un nombre aléatoire de neurones cachés. Les liens entre les neurones sont également
+ * initialisés avec des poids aléatoires.
+ * 
+ * @return Genome Le génome nouvellement créé.
+ */
 Genome Population::new_genome() {
     Genome genome{generate_next_genome_id(), config.num_inputs, config.num_outputs};
 
@@ -68,7 +100,16 @@ Genome Population::new_genome() {
 }
 
 
-// Méthode pour créer un nouveau neurone
+
+/**
+ * @brief Crée un nouveau neurone avec l'identifiant de neurone spécifié.
+ * 
+ * Cette méthode crée un nouveau neurone avec l'identifiant de neurone spécifié, un biais
+ * initialisé à 0.0 et une fonction d'activation par défaut (Sigmoid).
+ * 
+ * @param neuron_id L'identifiant unique du neurone à créer.
+ * @return Une structure NeuronGene représentant le neurone nouvellement créé.
+ */
 neat::NeuronGene Population::new_neuron(int neuron_id) {
     neat::NeuronGene neuron;
     neuron.neuron_id = neuron_id;
@@ -77,7 +118,17 @@ neat::NeuronGene Population::new_neuron(int neuron_id) {
     return neuron;
 }
 
-// Méthode pour créer un nouveau lien
+
+/**
+ * @brief Crée un nouveau lien avec les identifiants de neurones spécifiés.
+ * 
+ * Cette méthode crée un nouveau lien avec les identifiants de neurones spécifiés, un poids
+ * initialisé aléatoirement et activé par défaut.
+ * 
+ * @param input_id L'identifiant du neurone d'entrée pour le lien.
+ * @param output_id L'identifiant du neurone de sortie pour le lien.
+ * @return neat::LinkGene Une structure LinkGene représentant le lien nouvellement créé.
+ */
 neat::LinkGene Population::new_link(int input_id, int output_id) {
     neat::LinkGene link;
     link.link_id = {input_id, output_id};
@@ -86,6 +137,19 @@ neat::LinkGene Population::new_link(int input_id, int output_id) {
     return link;
 }
 
+/**
+ * @brief Mute le génome en ajoutant ou en supprimant des liens et des neurones, et en modifiant les poids et les biais.
+ *
+ * Cette méthode mute le génome en effectuant les opérations suivantes avec des probabilités définies par la configuration NEAT :
+ * - Ajouter un lien avec la probabilité définie par `config.probability_add_link`.
+ * - Supprimer un lien avec la probabilité définie par  `config.probability_remove_link`.
+ * - Ajouter un neurone avec la probabilité définie par `config.probability_add_neuron`.
+ * - Supprimer un neurone avec la probabilité définie par `config.probability_remove_neuron`.
+ * - Faire muter le poids d'un lien aléatoire avec la probabilité définie par `config.probability_mutate_link_weight`.
+ * - Faire muter le biais d'un neurone aléatoire avec la probabilité définie par `config.probability_mutate_neuron_bias`.
+ *
+ * @param genome Le génome à muter.
+ */
 void Population::mutate(Genome &genome) {
     RNG rng;
     
@@ -143,6 +207,15 @@ if (mutate_link && !genome.links.empty()) {
 
 
 
+/**
+ * @brief Permet de reproduire la population actuelle en fonction de la fitness, de sélectionner les parents parmi les meilleurs individus
+ *
+ * Cette méthode permet de reproduire la population actuelle en fonction de la fitness des individus. Les individus sont triés par ordre de fitness
+ * décroissante, puis les parents sont sélectionnés parmi les meilleurs individus en fonction d'un seuil de survie défini par la configuration NEAT.
+ * Les parents sont ensuite croisés pour créer de nouveaux individus, qui sont ensuite mutés pour introduire de la diversité.
+ *
+ * @return std::vector<neat::Individual> Un vecteur contenant les nouveaux individus de la génération suivante.
+ */
 std::vector<neat::Individual> Population::reproduce() {
     auto old_members = sort_individuals_by_fitness(individuals);
     int reproduction_cutoff = std::ceil(config.survival_threshold * old_members.size());
@@ -167,6 +240,15 @@ std::vector<neat::Individual> Population::reproduce() {
 
 
 
+/**
+ * @brief Trie les individus par fitness en ordre décroissant.
+ *
+ * Cette méthode trie les individus par fitness en ordre décroissant, du plus grand au plus petit.
+ * Elle retourne un nouveau vecteur d'individus trié par fitness.
+ *
+ * @param individuals Un vecteur d'individus à trier.
+ * @return Un nouveau vecteur d'individus trié par fitness.
+ */
 std::vector<neat::Individual> Population::sort_individuals_by_fitness(const std::vector<neat::Individual>& individuals) {
     // Créer une copie des individus à trier
     std::vector<neat::Individual> sorted_individuals = individuals;
@@ -181,6 +263,13 @@ std::vector<neat::Individual> Population::sort_individuals_by_fitness(const std:
 }
 
 
+/**
+ * @brief Met à jour le meilleur individu de la population.
+ * 
+ * Cette méthode met à jour le meilleur individu de la population en cherchant l'individu avec la meilleure fitness.
+ * Si un meilleur individu est trouvé, la variable best_individual est mise à jour avec cet individu.
+ * 
+ */
 void Population::update_best() {
     // Cherche l'individu avec la meilleure fitness
     auto best_it = std::max_element(individuals.begin(), individuals.end(), 

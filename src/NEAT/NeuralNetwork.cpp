@@ -3,6 +3,19 @@
 #include <algorithm>
 #include <iostream>
 
+/**
+ * @brief Active le réseau de neurones avec un ensemble d'entrées.
+ *
+ * Cette méthode active le réseau de neurones avec un ensemble d'entrées spécifié.
+ * Les valeurs d'entrée sont propagées à travers le réseau, et les valeurs de sortie
+ * sont calculées en conséquence.
+ *
+ * @param inputs Un vecteur d'entrées à fournir au réseau de neurones.
+ * @return Un vecteur de valeurs de sortie calculées par le réseau de neurones.
+ *
+ * @throws std::runtime_error Si l'id d'un neurone n'est pas trouvé dans le vecteur de valeurs.
+ * @throws std::logic_error Si la taille des entrées ne correspond pas à la taille des neurones d'entrée.
+ */
 std::vector<double> FeedForwardNeuralNetwork::activate(const std::vector<double>& inputs) {
     /*
     std::cout << "Inputs size: " << inputs.size() << "\n";
@@ -61,6 +74,18 @@ std::vector<double> FeedForwardNeuralNetwork::activate(const std::vector<double>
 
 
 
+/**
+ * @brief Simule la propagation vers l'avant des neurones.
+ *
+ * Cette fonction simule la propagation vers l'avant des neurones dans un réseau de neurones
+ * en identifiant les couches de neurones et en les triant par
+ * ordre de propagation vers l'avant.
+ *
+ * @param inputs Un vecteur d'ID de neurones d'entrée.
+ * @param outputs Un vecteur d'ID de neurones de sortie.
+ * @param links Un vecteur de LinkGene représentant les connexions entre les neurones.
+ * @return Un vecteur de vecteur où chaque vecteur représente une couche de neurones.
+ */
 std::vector<std::vector<int>> feed_forward_layer(
     const std::vector<int>& inputs, 
     const std::vector<int>& outputs, 
@@ -93,8 +118,9 @@ std::vector<std::vector<int>> feed_forward_layer(
 
 
 
-// Fonction utilitaire pour convertir un Activation en ActivationFn
-/**@brief Convertir un Activation en ActivationFn
+
+/**
+ * @brief Convertir un Activation en ActivationFn
  * @param activation Activation à convertir
  * @return ActivationFn correspondant à l'Activation
  */
@@ -111,6 +137,16 @@ ActivationFn convert_activation(const Activation& activation) {
 
 
 
+/**
+ * @brief Crée un feedforward neural network à partir d'un génome.
+ *
+ * Cette fonction crée un feedforward neural network à partir d'un génome donné.
+ * Elle parcourt les neurones et les connexions du génome pour construire le réseau
+ * de neurones correspondant.
+ *
+ * @param genome Le génome à partir duquel construire le réseau de neurones.Il contient les informations sur les neurones et les connexions.
+ * @return FeedForwardNeuralNetwork Le réseau de neurones créé à partir du génome.
+ */
 FeedForwardNeuralNetwork create_from_genome(const Genome &genome) {
     // Utiliser les méthodes adéquates pour obtenir les identifiants d'entrée et de sortie
     std::vector<int> inputs = genome.make_input_ids();
@@ -165,6 +201,19 @@ std::cout << std::endl;
     return FeedForwardNeuralNetwork{std::move(inputs), std::move(outputs), std::move(neurons)};
 }
 
+/**
+ * @brief Trie les neurones par couche dans un réseau de neurones.
+ *
+ * Cette fonction prend une liste de neurones d’entrée, de sortie et de liens entre les neurones,
+ * et trie les neurones en fonction de leurs couches. Les neurones d’entrée sont considérés comme étant 
+ * la première couche (couche 0), et la fonction propage l’information de couche par le biais du 
+ * réseau basé sur les liens.
+ *
+ * @param inputs Un vecteur d'ID de neurones d'entrée.
+ * @param outputs Un vecteur d'ID de neurones de sortie.
+ * @param links Un vecteur de LinkGene représentant les connexions entre les neurones.
+ * @return Un vecteur d'ID de neurones triés par couche.
+ */
 std::vector<int> sort_neurons_by_layer(
     const std::vector<int>& inputs,
     const std::vector<int>& outputs,
@@ -213,6 +262,19 @@ std::vector<int> sort_neurons_by_layer(
     return sorted_neurons;
 }
 
+/**
+ * @brief Identifie les couches de neurones dans un réseau neuronal en fonction des gènes d’entrée, de sortie et de liaison.
+ *
+ * Cette fonction organise les neurones en couches à partir des neurones d’entrée, 
+ * puis en ajoutant progressivement des couches de neurones sur la base des liens fournis, 
+ * et enfin ajouter les neurones de sortie comme dernière couche.
+ *
+ * @param inputs Un vecteur d'entiers représentant les ID des neurones d'entrée.
+ * @param outputs Un vecteur d'entiers représentant les ID des neurones de sortie.
+ * @param links Un vecteur de neat::LinkGene représentant les liens entre les neurones.
+ * 
+ * @return Vecteur de vecteurs d’entiers, où chaque vecteur interne représente une couche d’identificateurs neuronaux.
+ */
 std::vector<std::vector<int>> identify_neuron_layers(
     const std::vector<int>& inputs, 
     const std::vector<int>& outputs, 

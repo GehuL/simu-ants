@@ -12,7 +12,7 @@
 
 class Population {
 public:
-    Population(NeatConfig config, const RNG &rng);
+    Population(NeatConfig config,  RNG &rng);
 
     // Méthode run avec un template pour la fonction de fitness
     template <typename FitnessFn>
@@ -66,6 +66,18 @@ neat::Individual Population::run(FitnessFn compute_fitness, int num_generations)
     return best_individual;
 }
 
+/**
+ * @brief Runs the NEAT algorithm for a specified number of generations.
+ *
+ * This function simulates the evolution of a population of individuals using the NEAT algorithm.
+ * It evaluates the fitness of each individual in the population, updates the best individual,
+ * and generates new generations until all individuals reach the goal or the maximum number of generations is reached.
+ *
+ * @tparam FitnessFn A callable type that computes the fitness of an individual.
+ * @param compute_fitness A function that takes an individual's genome and its index, and returns its fitness value.
+ * @param max_generations The maximum number of generations to run the simulation.
+ * @return The best individual after all generations or when all individuals have reached the goal.
+ */
 template <typename FitnessFn>
 neat::Individual Population::runV2(FitnessFn compute_fitness, int max_generations) {
    /*for (int generation = 0; generation < max_generations; ++generation) {
