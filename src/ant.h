@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 
+#include "others.h"
 #include "entity.h"
 #include "tiles.h"
 
@@ -15,6 +16,7 @@ namespace simu
 
             Ant(const long id = -1);
             Ant(const long id, const Ant& ant);
+            Ant(const long id, Vector2f position);
 
             virtual ~Ant() {};
 
@@ -52,6 +54,8 @@ namespace simu
         public:
             DemoAnt(const long id = -1);
             DemoAnt(const long id, const DemoAnt& ant);
+            DemoAnt(const long id, Vector2f position);
+
             virtual ~DemoAnt() {};
 
             const char* getType() const override { return "demoAnt"; };
@@ -74,6 +78,8 @@ namespace simu
         public:
             AntIA(const long id = -1);
             AntIA(const long id, const AntIA& ant);
+            AntIA(const long id, Vector2f position);
+
             virtual ~AntIA() {};
 
             const char* getType() const override { return "antIA"; };

@@ -23,6 +23,7 @@ namespace simu
 
             Entity(const long id = -1);
             Entity(const long id, const Entity& entity);
+            Entity(const long id, Vector2f position);
 
             virtual ~Entity();
 
@@ -56,8 +57,8 @@ namespace simu
         private:
             const long m_id;
         protected:
-            Vector2 m_pos;
-            Vector2 m_velocity;
+            Vector2 m_pos = Vector2{0.f, 0.f};
+            Vector2 m_velocity = Vector2{0.f, 0.f};
             float m_angle;
     };
 
