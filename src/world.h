@@ -142,6 +142,28 @@ namespace simu
             void save(const std::string& file);
             void load(const std::string& file);
 
+            /**
+             * @brief Renvoie la position de la souris dans la grille
+             */
+            Vector2i mouseToGridCoord() const;
+
+            /**
+             * @brief Renvoie la position globale de la position dans la grille
+             * @param pos Position d'une tuile dans la grille courante
+             * @return Les coordonées par rapport au repère de la caméra 2D
+             */
+            Vector2f gridCoordToWorld(Vector2i pos) const;
+
+            /**
+             * Positionne la caméra au centre de la grille
+             */
+            void centerCamera();
+
+            /**
+             * @brief Renvoie la tuile correspondante à celle sélectionner
+             */
+            Tile getSelectedTile() const;
+
         private:
             World();
 
