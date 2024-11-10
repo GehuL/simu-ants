@@ -133,7 +133,6 @@ void simu::to_json(json &json, const Grid &grid)
 
 void simu::from_json(const json & json, Grid & grid)
 {
-    // TODO: Décompresser les données
     // TODO: Ajouter les phéromones dans m_updateBuffer
     auto rowdata = json.at("data");
     

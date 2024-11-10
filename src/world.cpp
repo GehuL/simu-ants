@@ -92,7 +92,6 @@ void World::load(const std::string& filename)
 {
     TRACELOG(LOG_INFO, "Loading file %s", filename.c_str());
     
-    // TODO: Optimiser la fonction
     try
     {
         auto file = std::ifstream(filename, std::ios_base::in);
