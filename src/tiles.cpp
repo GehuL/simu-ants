@@ -20,10 +20,12 @@ Grid::~Grid()
 void Grid::unload()
 {
     if(m_grid != NULL)
+    {
         MemFree(m_grid);
+        m_grid = NULL;
+    }
     
     m_updateBuff.clear();
-    m_grid = NULL;
 
     UnloadImage(m_img);
     UnloadTexture(m_tex);
@@ -170,11 +172,26 @@ void simu::decompressGrid(Grid& grid, std::string &data, int gridWidth)
     if(decoded)
         MemFree(decoded);
 
-    if(grid.m_grid)
-        MemFree(grid.m_grid);
-   
+    grid.unload();
+
     grid.m_gridWidth = gridWidth;
     grid.m_grid = reinterpret_cast<Tile*>(decompressed);
+
+    grid.m_img = GenImageColor(grid.m_gridWidth, grid.m_gridWidth, WHITE);
+    grid.m_tex = LoadTextureFromImage(grid.m_img);
+    SetTextureFilter(grid.m_tex, TEXTURE_FILTER_POINT);
+
+    // Update l'image et les phéromones
+    for(int index = 0; index < grid.m_gridWidth*grid.m_gridWidth; index++)
+    {
+        const Tile tile = grid.m_grid[index];
+        grid.setTile(tile, index);
+        if(tile.type == Type::PHEROMONE)
+        {
+            grid.m_updateBuff.push_back(index);
+        }
+    }
+
 }
 
 void Grid::fromImage(const std::string& file)
