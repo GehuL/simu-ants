@@ -186,8 +186,8 @@ DemoAnt& DemoAnt::operator=(const DemoAnt& ant)
 }
 
 // ==================[ANT IA]==================
-AntIA::AntIA(const long id) : Ant(id), m_network(create_from_genome(Genome(0, 3, 2))) {}
-AntIA::AntIA(const long id, const AntIA& ant) : Ant(id, ant), m_network(create_from_genome(Genome(0, 3, 2))) {}
+AntIA::AntIA(const long id) : Ant(id), m_network(create_from_genome(Genome::new_genome(3, 2))) {}
+AntIA::AntIA(const long id, const AntIA& ant) : Ant(id, ant), m_network(ant.m_network) {}
 AntIA::AntIA(const long id, const Genome& genome) : Ant(id), m_network(create_from_genome(genome)){}
 
 void AntIA::save(json &json) const

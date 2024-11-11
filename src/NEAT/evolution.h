@@ -4,6 +4,7 @@
 #include <vector>
 #include "../engine/ant.h"
 #include "Genome.h"
+#include "Population.h"
 
 namespace neat
 {
@@ -14,7 +15,7 @@ namespace neat
     class AbstractGenetic
     {
         public:
-            virtual ~GeneticEvolution() = 0;
+            virtual ~AbstractGenetic() = 0;
 
             /**
              * @brief Initialise une population de N éléments
@@ -74,7 +75,7 @@ namespace neat
     class GeneticTrainer
     {
         public:
-            GeneticTrainer(std::function<double(AntIA)> fitness);
+            GeneticTrainer(std::function<double(simu::AntIA)> fitness);
 
             /**
              * @brief Renvoie la nouvelle génération de génome
@@ -84,11 +85,10 @@ namespace neat
             int generationCount() const { return m_genCount; }
 
         private:
-            std::function<double(AntIA)> m_fitness;
+            std::function<double(simu::AntIA)> m_fitness;
             Population m_population;
             int m_genCount;
-
-    }
+    };
 }
 
 #endif

@@ -12,23 +12,11 @@ class Evolution : public WorldListener
         void onInit() override
         {
             getWorld().getGrid().fromImage("rsc/maze.png");
-
-            for(auto en : m_pop.get_individuals())
-            {
-                auto ant = getWorld().spawnEntity<AntIA>();
-            }
+            getWorld().spawnEntities<DemoAnt>(10);
         };
 
         void onUpdate() override
         {
-            if(m_reproductionPeriod <= m_reproductionTick)
-            {
-                // TODO: Reproduction
-                m_reproductionTick = 0;
-            }else
-            {
-                m_reproductionTick++;
-            }
         };
 
         void onUnload() override
@@ -37,7 +25,6 @@ class Evolution : public WorldListener
         };
 
     private:
-        GeneticTrainer m_trainer;
         int m_reproductionTick;
         int m_reproductionPeriod;
 };

@@ -22,6 +22,8 @@ public:
     std::vector<neat::NeuronGene> neurons;
     std::vector<neat::LinkGene> links;
 
+    static Genome new_genome(int num_inputs, int num_outputs);
+
     // Méthodes pour accéder aux informations du génome
     int get_num_inputs() const;
     int get_num_outputs() const;

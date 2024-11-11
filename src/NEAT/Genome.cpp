@@ -1,7 +1,7 @@
 #include "Genome.h"
 #include "neat.h"  // Inclure neat.h pour les définitions complètes
 #include <optional>  // Inclure <optional> pour utiliser std::optional
-
+#include "rng.h"
 
 /**
  * @brief Constructeur par défaut pour la classe Genome.
@@ -30,7 +30,43 @@ Genome::Genome(int id, int num_inputs, int num_outputs)
  * 
  * @return int Le nombre de nœuds d’entrée.
  */
-int Genome::get_num_inputs() const {
+Genome Genome::new_genome(int num_inputs, int num_outputs)
+{
+    Genome genome{0, num_inputs, num_outputs};
+
+    // Ajouter les neurones d'entrée
+    for (int neuron_id = 0; neuron_id < num_inputs; ++neuron_id) {
+        genome.add_neuron(new_neuron(neuron_id));
+    }
+
+    // Ajouter les neurones de sortie
+    for (int output_id = 0; output_id < num_outputs; ++output_id) {
+        genome.add_neuron(new_neuron(num_inputs + output_id));
+    }
+
+    // Ajouter des neurones cachés aléatoirement (entre 1 et 3)
+    RNG rng;
+    int num_hidden_neurons = rng.next_int(1, 4);  // Génère entre 1 et 3 neurones cachés
+    for (int i = 0; i < num_hidden_neurons; ++i) {
+        int hidden_id = num_inputs + num_outputs + i;
+        genome.add_neuron(new_neuron(hidden_id));
+
+        // Ajouter des liens entre neurones d'entrée et cachés
+        for (int input_id = 0; input_id < num_inputs; ++input_id) {
+            genome.add_link(new_link(input_id, hidden_id));
+        }
+
+        // Ajouter des liens entre neurones cachés et de sortie
+        for (int output_id = 0; output_id < num_outputs; ++output_id) {
+            genome.add_link(new_link(hidden_id, num_inputs + output_id));
+        }
+    }
+
+    return genome;
+}
+
+int Genome::get_num_inputs() const
+{
     return num_inputs;  // Retourne le nombre d'entrées
 }
 

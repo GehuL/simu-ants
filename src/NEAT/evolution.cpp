@@ -14,7 +14,7 @@ const std::vector<neat::Individual>& GeneticTrainer::train()
 {
     for(auto& ind : m_population.get_individuals())
     {
-        ind.fitness = m_fitness();
+        // ind.fitness = m_fitness();
         // ind.fitness_computed=true;
     }
     auto new_generation = population.reproduce();
