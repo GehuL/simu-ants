@@ -1,3 +1,6 @@
 .vscode
 main.code-workspace
 *.exe
+*.json
+build
+bin
