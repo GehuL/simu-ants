@@ -20,12 +20,12 @@ void save(const Genome &genome, const std::string &filename) {
     // Sauvegarder les informations du génome dans le fichier
     file << "Genome ID: " << genome.get_genome_id() << "\n";
     file << "Neurons:\n";
-    for (const auto &neuron : genome.neurons) {
+    for (const auto &neuron : genome.get_neurons()) {
         file << "Neuron ID: " << neuron.neuron_id << ", Bias: " << neuron.bias << "\n";
     }
 
     file << "Links:\n";
-    for (const auto &link : genome.links) {
+    for (const auto &link : genome.get_links()) {
         file << "Link from neuron " << link.link_id.input_id 
              << " to neuron " << link.link_id.output_id 
              << " with weight " << link.weight 
@@ -42,6 +42,7 @@ void save(const Genome &genome, const std::string &filename) {
  * @param ant_id L'identifiant de la fourmi.
  * @return Un vecteur contenant la position X, la position Y, l'altitude et la distance à l'objectif.
  */
+/*
 std::vector<double> get_game_state(int ant_id) {
     std::vector<double> game_state;
 
@@ -53,6 +54,8 @@ std::vector<double> get_game_state(int ant_id) {
 
     return game_state;
 }
+*/
+
 
 /**
  * @brief Effectue une action pour une fourmi en fonction des valeurs fournies.
@@ -60,6 +63,7 @@ std::vector<double> get_game_state(int ant_id) {
  * @param actions Un vecteur de valeurs pour les actions de déplacement (haut, bas, gauche, droite).
  * @param ant_id L'identifiant de la fourmi.
  */
+/*
 void perform_actions(const std::vector<double>& actions, int ant_id) {
     double move_up = actions[0]; 
     double move_down = actions[1];
@@ -77,3 +81,4 @@ void perform_actions(const std::vector<double>& actions, int ant_id) {
         move_ant_down(ant_id);
     }
 }
+*/

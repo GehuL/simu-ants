@@ -2,16 +2,19 @@
 #ifndef NEAT_H
 #define NEAT_H
 
+
 #include <unordered_set>
 #include <unordered_map>
 #include <vector>
 #include "Activation.h"
-#include "Genome.h"
 #include "GenomeIndexer.h"
 #include "NeatConfig.h"
 
+
 namespace neat
 {
+    
+    
 
     // Structure d'un neurone dans le génome
     struct NeuronGene

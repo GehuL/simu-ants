@@ -46,16 +46,16 @@ FeedForwardNeuralNetwork FeedForwardNeuralNetwork::create_from_genome(const Geno
     std::vector<int> outputs = genome.make_output_ids();
 
     LayerManager layer_manager;
-    std::vector<std::vector<int>> layers = layer_manager.organize_layers(inputs, outputs, genome.links);
+    std::vector<std::vector<int>> layers = layer_manager.organize_layers(inputs, outputs, genome.get_links());
 
     std::vector<Neuron> neurons;
     for (const auto& layer : layers) {
-        std::vector<int> sorted_layer = layer_manager.sort_by_layer(layer, genome.links);
+        std::vector<int> sorted_layer = layer_manager.sort_by_layer(layer, genome.get_links()); 
 
         for (int neuron_id : sorted_layer) {
             std::vector<NeuronInput> neuron_inputs;
 
-            for (const auto& link : genome.links) {
+            for (const auto& link : genome.get_links()) {
                 if (neuron_id == link.link_id.output_id) {
                     neuron_inputs.emplace_back(NeuronInput{link.link_id.input_id, link.weight});
                 }

@@ -3,7 +3,7 @@
 
 #include "neat.h"
 #include "Activation.h"
-#include "RNG.h"
+#include "rng.h"
 #include <vector>
 #include <optional>
 
@@ -56,6 +56,23 @@ public:
      * @return int L’identifiant du génome.
      */
     int get_genome_id() const;
+
+    /**
+     * @brief Récupère les neurones du génome.
+     *
+     * @return std::vector<neat::NeuronGene> Les neurones du génome.
+     */
+    std::vector<neat::NeuronGene> get_neurons() const;
+
+    /**
+     * @brief Récupère les liens du génome.
+     *
+     * @return std::vector<neat::LinkGene> Les liens du génome.
+     */
+    std::vector<neat::LinkGene> get_links() const;
+
+    std::vector<neat::NeuronGene>& get_neurons();
+    std::vector<neat::LinkGene>& get_links();
 
     /**
      * @brief Ajoute un neurone au génome.

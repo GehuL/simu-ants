@@ -54,6 +54,22 @@ int Genome::get_genome_id() const {
     return genome_id;  // Retourne l'ID du génome
 }
 
+std::vector<neat::NeuronGene> Genome::get_neurons() const {
+    return neurons;  // Retourne les neurones du génome
+}
+
+std::vector<neat::LinkGene> Genome::get_links() const {
+    return links;  // Retourne les liens du génome
+}
+
+std::vector<neat::NeuronGene>& Genome::get_neurons() {
+    return neurons;  // Retourne les neurones du génome
+}
+
+std::vector<neat::LinkGene>& Genome::get_links() {
+    return links;  // Retourne les liens du génome
+}
+
 int Genome::generate_next_neuron_id() {
     int max_id = 0;
     for (const auto& neuron : neurons) {

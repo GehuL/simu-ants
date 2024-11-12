@@ -41,6 +41,14 @@ namespace neat
             return LinkGene{link_id, weight, is_enabled};
         }
 
+        LinkGene new_value(int input_id, int output_id) {
+        double weight = generate_random_weight(); 
+        bool is_enabled = true;  
+
+        LinkId link_id{input_id, output_id};  
+        return LinkGene{link_id, weight, is_enabled};  
+    }
+
     private:
         RNG rng;
 
