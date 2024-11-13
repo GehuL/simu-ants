@@ -15,7 +15,7 @@ LDFLAGS    =
 # Build directory
 BUILDIR    = build
 # Source files - All .cpp files required to build the executable
-SRC_FILES  = main.cpp ComputeFitness.cpp Genome.cpp population.cpp GenomeIndexer.cpp neat.cpp NeuralNetwork.cpp Utils.cpp LayerManager.cpp Mutator.cpp 
+SRC_FILES  = main2.cpp ComputeFitness.cpp Genome.cpp population.cpp GenomeIndexer.cpp neat.cpp NeuralNetwork.cpp Utils.cpp LayerManager.cpp Mutator.cpp 
 # Object files - All .o files generated from the source files
 OBJ_FILES  = $(patsubst %.cpp, $(BUILDIR)/%.o, $(SRC_FILES))
 # Executable - The name of the executable into the bin directory

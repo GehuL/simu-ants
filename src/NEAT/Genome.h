@@ -29,6 +29,8 @@ public:
      */
     Genome(int id, int num_inputs, int num_outputs);
 
+    bool would_create_cycle(int input_id, int output_id) const;
+
     // Méthodes statiques pour créer un génome
     static Genome create_genome(int id, int num_inputs, int num_outputs, int num_hidden_neurons, RNG &rng);
 

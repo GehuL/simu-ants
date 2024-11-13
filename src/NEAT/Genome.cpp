@@ -2,6 +2,7 @@
 #include "neat.h"
 #include <optional>
 #include <vector>
+#include <functional>
 
 // Constructeur par défaut
 Genome::Genome() : genome_id(0), num_inputs(0), num_outputs(0) {}
@@ -10,6 +11,34 @@ Genome::Genome(int id, int num_inputs, int num_outputs)
     : genome_id(id), num_inputs(num_inputs), num_outputs(num_outputs) {}
 
 // Crée un nouveau génome avec les neurones d'entrée, de sortie et un certain nombre de neurones cachés
+// Fonction auxiliaire pour vérifier si un lien créerait un cycle
+bool Genome::would_create_cycle(int input_id, int output_id) const {
+    std::unordered_set<int> visited;
+    std::unordered_map<int, std::vector<int>> graph;
+
+    // Construire le graphe actuel des connexions
+    for (const auto &link : links) {
+        if (link.is_enabled) {
+            graph[link.link_id.input_id].push_back(link.link_id.output_id);
+        }
+    }
+
+    // Effectuer une recherche en profondeur pour voir s'il existe un chemin de output_id vers input_id
+    std::function<bool(int)> dfs = [&](int current) {
+        if (current == input_id) return true;
+        if (visited.count(current)) return false;
+
+        visited.insert(current);
+        for (int neighbor : graph[current]) {
+            if (dfs(neighbor)) return true;
+        }
+        return false;
+    };
+
+    return dfs(output_id);
+}
+
+// Fonction de création du génome avec vérification des cycles
 Genome Genome::create_genome(int id, int num_inputs, int num_outputs, int num_hidden_neurons, RNG &rng) {
     Genome genome(id, num_inputs, num_outputs);
 
@@ -29,8 +58,38 @@ Genome Genome::create_genome(int id, int num_inputs, int num_outputs, int num_hi
         genome.add_neuron(neat::NeuronGene{hidden_id, 0.0, Activation(Activation::Type::Sigmoid)});
     }
 
+    // Créer des liens sans cycles
+    for (int input_id = 0; input_id < num_inputs; ++input_id) {
+        // Lien vers chaque neurone caché et chaque neurone de sortie
+        for (int hidden_id = num_inputs + num_outputs; hidden_id < num_inputs + num_outputs + num_hidden_neurons; ++hidden_id) {
+            if (!genome.would_create_cycle(input_id, hidden_id)) {
+                genome.add_link(genome.create_link(input_id, hidden_id, rng));
+            }
+        }
+        for (int output_id = num_inputs; output_id < num_inputs + num_outputs; ++output_id) {
+            if (!genome.would_create_cycle(input_id, output_id)) {
+                genome.add_link(genome.create_link(input_id, output_id, rng));
+            }
+        }
+    }
+
+    // Liens entre neurones cachés et des cachés aux sorties
+    for (int hidden_id = num_inputs + num_outputs; hidden_id < num_inputs + num_outputs + num_hidden_neurons; ++hidden_id) {
+        for (int target_hidden_id = hidden_id + 1; target_hidden_id < num_inputs + num_outputs + num_hidden_neurons; ++target_hidden_id) {
+            if (!genome.would_create_cycle(hidden_id, target_hidden_id)) {
+                genome.add_link(genome.create_link(hidden_id, target_hidden_id, rng));
+            }
+        }
+        for (int output_id = num_inputs; output_id < num_inputs + num_outputs; ++output_id) {
+            if (!genome.would_create_cycle(hidden_id, output_id)) {
+                genome.add_link(genome.create_link(hidden_id, output_id, rng));
+            }
+        }
+    }
+
     return genome;
 }
+
 
 // Crée un lien avec des poids aléatoires
 neat::LinkGene Genome::create_link(int input_id, int output_id, RNG &rng) {
