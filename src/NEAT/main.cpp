@@ -18,6 +18,8 @@ int main() {
 
     Genome genome = Genome::create_genome(genome_id, num_inputs, num_outputs, num_hidden_neurons, rng);
 
+    neat::Individual individual(&genome);
+
     // Afficher le génome initial
     std::cout << "Génome initial :" << std::endl;
     save(genome, "genome_initial.txt");
@@ -36,6 +38,8 @@ int main() {
     std::cout << "\nGénome après mutations :" << std::endl;
     save(genome, "genome_mutated.txt");
 
+    
+
     // Calcul de la fitness
     int ant_id = 0;  // ID de la fourmi à tester
     ComputeFitness compute_fitness(rng);
@@ -43,6 +47,7 @@ int main() {
 
     std::cout << "\nFitness calculée pour le génome (fourmi " << ant_id << ") : " << fitness << std::endl;
 
+/*
     // Récupérer l'état de jeu d'une fourmi
     std::vector<double> game_state = get_game_state(ant_id);
     std::cout << "\nÉtat de jeu de la fourmi " << ant_id << " :" << std::endl;
@@ -54,6 +59,7 @@ int main() {
     std::vector<double> actions = {1.0, 0.0, 0.5, 0.2};  // Exemple d'actions pour la fourmi
     std::cout << "\nActions exécutées pour la fourmi " << ant_id << ":" << std::endl;
     perform_actions(actions, ant_id);
+    */
 
     return 0;
 }

@@ -18,8 +18,9 @@
  */
 void save(const Genome &genome, const std::string &filename);
 
-
+/*
 std::vector<double> get_game_state(int ant_id);
 void perform_actions(const std::vector<double>& actions, int ant_id);
+*/
 
 #endif // UTILS_H

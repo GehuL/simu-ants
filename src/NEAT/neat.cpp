@@ -39,11 +39,11 @@ LinkGene Neat::crossover_link(const LinkGene &a, const LinkGene &b) {
 }
 
 Genome Neat::crossover(const Individual &dominant, const Individual &recessive, int child_genome_id) {
-    Genome offspring{child_genome_id, dominant.genome.get_num_inputs(), dominant.genome.get_num_outputs()};
+    Genome offspring{child_genome_id, dominant.genome->get_num_inputs(), dominant.genome->get_num_outputs()};
 
-    for (const auto &dominant_neuron : dominant.genome.get_neurons()) {
+    for (const auto &dominant_neuron : dominant.genome->get_neurons()) {
         int neuron_id = dominant_neuron.neuron_id;
-        std::optional<neat::NeuronGene> recessive_neuron = recessive.genome.find_neuron(neuron_id);
+        std::optional<neat::NeuronGene> recessive_neuron = recessive.genome->find_neuron(neuron_id);
         if (!recessive_neuron) {
             offspring.add_neuron(dominant_neuron);
         } else {
@@ -51,9 +51,9 @@ Genome Neat::crossover(const Individual &dominant, const Individual &recessive, 
         }
     }
 
-    for (const auto &dominant_link : dominant.genome.get_links()) {
+    for (const auto &dominant_link : dominant.genome->get_links()) {
         LinkId link_id = dominant_link.link_id;
-        std::optional<neat::LinkGene> recessive_link = recessive.genome.find_link(link_id);
+        std::optional<neat::LinkGene> recessive_link = recessive.genome->find_link(link_id);
         if (!recessive_link) {
             offspring.add_link(dominant_link);
         } else {

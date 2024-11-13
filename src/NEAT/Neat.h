@@ -2,13 +2,16 @@
 #ifndef NEAT_H
 #define NEAT_H
 
-
+#include "Neat.h"
 #include <unordered_set>
 #include <unordered_map>
 #include <vector>
 #include "Activation.h"
 #include "GenomeIndexer.h"
 #include "NeatConfig.h"
+
+class Genome;
+
 
 
 namespace neat
@@ -73,14 +76,14 @@ namespace neat
     // Structure pour représenter un individu
     struct Individual
     {
-        Genome genome;
+        Genome* genome;  // Use a pointer to Genome
         bool fitness_computed;
         double fitness;
 
         Individual()
-            : genome(), fitness_computed(false), fitness(0.0) {}
+            : genome(nullptr), fitness_computed(false), fitness(0.0) {}
 
-        Individual(const Genome &genome)
+        Individual(Genome* genome)
             : genome(genome), fitness_computed(false), fitness(0.0) {}
     };
 

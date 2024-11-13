@@ -71,3 +71,14 @@ FeedForwardNeuralNetwork FeedForwardNeuralNetwork::create_from_genome(const Geno
 
     return FeedForwardNeuralNetwork{std::move(inputs), std::move(outputs), std::move(neurons)};
 }
+
+ActivationFn convert_activation(const Activation& activation) {
+    switch (activation.get_type()) {
+        case Activation::Type::Sigmoid:
+            return Sigmoid{};
+        case Activation::Type::Tanh:
+            return Tanh{};
+        default:
+            throw std::invalid_argument("Unknown activation type");
+    }
+}
