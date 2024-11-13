@@ -32,13 +32,23 @@ std::vector<neat::Individual> Population::reproduce() {
     int reproduction_cutoff = std::ceil(config.survival_threshold * old_members.size());
     std::vector<neat::Individual> new_generation;
 
+    std::cout << "Reproducing..." << std::endl;
+
     while (new_generation.size() < config.population_size) {
         neat::Individual& p1 = rng.choose_random(old_members, reproduction_cutoff);
         neat::Individual& p2 = rng.choose_random(old_members, reproduction_cutoff);
 
+        std::cout << "Crossover between " << p1.genome->get_genome_id() << " and " << p2.genome->get_genome_id() << std::endl;
+
         neat::Neat neat_instance;
         Genome offspring = neat_instance.crossover(p1.genome, p2.genome, generate_next_genome_id());
+
+        std::cout << "Offspring genome ID: " << offspring.get_genome_id() << std::endl;
+
         mutate(offspring);
+
+        
+
         new_generation.push_back(neat::Individual(&offspring));
     }
 
