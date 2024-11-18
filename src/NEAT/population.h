@@ -88,6 +88,19 @@ public:
     */
    void update_best();
 
+
+/**
+ * @brief Remplace la population actuelle par une nouvelle génération d'individus.
+ *
+ * Cette méthode prend en entrée un vecteur de nouveaux individus, 
+ * et met à jour la population en remplaçant les anciens individus 
+ * par les nouveaux tout en conservant les informations nécessaires.
+ *
+ * @param new_generation Le vecteur contenant les nouveaux individus.
+ */
+   void replace_population(std::vector<neat::Individual> new_generation);
+
+   
 private:
    NeatConfig config;
    RNG &rng;

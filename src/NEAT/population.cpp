@@ -73,3 +73,19 @@ void Population::update_best() {
         best_individual = *best_it;
     }
 }
+
+void Population::replace_population(std::vector<neat::Individual> new_generation) {
+    if (new_generation.empty()) {
+        throw std::runtime_error("Erreur : La nouvelle génération est vide. Impossible de remplacer la population.");
+    }
+
+    // Remplace les individus actuels par ceux de la nouvelle génération
+    individuals = std::move(new_generation);
+
+    // Met à jour le meilleur individu avec la nouvelle population
+    update_best();
+
+    std::cout << "Population remplacée. Taille actuelle : " << individuals.size() << std::endl;
+}
+
+

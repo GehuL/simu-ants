@@ -3,6 +3,7 @@
 #include <iostream>
 #include "Neat.h"
 #include <random>
+#include <algorithm>
 
 /**
  * @brief Sauvegarde un génome dans un fichier.
@@ -82,3 +83,70 @@ void perform_actions(const std::vector<double>& actions, int ant_id) {
     }
 }
 */
+
+/**
+ * @brief Génère un état de jeu aléatoire pour tester la logique du réseau neuronal.
+ * 
+ * @param ant_id L'identifiant de la fourmi.
+ * @param rng Une référence à un générateur de nombres aléatoires.
+ * @return Un vecteur de valeurs représentant l'état du jeu.
+ */
+std::vector<double> default_get_game_state(int ant_id, RNG &rng) {
+    std::vector<double> game_state;
+
+    // Génère des valeurs aléatoires pour l'état du jeu
+    double pos_x = rng.next_double();      // Position X entre 0 et 100
+    double pos_y = rng.next_double();      // Position Y entre 0 et 100
+    double altitude = rng.next_double();    // Altitude entre 0 et 10
+    double distance_to_goal = rng.next_double(); // Distance à l'objectif entre 0 et 50
+
+    game_state.push_back(pos_x);
+    game_state.push_back(pos_y);
+    game_state.push_back(altitude);
+    game_state.push_back(distance_to_goal);
+
+    // Affiche l'état du jeu dans le terminal
+    std::cout << "Game State for Ant ID " << ant_id << ": ["
+              << "X: " << pos_x << ", Y: " << pos_y
+              << ", Altitude: " << altitude
+              << ", Distance to Goal: " << distance_to_goal
+              << "]" << std::endl;
+
+    return game_state;
+}
+
+/**
+ * @brief Imprime les actions sélectionnées en fonction des sorties du réseau neuronal.
+ * 
+ * @param actions Un vecteur contenant les valeurs des actions.
+ * @param ant_id L'identifiant de la fourmi.
+ */
+void default_perform_action(const std::vector<double> &actions, int ant_id) {
+    // Vérifie que le vecteur d'actions est valide
+    if (actions.size() != 4) {
+        std::cerr << "Error: Actions vector must contain exactly 4 values!" << std::endl;
+        return;
+    }
+
+    // Affiche les valeurs des actions
+    std::cout << "Actions for Ant ID " << ant_id << ": ["
+              << "Up: " << actions[0] << ", Down: " << actions[1]
+              << ", Left: " << actions[2] << ", Right: " << actions[3]
+              << "]" << std::endl;
+
+    // Trouve l'action avec la plus grande valeur
+    auto max_action = std::max_element(actions.begin(), actions.end());
+    int action_index = std::distance(actions.begin(), max_action);
+
+    // Détermine et affiche l'action effectuée
+    std::string action;
+    switch (action_index) {
+        case 0: action = "Move Up"; break;
+        case 1: action = "Move Down"; break;
+        case 2: action = "Move Left"; break;
+        case 3: action = "Move Right"; break;
+        default: action = "Unknown"; break;
+    }
+
+    std::cout << "Selected Action for Ant ID " << ant_id << ": " << action << std::endl;
+}

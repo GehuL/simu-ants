@@ -1,6 +1,7 @@
 #include "Genome.h"
 #include "neat.h"
 #include <optional>
+#include <iostream>
 #include <vector>
 #include <functional>
 
@@ -58,9 +59,11 @@ Genome Genome::create_genome(int id, int num_inputs, int num_outputs, int num_hi
         genome.add_neuron(neat::NeuronGene{hidden_id, 0.0, Activation(Activation::Type::Sigmoid)});
     }
 
+    std::cout << "Genome ID: " << id << ", Neurones: " << genome.get_neurons().size() 
+              << ", Liens: " << genome.get_links().size() << std::endl;
+
     // Créer des liens sans cycles
     for (int input_id = 0; input_id < num_inputs; ++input_id) {
-        // Lien vers chaque neurone caché et chaque neurone de sortie
         for (int hidden_id = num_inputs + num_outputs; hidden_id < num_inputs + num_outputs + num_hidden_neurons; ++hidden_id) {
             if (!genome.would_create_cycle(input_id, hidden_id)) {
                 genome.add_link(genome.create_link(input_id, hidden_id, rng));
@@ -73,7 +76,6 @@ Genome Genome::create_genome(int id, int num_inputs, int num_outputs, int num_hi
         }
     }
 
-    // Liens entre neurones cachés et des cachés aux sorties
     for (int hidden_id = num_inputs + num_outputs; hidden_id < num_inputs + num_outputs + num_hidden_neurons; ++hidden_id) {
         for (int target_hidden_id = hidden_id + 1; target_hidden_id < num_inputs + num_outputs + num_hidden_neurons; ++target_hidden_id) {
             if (!genome.would_create_cycle(hidden_id, target_hidden_id)) {
@@ -87,8 +89,12 @@ Genome Genome::create_genome(int id, int num_inputs, int num_outputs, int num_hi
         }
     }
 
+    std::cout << "Final Genome ID: " << id << ", Neurones: " << genome.get_neurons().size() 
+              << ", Liens: " << genome.get_links().size() << std::endl;
+
     return genome;
 }
+
 
 
 // Crée un lien avec des poids aléatoires

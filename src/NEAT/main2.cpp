@@ -23,6 +23,8 @@ int main() {
                 individual.fitness = compute_fitness(*individual.genome, ant_id);
             }
         }
+
+
         
         std::cout<<"Meilleure fitness : "<<population.get_individuals().front().fitness<<std::endl;
 
