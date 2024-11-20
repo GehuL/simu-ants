@@ -147,6 +147,10 @@ namespace neat
          */
         Genome crossover(const Individual &dominant, const Individual &recessive, int child_genome_id);
 
+        Genome alt_crossover(const std::shared_ptr<Genome>& dominant, 
+                       const std::shared_ptr<Genome>& recessive, 
+                       int child_genome_id);
+
     private:
         GenomeIndexer m_genome_indexer;
     };

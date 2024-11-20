@@ -58,6 +58,51 @@ std::vector<neat::Individual> Population::reproduce() {
     return new_generation;
 }
 
+std::vector<neat::Individual> Population::reproduce_from_genomes(const std::vector<std::shared_ptr<Genome>>& genomes) {
+    if (genomes.empty()) {
+        throw std::runtime_error("Erreur : La liste de génomes est vide. Impossible de reproduire.");
+    }
+
+    // Initialiser une instance de ComputeFitness
+    ComputeFitness compute_fitness(rng);
+
+    // Trier les génomes par fitness évaluée (sans stocker la fitness dans les objets Genome)
+    std::vector<std::shared_ptr<Genome>> sorted_genomes = genomes;
+    std::sort(sorted_genomes.begin(), sorted_genomes.end(),
+        [&compute_fitness](const std::shared_ptr<Genome>& a, const std::shared_ptr<Genome>& b) {
+            // Évaluer la fitness pour comparer les génomes
+            return compute_fitness(*a, /* ant_id */ 0) > compute_fitness(*b, /* ant_id */ 0);
+        });
+
+    int reproduction_cutoff = std::ceil(config.survival_threshold * sorted_genomes.size());
+    std::vector<neat::Individual> new_generation;
+
+    std::cout << "Reproducing from custom genome list..." << std::endl;
+
+    // Boucle pour créer la nouvelle génération
+    while (new_generation.size() < config.population_size) {
+        const std::shared_ptr<Genome>& p1 = rng.choose_random(sorted_genomes, reproduction_cutoff);
+        const std::shared_ptr<Genome>& p2 = rng.choose_random(sorted_genomes, reproduction_cutoff);
+
+        std::cout << "Crossover between " << p1->get_genome_id() << " and " << p2->get_genome_id() << std::endl;
+
+        neat::Neat neat_instance;
+        Genome offspring_genome = neat_instance.alt_crossover(p1, p2, generate_next_genome_id());
+        std::shared_ptr<Genome> offspring = std::make_shared<Genome>(offspring_genome);
+
+        std::cout << "Offspring genome ID: " << offspring->get_genome_id() << std::endl;
+
+        mutate(*offspring);
+
+        new_generation.push_back(neat::Individual(offspring));
+    }
+
+    return new_generation;
+}
+
+
+
+
 std::vector<neat::Individual> Population::sort_individuals_by_fitness(const std::vector<neat::Individual>& individuals) {
     std::vector<neat::Individual> sorted_individuals = individuals;
     std::sort(sorted_individuals.begin(), sorted_individuals.end(), 
@@ -90,5 +135,8 @@ void Population::replace_population(std::vector<neat::Individual> new_generation
 
     std::cout << "Population remplacée. Taille actuelle : " << individuals.size() << std::endl;
 }
+
+
+
 
 

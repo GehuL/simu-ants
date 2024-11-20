@@ -68,6 +68,8 @@ public:
     */
    std::vector<neat::Individual> reproduce();
 
+   std::vector<neat::Individual> reproduce_from_genomes(const std::vector<std::shared_ptr<Genome>>& genomes);
+
    /**
     * @brief Trie les individus par fitness en ordre décroissant.
     *
