@@ -5,13 +5,15 @@
 #include "Neat.h"
 #include "Genome.h"
 #include <iostream>
+#include <memory>
 
 Population::Population(NeatConfig config, RNG &rng) 
     : config{config}, rng{rng}, next_genome_id{0} {
     for (int i = 0; i < config.population_size; ++i) {
         int num_hidden_neurons = rng.next_int(1, 4);  // Random hidden neurons
-        Genome genome = Genome::create_genome(generate_next_genome_id(), config.num_inputs, config.num_outputs, num_hidden_neurons, rng);
-        individuals.push_back(neat::Individual(&genome));
+std::shared_ptr<Genome> genome = std::make_shared<Genome>(Genome::create_genome(generate_next_genome_id(), config.num_inputs, config.num_outputs, num_hidden_neurons, rng));
+individuals.emplace_back(genome);
+
     }
 }
 
@@ -49,7 +51,8 @@ std::vector<neat::Individual> Population::reproduce() {
 
         
 
-        new_generation.push_back(neat::Individual(&offspring));
+        new_generation.push_back(neat::Individual(std::make_shared<Genome>(offspring)));
+
     }
 
     return new_generation;

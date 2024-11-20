@@ -9,6 +9,7 @@
 #include "Activation.h"
 #include "GenomeIndexer.h"
 #include "NeatConfig.h"
+#include <memory>
 
 class Genome;
 
@@ -75,17 +76,17 @@ namespace neat
 
     // Structure pour représenter un individu
     struct Individual
-    {
-        Genome* genome;  // Use a pointer to Genome
-        bool fitness_computed;
-        double fitness;
+{
+    std::shared_ptr<Genome> genome;  // Utilise std::shared_ptr pour gérer le cycle de vie
+    bool fitness_computed;
+    double fitness;
 
-        Individual()
-            : genome(nullptr), fitness_computed(false), fitness(0.0) {}
+    Individual()
+        : genome(nullptr), fitness_computed(false), fitness(0.0) {}
 
-        Individual(Genome* genome)
-            : genome(genome), fitness_computed(false), fitness(0.0) {}
-    };
+    Individual(std::shared_ptr<Genome> genome)
+        : genome(std::move(genome)), fitness_computed(false), fitness(0.0) {}
+};
 
     struct DoubleConfig
     {
