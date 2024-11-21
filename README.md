@@ -8,7 +8,7 @@ C:\raylib\raylib\src
 ```
 Par la suite, modifier les macros dans le fichier C:\raylib\raylib\src\config.h: 
 Les deux macros suivantes doivent être mis en commentaire: 
-> #define SUPPORT_PARTIALBUSY_WAIT_LOOP  
+> #define SUPPORT_PARTIALBUSY_WAIT_LOOP 
 > #define SUPPORT_BUSY_WAIT_LOOP 
 Et celle-ci décommenté: 
 > #define SUPPORT_CUSTOM_FRAME_CONTROL 
