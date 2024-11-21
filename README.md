@@ -2,11 +2,8 @@
 Plusieurs étapes sont nécessaire afin de compiler le projet. 
 Tout d'abord, il est nécessaire de télécharger [Raylib](https://github.com/raysan5/raylib/releases/tag/5.0) et [Raygui](https://github.com/raysan5/raygui/releases/tag/4.0). 
 Ensuite, extraire Raygui et Raylib à la racine de l'ordinateur de préférence (C:\). 
-Puis glisser le fichier raygui.h dans le dossier  
-```bash
-C:\raylib\raylib\src
-```
-Par la suite, il faut modifier des macros dans le fichier C:\raylib\raylib\src\config.h.
+Puis glisser le fichier `raygui.h` dans le dossier `C:\raylib\raylib\src`.
+Par la suite, il faut modifier des macros dans le fichier `C:\raylib\raylib\src\config.h`.
 Les deux macros suivantes doivent être mis en commentaire: 
 ```
 #define SUPPORT_PARTIALBUSY_WAIT_LOOP 
