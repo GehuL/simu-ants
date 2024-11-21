@@ -20,6 +20,15 @@ MAKE
 ```
 
 Pour travailler avec VSCode, il reste à créer une configuration pour compiler et executer le projet. 
-Il suffit d'aller dans le répertoire `C:\raylib\raylib\projects\VSCode\`  
-et copier le dossier .vscode afin de le coller à la racine du projet. 
-Il ne reste plus qu'a indiquer l'emplacement de Raylib dans le fichier task.json.  
+Il suffit d'aller dans le répertoire     
+`C:\raylib\raylib\projects\VSCode\`  
+et copier le dossier `.vscode` afin de le coller à la racine du projet. 
+Enfin, dans le fichier task.json, modifier les valeurs de la clé "args" pour avoir la configuration ci-dessous:
+```json
+"args": [
+            "RAYLIB_PATH=C:/raylib/raylib",
+            "PROJECT_NAME=${workspaceFolderBasename}.exe",
+             "OBJS=src/*.cpp",
+            "BUILD_MODE=DEBUG"
+          ]
+```
