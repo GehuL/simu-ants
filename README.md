@@ -6,12 +6,16 @@ Puis glisser le fichier raygui.h dans le dossier
 ```bash
 C:\raylib\raylib\src
 ```
-Par la suite, modifier les macros dans le fichier C:\raylib\raylib\src\config.h: 
+Par la suite, il faut modifier des macros dans le fichier C:\raylib\raylib\src\config.h.
 Les deux macros suivantes doivent être mis en commentaire: 
-> #define SUPPORT_PARTIALBUSY_WAIT_LOOP 
-> #define SUPPORT_BUSY_WAIT_LOOP 
+```
+#define SUPPORT_PARTIALBUSY_WAIT_LOOP 
+#define SUPPORT_BUSY_WAIT_LOOP  
+```
 Et celle-ci décommenté: 
-> #define SUPPORT_CUSTOM_FRAME_CONTROL 
+```
+#define SUPPORT_CUSTOM_FRAME_CONTROL 
+```
 A présent on peut compiler raylib en entrant dans le terminal  
 à partir du dossier src: 
 ```bash
