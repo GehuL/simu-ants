@@ -1,104 +1,140 @@
 #include "Genome.h"
-#include "neat.h"  // Inclure neat.h pour les définitions complètes
-#include <optional>  // Inclure <optional> pour utiliser std::optional
-#include "rng.h"
+#include "neat.h"
+#include <optional>
+#include <iostream>
+#include <vector>
+#include <functional>
 
-/**
- * @brief Constructeur par défaut pour la classe Genome.
- * 
- * Initialise un objet Genome avec des valeurs par défaut :
- * - genome_id est initialisé à 0.
- * - num_inputs est réglé sur 0.
- * - num_outputs est réglé sur 0.
- */
+// Constructeur par défaut
 Genome::Genome() : genome_id(0), num_inputs(0), num_outputs(0) {}
 
-/**
- * @brief Construit un nouvel objet Génome.
- * 
- * @param id L’identifiant unique du génome.
- * @param num_inputs Nombre de nœuds d’entrée dans le génome.
- * @param num_outputs Le nombre de nœuds de sortie dans le génome.
- */
 Genome::Genome(int id, int num_inputs, int num_outputs)
     : genome_id(id), num_inputs(num_inputs), num_outputs(num_outputs) {}
 
-/**
- * @brief Obtenir le nombre d’entrées dans le génome.
- * 
- * Cette fonction renvoie le nombre de nœuds d’entrée dans le génome.
- * 
- * @return int Le nombre de nœuds d’entrée.
- */
-Genome Genome::new_genome(int num_inputs, int num_outputs)
-{
-    Genome genome{0, num_inputs, num_outputs};
+// Crée un nouveau génome avec les neurones d'entrée, de sortie et un certain nombre de neurones cachés
+// Fonction auxiliaire pour vérifier si un lien créerait un cycle
+bool Genome::would_create_cycle(int input_id, int output_id) const {
+    std::unordered_set<int> visited;
+    std::unordered_map<int, std::vector<int>> graph;
 
-    // Ajouter les neurones d'entrée
-    for (int neuron_id = 0; neuron_id < num_inputs; ++neuron_id) {
-        genome.add_neuron(new_neuron(neuron_id));
+    // Construire le graphe actuel des connexions
+    for (const auto &link : links) {
+        if (link.is_enabled) {
+            graph[link.link_id.input_id].push_back(link.link_id.output_id);
+        }
     }
 
-    // Ajouter les neurones de sortie
-    for (int output_id = 0; output_id < num_outputs; ++output_id) {
-        genome.add_neuron(new_neuron(num_inputs + output_id));
+    // Effectuer une recherche en profondeur pour voir s'il existe un chemin de output_id vers input_id
+    std::function<bool(int)> dfs = [&](int current) {
+        if (current == input_id) return true;
+        if (visited.count(current)) return false;
+
+        visited.insert(current);
+        for (int neighbor : graph[current]) {
+            if (dfs(neighbor)) return true;
+        }
+        return false;
+    };
+
+    return dfs(output_id);
+}
+
+// Fonction de création du génome avec vérification des cycles
+Genome Genome::create_genome(int id, int num_inputs, int num_outputs, int num_hidden_neurons, RNG &rng) {
+    Genome genome(id, num_inputs, num_outputs);
+
+    // Ajoute neurones d'entrée
+    for (int i = 0; i < num_inputs; ++i) {
+        genome.add_neuron(neat::NeuronGene{i, 0.0, Activation(Activation::Type::Sigmoid)});
     }
 
-    // Ajouter des neurones cachés aléatoirement (entre 1 et 3)
-    RNG rng;
-    int num_hidden_neurons = rng.next_int(1, 4);  // Génère entre 1 et 3 neurones cachés
+    // Ajoute neurones de sortie
+    for (int i = 0; i < num_outputs; ++i) {
+        genome.add_neuron(neat::NeuronGene{num_inputs + i, 0.0, Activation(Activation::Type::Sigmoid)});
+    }
+
+    // Ajoute neurones cachés
     for (int i = 0; i < num_hidden_neurons; ++i) {
         int hidden_id = num_inputs + num_outputs + i;
-        genome.add_neuron(new_neuron(hidden_id));
+        genome.add_neuron(neat::NeuronGene{hidden_id, 0.0, Activation(Activation::Type::Sigmoid)});
+    }
 
-        // Ajouter des liens entre neurones d'entrée et cachés
-        for (int input_id = 0; input_id < num_inputs; ++input_id) {
-            genome.add_link(new_link(input_id, hidden_id));
+    std::cout << "Genome ID: " << id << ", Neurones: " << genome.get_neurons().size() 
+              << ", Liens: " << genome.get_links().size() << std::endl;
+
+    // Créer des liens sans cycles
+    for (int input_id = 0; input_id < num_inputs; ++input_id) {
+        for (int hidden_id = num_inputs + num_outputs; hidden_id < num_inputs + num_outputs + num_hidden_neurons; ++hidden_id) {
+            if (!genome.would_create_cycle(input_id, hidden_id)) {
+                genome.add_link(genome.create_link(input_id, hidden_id, rng));
+            }
         }
-
-        // Ajouter des liens entre neurones cachés et de sortie
-        for (int output_id = 0; output_id < num_outputs; ++output_id) {
-            genome.add_link(new_link(hidden_id, num_inputs + output_id));
+        for (int output_id = num_inputs; output_id < num_inputs + num_outputs; ++output_id) {
+            if (!genome.would_create_cycle(input_id, output_id)) {
+                genome.add_link(genome.create_link(input_id, output_id, rng));
+            }
         }
     }
+
+    for (int hidden_id = num_inputs + num_outputs; hidden_id < num_inputs + num_outputs + num_hidden_neurons; ++hidden_id) {
+        for (int target_hidden_id = hidden_id + 1; target_hidden_id < num_inputs + num_outputs + num_hidden_neurons; ++target_hidden_id) {
+            if (!genome.would_create_cycle(hidden_id, target_hidden_id)) {
+                genome.add_link(genome.create_link(hidden_id, target_hidden_id, rng));
+            }
+        }
+        for (int output_id = num_inputs; output_id < num_inputs + num_outputs; ++output_id) {
+            if (!genome.would_create_cycle(hidden_id, output_id)) {
+                genome.add_link(genome.create_link(hidden_id, output_id, rng));
+            }
+        }
+    }
+
+    std::cout << "Final Genome ID: " << id << ", Neurones: " << genome.get_neurons().size() 
+              << ", Liens: " << genome.get_links().size() << std::endl;
 
     return genome;
 }
 
-int Genome::get_num_inputs() const
-{
+
+
+// Crée un lien avec des poids aléatoires
+neat::LinkGene Genome::create_link(int input_id, int output_id, RNG &rng) {
+    return neat::LinkGene{{input_id, output_id}, rng.next_gaussian(0.0, 1.0), true};
+}
+
+neat::NeuronGene Genome::create_neuron(int neuron_id) {
+    return neat::NeuronGene{neuron_id, 0.0, Activation(Activation::Type::Sigmoid)};
+}
+
+
+int Genome::get_num_inputs() const {
     return num_inputs;  // Retourne le nombre d'entrées
 }
 
-/**
- * @brief Obtenir le nombre de sorties dans le génome.
- * 
- * Cette fonction renvoie le nombre de nœuds de sortie dans le génome.
- * 
- * @return int Le nombre de nœuds de sortie.
- */
 int Genome::get_num_outputs() const {
     return num_outputs;  // Retourne le nombre de sorties
 }
 
-/**
- * @brief Récupère l’ID du génome.
- * 
- * @return int L’identifiant du génome.
- */
 int Genome::get_genome_id() const {
     return genome_id;  // Retourne l'ID du génome
 }
 
-/**
- * @brief Génère le prochain ID de neurone unique.
- *
- * Cette fonction itère à travers les neurones existants dans le génome et trouve l’ID maximum du neurone.
- * Il renvoie ensuite un nouvel identifiant supérieur d’un au maximum actuel, garantissant que chaque neurone
- * possède un identifiant unique.
- *
- * @return int Le prochain ID unique de neurone.
- */
+std::vector<neat::NeuronGene> Genome::get_neurons() const {
+    return neurons;  // Retourne les neurones du génome
+}
+
+std::vector<neat::LinkGene> Genome::get_links() const {
+    return links;  // Retourne les liens du génome
+}
+
+std::vector<neat::NeuronGene>& Genome::get_neurons() {
+    return neurons;  // Retourne les neurones du génome
+}
+
+std::vector<neat::LinkGene>& Genome::get_links() {
+    return links;  // Retourne les liens du génome
+}
+
 int Genome::generate_next_neuron_id() {
     int max_id = 0;
     for (const auto& neuron : neurons) {
@@ -109,29 +145,16 @@ int Genome::generate_next_neuron_id() {
     return max_id + 1;
 }
 
-
-/**
- * @brief Ajoute un neurone au génome.
- * 
- * Cette fonction ajoute un gène de neurone donné à la liste des neurones du génome.
- * 
- * @param neuron Le gène neurone à ajouter.
- */
+// Ajout des fonctions de gestion de neurones et liens
 void Genome::add_neuron(const neat::NeuronGene &neuron) {
     neurons.push_back(neuron);
 }
 
-/**
- * @brief Ajoute un lien donné à la liste des liens dans le génome.
- * 
- * TCette fonction ajoute un gène de lien donné à la liste des liens du génome.
- * 
- * @param link Le gène de lien à ajouter.
- */
 void Genome::add_link(const neat::LinkGene &link) {
     links.push_back(link);
 }
 
+// Recherche un neurone dans le génome par ID
 std::optional<neat::NeuronGene> Genome::find_neuron(int neuron_id) const {
     for (const auto &neuron : neurons) {
         if (neuron.neuron_id == neuron_id) {
@@ -141,16 +164,7 @@ std::optional<neat::NeuronGene> Genome::find_neuron(int neuron_id) const {
     return std::nullopt;  // Retourne un optional vide si non trouvé
 }
 
-/**
- * @brief Trouve un lien dans le génome à partir de son ID de lien.
- *
- * Cette fonction parcourt la liste des liens dans le génome pour trouver un lien
- * correspondant à l'ID de lien donné. Si un lien correspondant est trouvé, il est retourné.
- * Si aucun lien correspondant n'est trouvé, une option vide est retournée.
- *
- * @param link_id L'ID du lien à trouver.
- * @return std::optional<neat::LinkGene> Le lien s'il est trouvé, sinon une option vide.
- */
+// Recherche un lien dans le génome par ID de lien
 std::optional<neat::LinkGene> Genome::find_link(neat::LinkId link_id) const {
     for (const auto &link : links) {
         if (link.link_id.input_id == link_id.input_id && link.link_id.output_id == link_id.output_id) {
@@ -160,15 +174,7 @@ std::optional<neat::LinkGene> Genome::find_link(neat::LinkId link_id) const {
     return std::nullopt;  // Retourne un optional vide si non trouvé
 }
 
-/**
- * @brief Génère un vecteur contenant les identifiants des nœuds d’entrée.
- *
- * Cette fonction crée un vecteur d’entiers où chaque entier représente
- * l’ID d’un nœud d’entrée. Les ID sont générés séquentiellement à partir de 0
- * jusqu’au nombre de nœuds d’entrée spécifié par la variable membre `num_inputs’.
- *
- * @return Un vecteur d’entiers représentant les identifiants des nœuds d’entrée.
- */
+// Génère un vecteur contenant les identifiants des nœuds d’entrée
 std::vector<int> Genome::make_input_ids() const {
     std::vector<int> input_ids;
     for (int i = 0; i < num_inputs; i++) {
@@ -177,15 +183,7 @@ std::vector<int> Genome::make_input_ids() const {
     return input_ids;
 }
 
-/**
- * @brief Génère un vecteur contenant les identifiants des nœuds de sortie.
- *
- * Cette fonction crée un vecteur d’entiers représentant les identifiants des nœuds de sortie
- * dans le génome. Les ID sont calculés en fonction du nombre de nœuds d’entrée et des 
- * nombre de nœuds de sortie.
- *
- * @return Un vecteur d’entiers contenant les identifiants des nœuds de sortie.
- */
+// Génère un vecteur contenant les identifiants des nœuds de sortie
 std::vector<int> Genome::make_output_ids() const {
     std::vector<int> output_ids;
     for (int i = 0; i < num_outputs; i++) {
@@ -193,4 +191,3 @@ std::vector<int> Genome::make_output_ids() const {
     }
     return output_ids;
 }
-

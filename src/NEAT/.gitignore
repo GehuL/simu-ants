@@ -4,3 +4,4 @@ main.code-workspace
 *.json
 build
 bin
+*.txt
