@@ -19,7 +19,8 @@
                 "args": [
                     "RAYLIB_PATH=C:/raylib/raylib",
                     "PROJECT_NAME=simu-ants",
-                    "OBJS=src/engine/*.cpp src/NEAT/*.cpp src/main.cpp",
+                    // "OBJS=src/engine/*.cpp src/NEAT/*.cpp src/main.cpp",
+                    "OBJS=src/*.cpp",
                     "BUILD_MODE=DEBUG"
                 ],
             },

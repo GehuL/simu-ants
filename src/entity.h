@@ -38,6 +38,8 @@ namespace simu
             
             virtual const char* getType() const = 0;
 
+            void setPos(Vector2f pos) { this-> m_pos = pos; };
+
             Tile getTileOn() const;
             Tile getTileFacing() const;
 

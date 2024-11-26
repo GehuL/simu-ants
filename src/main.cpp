@@ -9,8 +9,9 @@ class Scene: public WorldListener
         void onInit() override
         {
             getWorld().getGrid().fromImage("maze.png");
-            getWorld().spawnEntities<DemoAnt>(10, getWorld().gridCoordToWorld(Vector2i{89, 161}));
             getWorld().centerCamera();
+            
+            auto ants = getWorld().spawnEntities<DemoAnt>(10, getWorld().gridCoordToWorld(Vector2i{89, 161}));
         };
 
         void onUnload() override
