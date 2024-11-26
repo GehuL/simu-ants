@@ -1,0 +1,4 @@
+.vscode
+main.code-workspace
+*.exe
+*.json
