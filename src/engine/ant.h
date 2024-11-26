@@ -94,6 +94,7 @@ namespace simu
 
         private:
             // TODO: Ajouter neural network
+            RNG m_rng;
             FeedForwardNeuralNetwork m_network;
     };
 
