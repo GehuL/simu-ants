@@ -94,7 +94,7 @@ void World::load(const std::string& filename)
             {
                 std::string typestr = entities_json[i]["type"];
                 entities_t t = entityFactory(typestr);
-                std::visit([&](auto e) mutable {
+                std::visit([&](auto& e) mutable {
                     using EntityType = std::decay_t<decltype(e)>;
                     auto en = std::make_shared<EntityType>(m_entity_cnt++);
                     auto en_j = entities_json[i];

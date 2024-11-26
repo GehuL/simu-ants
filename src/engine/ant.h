@@ -82,6 +82,7 @@ namespace simu
             virtual ~AntIA() {};
 
             const char* getType() const override { return "antIA"; };
+            const Genome& getGenome() { return m_genome; };
 
             static constexpr inputCount() { return 3; } ;
             static constexpr outputCount() { return 2; };
@@ -93,8 +94,7 @@ namespace simu
             AntIA& operator=(const AntIA& en);
 
         private:
-            // TODO: Ajouter neural network
-            RNG m_rng;
+            Genome m_genome;
             FeedForwardNeuralNetwork m_network;
     };
 

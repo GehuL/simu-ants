@@ -18,7 +18,8 @@
                 "command": "mingw32-make.exe",
                 "args": [
                     "RAYLIB_PATH=C:/raylib/raylib",
-                    "PROJECT_NAME=simu-ants",
+                    "PROJECT_NAME=simu-ants.exe",
+                    //"OBJS=src/*.cpp",
                     "OBJS=src/engine/*.cpp src/NEAT/*.cpp src/main.cpp",
                     "BUILD_MODE=DEBUG"
                 ],

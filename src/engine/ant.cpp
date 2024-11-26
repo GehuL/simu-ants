@@ -186,9 +186,11 @@ DemoAnt& DemoAnt::operator=(const DemoAnt& ant)
 }
 
 // ==================[ANT IA]==================
-AntIA::AntIA(const long id) : Ant(id), m_rng(), m_network(FeedForwardNeuralNetwork::create_from_genome(Genome::create_genome(0, 3, 2, 3, m_rng))) {}
-AntIA::AntIA(const long id, const AntIA& ant) : Ant(id, ant), m_network(ant.m_network) {}
-AntIA::AntIA(const long id, const Genome& genome) : Ant(id), m_network(FeedForwardNeuralNetwork::create_from_genome(genome)){}
+RNG gRng;
+
+AntIA::AntIA(const long id) : Ant(id), m_genome(Genome::create_genome(0, 3, 2, 3, gRng)), m_network(FeedForwardNeuralNetwork::create_from_genome(m_genome)) {}
+AntIA::AntIA(const long id, const AntIA& ant) : Ant(id, ant), m_network(ant.m_network), m_genome(ant.m_genome) {}
+AntIA::AntIA(const long id, const Genome& genome) : Ant(id), m_genome(genome), m_network(FeedForwardNeuralNetwork::create_from_genome(genome)) {}
 
 void AntIA::save(json &json) const
 {
