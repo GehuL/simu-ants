@@ -4,7 +4,7 @@
 
 #include <vector>
 #include <unordered_set>
-#include "neat.h"
+#include "Neat.h"
 
 class LayerManager
 {

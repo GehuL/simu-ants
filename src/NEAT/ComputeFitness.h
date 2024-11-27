@@ -1,7 +1,7 @@
     #ifndef COMPUTEFITNESS_H
     #define COMPUTEFITNESS_H
 
-    #include "RNG.h"  // Inclure la classe RNG (générateur de nombres aléatoires)
+    #include "rng.h"  // Inclure la classe RNG (générateur de nombres aléatoires)
     #include "Genome.h"  // Inclure la définition du Genome
 
     class ComputeFitness {

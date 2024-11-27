@@ -1,7 +1,7 @@
 #ifndef NEURON_MUTATOR_H
 #define NEURON_MUTATOR_H
 
-#include "neat.h"
+#include "Neat.h"
 #include "rng.h"
 #include "Activation.h"
 

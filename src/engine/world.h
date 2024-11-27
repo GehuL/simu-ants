@@ -55,27 +55,29 @@ namespace simu
             /**
              * @brief Ajoute des entités dans la simulation
              * @param count Quantité d'entitée à ajouter
+             * @param args Les paramètres du constructeur de l'entité
              * @return La position du premier élément ajouté. Renvoie end() si il y a une erreur (count <= 0)
              */
-            template<class T, class = TEMPLATE_CONDITION(T)>
-            std::vector<std::weak_ptr<simu::Entity>> spawnEntities(size_t count)
+            template<class T, typename... Args, class = TEMPLATE_CONDITION(T)>
+            std::vector<std::weak_ptr<T>> spawnEntities(size_t count, Args... args)
             {
                 CHECK_TEMPLATE_ST(T)
 
                 if(count <= 0)
-                    return std::vector<std::weak_ptr<Entity>>();
+                    return std::vector<std::weak_ptr<T>>();
 
                 const size_t en_cnt = m_entities.size();
 
                 // Redimensionne le vecteur pour ajouter "count" nouveaux éléments
                 m_entities.resize(en_cnt + count); 
-                std::vector<std::weak_ptr<Entity>> newlies(m_entities.size());
+                std::vector<std::weak_ptr<T>> newlies(count);
 
                 // Itère à partir de l'ancienne fin, jusqu'à la nouvelle fin
-                for (size_t i = en_cnt; i < m_entities.size(); ++i)
+                for (size_t i = 0; i < m_entities.size(); ++i)
                 {
-                    m_entities[i] = std::make_shared<T>(m_entity_cnt);
-                    newlies[i] = m_entities[i];
+                    auto en = std::make_shared<T>(m_entity_cnt, args...);
+                    newlies[i] = en;
+                    m_entities[i + en_cnt] = en;
                     m_entity_cnt++;
                 }   
 
@@ -83,12 +85,17 @@ namespace simu
                 return newlies;
             }
             
-            template<class T, class = TEMPLATE_CONDITION(T)>
-            std::weak_ptr<T> spawnEntity()
+            /**
+             * @brief Ajoute une entité dans la simulation
+             * @param args Les paramètres du constructeur de l'entité
+             * @return Un pointeur vers la fourmis nouvellement crée
+             */
+            template<class T, typename... Args, class = TEMPLATE_CONDITION(T)>
+            std::weak_ptr<T> spawnEntity(Args... args)
             {
                 CHECK_TEMPLATE_ST(T)
 
-                std::shared_ptr<T> en = std::make_shared<T>(m_entity_cnt);
+                std::shared_ptr<T> en = std::make_shared<T>(m_entity_cnt, args...);
 
                 m_entities.push_back(en);
                 m_entity_cnt++;
@@ -135,6 +142,28 @@ namespace simu
 
             void save(const std::string& file);
             void load(const std::string& file);
+
+            /**
+             * @brief Renvoie la position de la souris dans la grille
+             */
+            Vector2i mouseToGridCoord() const;
+
+            /**
+             * @brief Renvoie la position globale de la position dans la grille
+             * @param pos Position d'une tuile dans la grille courante
+             * @return Les coordonées par rapport au repère de la caméra 2D
+             */
+            Vector2f gridCoordToWorld(Vector2i pos) const;
+
+            /**
+             * Positionne la caméra au centre de la grille
+             */
+            void centerCamera();
+
+            /**
+             * @brief Renvoie la tuile correspondante à celle sélectionner
+             */
+            Tile getSelectedTile() const;
 
         private:
             World();

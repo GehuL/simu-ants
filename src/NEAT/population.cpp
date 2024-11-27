@@ -1,6 +1,6 @@
-#include "Population.h"
+#include "population.h"
 #include "Mutator.h"
-#include "RNG.h"
+#include "rng.h"
 #include "ComputeFitness.h"
 #include "Neat.h"
 #include "Genome.h"

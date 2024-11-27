@@ -8,7 +8,7 @@
             "name": "Debug",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/simu-ants.exe",
+            "program": ".${workspaceFolder}/simu-ants",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -44,14 +44,11 @@
             "externalConsole": false,
             "program": "${workspaceFolder}/${fileBasenameNoExtension}",
             "MIMode": "gdb",
-            "windows": {
-              "program": "${workspaceFolder}/${fileBasenameNoExtension}.exe",
-              "miDebuggerPath": "C:/raylib/w64devkit/bin/gdb.exe"
-            },
             "osx": {
               "MIMode": "lldb"
             },
             "linux": {
+              "program": "./${workspaceFolder}/simu-ants",
               "miDebuggerPath": "/usr/bin/gdb"
             },
             "preLaunchTask": "build release",

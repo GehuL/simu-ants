@@ -1,5 +1,5 @@
 #include "Genome.h"
-#include "neat.h"
+#include "Neat.h"
 #include <optional>
 #include <iostream>
 #include <vector>

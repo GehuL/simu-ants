@@ -2,7 +2,7 @@
 #define POPULATION_H
 
 #include "Mutator.h"
-#include "RNG.h"
+#include "rng.h"
 #include "ComputeFitness.h"
 #include "Genome.h"
 #include "NeatConfig.h"
