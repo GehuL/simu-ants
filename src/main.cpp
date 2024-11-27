@@ -11,6 +11,11 @@ class Scene: public WorldListener
             getWorld().getGrid().fromImage("maze.png");
             getWorld().spawnEntities<DemoAnt>(10, getWorld().gridCoordToWorld(Vector2i{89, 161}));
             getWorld().centerCamera();
+
+            // Test get Entities
+            auto entities = getWorld().getEntities();
+            for(std::weak_ptr<Entity> en : entities)
+                std::cout << en.lock()->getType() << std::endl;
         };
 
         void onUnload() override

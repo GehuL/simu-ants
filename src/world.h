@@ -121,11 +121,10 @@ namespace simu
                 return ptr;
             };
 
-//            template<class T=Entity, class = TEMPLATE_CONDITION(T)>
-            // std::vector<std::weak_ptr<Entity>> getEntities()
-            // {
-            //     return std::vector<T>(m_entities.begin(), m_entities.end());
-            // }
+            std::vector<std::weak_ptr<Entity>> getEntities()
+            {
+                return std::vector<std::weak_ptr<Entity>>(m_entities.begin(), m_entities.end());
+            }
 
             bool const exist(long id)
             {
