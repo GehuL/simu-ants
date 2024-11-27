@@ -7,14 +7,12 @@
 
 using namespace simu;
 
+Ant::Ant(const long id) : Entity(id) {}
 Ant::Ant(const long id, const Ant& ant) : Entity(id, ant), m_life(ant.m_life), 
 m_carried_object(ant.m_carried_object)
 {
 }
-
-Ant::Ant(const long id) : Entity(id)
-{
-}
+Ant::Ant(const long id, Vector2 pos) : Entity(id, pos) {}
 
 void Ant::update() {}
 
@@ -133,6 +131,7 @@ Ant& Ant::operator=(const Ant& ant)
 // ==================[DEMO ANT]==================
 DemoAnt::DemoAnt(const long id) : Ant(id) {}
 DemoAnt::DemoAnt(const long id, const DemoAnt &ant) : Ant(id, ant),  m_rotateCd(ant.m_rotateCd) {}
+DemoAnt::DemoAnt(const long id, Vector2f position) : Ant(id, position) {}
 
 void DemoAnt::update()
 {
@@ -190,7 +189,7 @@ RNG gRng;
 
 AntIA::AntIA(const long id) : Ant(id), m_genome(Genome::create_genome(0, 3, 2, 3, gRng)), m_network(FeedForwardNeuralNetwork::create_from_genome(m_genome)) {}
 AntIA::AntIA(const long id, const AntIA& ant) : Ant(id, ant), m_network(ant.m_network), m_genome(ant.m_genome) {}
-AntIA::AntIA(const long id, const Genome& genome) : Ant(id), m_genome(genome), m_network(FeedForwardNeuralNetwork::create_from_genome(genome)) {}
+AntIA::AntIA(const long id, const Genome genome) : Ant(id), m_genome(genome), m_network(FeedForwardNeuralNetwork::create_from_genome(genome)) {}
 
 void AntIA::save(json &json) const
 {

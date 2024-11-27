@@ -76,14 +76,14 @@ namespace simu
                 for (size_t i = 0; i < m_entities.size(); ++i)
                 {
                     auto en = std::make_shared<T>(m_entity_cnt, args...);
-                    newlies[i] = en;
                     m_entities[i + en_cnt] = en;
+                    newlies[i] = en;
                     m_entity_cnt++;
                 }   
 
                 // Retourne l'itérateur correspondant à l'ancienne fin (avant ajout des nouveaux éléments)
                 return newlies;
-            }
+            };
             
             /**
              * @brief Ajoute une entité dans la simulation
@@ -121,6 +121,11 @@ namespace simu
                 return ptr;
             };
 
+            std::vector<std::weak_ptr<Entity>> getEntities()
+            {
+                return std::vector<std::weak_ptr<Entity>>(m_entities.begin(), m_entities.end());
+            }
+
             bool const exist(long id)
             {
                 auto it = std::find_if(m_entities.begin(), m_entities.end(), [id](std::shared_ptr<Entity> en)
@@ -128,12 +133,12 @@ namespace simu
                     return (bool)en && en.get()->getId() == id;
                 });
                 return it != m_entities.end() ;
-            }
+            };
 
             void setListener(std::shared_ptr<WorldListener> listener)
             {
                 m_listener = listener;
-            }
+            };
 
             Grid& getGrid() { return m_grid; };
             

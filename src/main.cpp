@@ -24,6 +24,11 @@ class Scene: public WorldListener
         
         void onUpdate() override
         {
+            if(m_count ++  < 1000)
+                return;
+            
+            m_count = 0;
+
             std::vector<std::shared_ptr<Genome>> genomes;
             for(auto& ant: m_ants)
             {
@@ -36,13 +41,17 @@ class Scene: public WorldListener
 
             m_ants.clear();
             auto newlies = mPop.reproduce_from_genomes(genomes);
-            for(auto& ant: newlies)
+
+            for(auto genome: newlies)
             {
-                getWorld().spawnEntity<AntIA>(newlies);
+                
+                m_ants.push_back(getWorld().spawnEntity<AntIA>(*genome.genome.get()));
             }
+
         };
 
     private:
+        int m_count = 0;
         std::vector<std::weak_ptr<AntIA>> m_ants;
         Population mPop;
 };

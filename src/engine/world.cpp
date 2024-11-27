@@ -27,10 +27,6 @@ void World::init()
 
     if(m_listener)
         m_listener.get()->onInit();
-    // Centre la caméra
-    float offset = (GetScreenWidth() - m_grid.getGridWidth() * m_grid.getTileSize()) / 2.f;
-    m_camera.offset = (Vector2){offset, offset};
-    m_camera.zoom = 1.0;
 }
 
 void World::unload()
@@ -38,6 +34,28 @@ void World::unload()
     if(m_listener)
         m_listener.get()->onUnload();
     m_grid.unload();
+}
+
+Vector2i World::mouseToGridCoord() const
+{
+    Vector2f pos = GetScreenToWorld2D(GetMousePosition(), m_camera);
+    return m_grid.toTileCoord(pos.x, pos.y);
+}
+
+Vector2f World::gridCoordToWorld(Vector2i pos) const
+{
+    return Vector2f{static_cast<float>(pos.x * m_grid.getTileSize()), static_cast<float>(pos.y * m_grid.getTileSize())};
+}
+
+void World::centerCamera()
+{
+    float offset = (GetScreenWidth() - m_grid.getGridWidth() * m_grid.getTileSize()) / 2.f;
+    m_camera.offset = (Vector2){offset, offset};
+}
+
+Tile World::getSelectedTile() const
+{
+    return m_cursorTiles[m_cursorTileIndex];
 }
 
 void World::save(const std::string& filename)
@@ -135,7 +153,7 @@ void World::handleMouse()
     Vector2 pos = GetScreenToWorld2D(GetMousePosition(), m_camera);
     if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)) // PUT WALL
     {
-        m_grid.setTile(m_cursorTiles[m_cursorTileIndex], pos.x, pos.y);
+        m_grid.setTile(getSelectedTile(), pos.x, pos.y);
     }else if(IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) // REMOVE TILE
     {
         m_grid.setTile(AIR, pos.x, pos.y);
@@ -189,7 +207,16 @@ void World::drawUI()
 {
     handleKeyboard();
     handleMouse();
-    // TODO: Afficher coordonnées dans la grille et globale de la souris 
+
+    // Coordonnées de la souris
+    Vector2i mousePos = mouseToGridCoord();
+    DrawText(TextFormat("(X: %d|Y: %d)", mousePos.x, mousePos.y), 5, GetScreenHeight() - 20, 16, GRAY);
+    
+    // Type de tuile sélectionné
+    DrawText("Tile: ", 100, GetScreenHeight() - 20, 16, GRAY);
+    DrawRectangle(135, GetScreenHeight() - 17, 10, 10, getSelectedTile().color);
+
+    // Nombre d'entités
     DrawText(TextFormat("Entity: %d", m_entities.size()), 0, 100, 20, BLUE);
 }
 

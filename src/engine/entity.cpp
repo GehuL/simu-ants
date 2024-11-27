@@ -6,15 +6,10 @@
 using namespace simu;
 
 Entity::Entity(const long id, const Entity& en) : m_id(id), m_pos(en.m_pos), 
-m_velocity(en.m_velocity), m_angle(en.m_angle)
-{
-}
+m_velocity(en.m_velocity), m_angle(en.m_angle) {}
 
-Entity::Entity(const long id) : m_id(id), m_angle(0) 
-{
-    m_pos = (Vector2) {0.f, 0.f};
-    m_velocity = (Vector2) {0.f, 0.f};
-};
+Entity::Entity(const long id, Vector2f position): m_id(id), m_pos(position) {}
+Entity::Entity(const long id) : m_id(id), m_angle(0) {}
 
 Entity::~Entity()
 {
