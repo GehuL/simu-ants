@@ -33,7 +33,13 @@ class Scene: public WorldListener
                     genomes.push_back(genome);
                 }
             }
-            mPop.reproduce_from_genomes(genomes);
+
+            m_ants.clear();
+            auto newlies = mPop.reproduce_from_genomes(genomes);
+            for(auto& ant: newlies)
+            {
+                getWorld().spawnEntity<AntIA>(newlies);
+            }
         };
 
     private:
