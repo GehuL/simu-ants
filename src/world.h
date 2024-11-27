@@ -59,30 +59,31 @@ namespace simu
              * @return La position du premier élément ajouté. Renvoie end() si il y a une erreur (count <= 0)
              */
             template<class T, typename... Args, class = TEMPLATE_CONDITION(T)>
-            std::vector<std::weak_ptr<simu::Entity>> spawnEntities(size_t count, Args... args)
+            std::vector<std::weak_ptr<T>> spawnEntities(size_t count, Args... args)
             {
                 CHECK_TEMPLATE_ST(T)
 
                 if(count <= 0)
-                    return std::vector<std::weak_ptr<Entity>>();
+                    return std::vector<std::weak_ptr<T>>();
 
                 const size_t en_cnt = m_entities.size();
 
                 // Redimensionne le vecteur pour ajouter "count" nouveaux éléments
                 m_entities.resize(en_cnt + count); 
-                std::vector<std::weak_ptr<Entity>> newlies(m_entities.size());
+                std::vector<std::weak_ptr<T>> newlies(count);
 
                 // Itère à partir de l'ancienne fin, jusqu'à la nouvelle fin
-                for (size_t i = en_cnt; i < m_entities.size(); ++i)
+                for (size_t i = 0; i < m_entities.size(); ++i)
                 {
-                    m_entities[i] = std::make_shared<T>(m_entity_cnt, args...);
-                    newlies[i] = m_entities[i];
+                    auto en = std::make_shared<T>(m_entity_cnt, args...);
+                    m_entities[i + en_cnt] = en;
+                    newlies[i] = en;
                     m_entity_cnt++;
                 }   
 
                 // Retourne l'itérateur correspondant à l'ancienne fin (avant ajout des nouveaux éléments)
                 return newlies;
-            }
+            };
             
             /**
              * @brief Ajoute une entité dans la simulation
@@ -120,6 +121,12 @@ namespace simu
                 return ptr;
             };
 
+//            template<class T=Entity, class = TEMPLATE_CONDITION(T)>
+            // std::vector<std::weak_ptr<Entity>> getEntities()
+            // {
+            //     return std::vector<T>(m_entities.begin(), m_entities.end());
+            // }
+
             bool const exist(long id)
             {
                 auto it = std::find_if(m_entities.begin(), m_entities.end(), [id](std::shared_ptr<Entity> en)
@@ -127,12 +134,12 @@ namespace simu
                     return (bool)en && en.get()->getId() == id;
                 });
                 return it != m_entities.end() ;
-            }
+            };
 
             void setListener(std::shared_ptr<WorldListener> listener)
             {
                 m_listener = listener;
-            }
+            };
 
             Grid& getGrid() { return m_grid; };
             
