@@ -46,6 +46,7 @@ void Ant::rotate(float angle)
 void Ant::move(Direction dir)
 {
     rotate(dir);
+    moveForward();
 }
 
 void Ant::moveForward()
