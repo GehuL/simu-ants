@@ -27,6 +27,19 @@ namespace simu
         }
     }
 
+    // Direction en radian par rapport au cercle trigonometrique
+    class Direction
+    {
+            float mAngle;
+        public:
+            Direction(float angle) : mAngle(angle) {};
+            operator float() const { return mAngle; };
+    };
+
+    const Direction EAST(0.f);
+    const Direction NORTH(PI / 2.f);
+    const Direction WEST(PI);
+    const Direction SOUTH(3.f * PI / 2.f);
 }
 
 #endif 

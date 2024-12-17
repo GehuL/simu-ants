@@ -9,7 +9,7 @@
 
 #include "raylib.h"
 #include "tiles.h"
-#include "others.h"
+#include "types.h"
 #include "variant"
 
 using json = nlohmann::json;

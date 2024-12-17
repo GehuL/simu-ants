@@ -4,7 +4,7 @@
 #include <map>
 #include <string>
 
-#include "others.h"
+#include "types.h"
 #include "entity.h"
 #include "tiles.h"
 
@@ -31,7 +31,8 @@ namespace simu
             float getLife() const { return m_life; };
 
             // ------ ACTIONS IA -------
-            void rotate(float angle);  // Définie la direction et le sens de la fourmis
+            void move(Direction dir);
+            void rotate(float angle);  // Définie la direction et le sens de la fourmis en radian
             void moveForward();        // Se déplace devant elle (en fonction de son angle)
             void eat();                // Mange sur sa position (si il y a quelque chose)
             void pheromone();          // Pose un phéromone sur sa position

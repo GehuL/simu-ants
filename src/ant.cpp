@@ -43,6 +43,11 @@ void Ant::rotate(float angle)
     m_velocity = Vector2Rotate((Vector2) {1.0, 0.0}, angle);
 }
 
+void Ant::move(Direction dir)
+{
+    rotate(dir);
+}
+
 void Ant::moveForward()
 {
     m_pos = Vector2Add(m_pos, m_velocity);
