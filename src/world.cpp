@@ -200,6 +200,9 @@ void World::drawFrame()
     {
         en->draw();
     }
+
+    if(m_listener)
+        m_listener.get()->onDraw();
 }
 
 void World::drawUI()

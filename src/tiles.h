@@ -130,6 +130,14 @@ namespace simu
                 setTile(tile, idx);
             }
 
+            /** @brief Trouve un chemin depuis start a dest. L'algorithme A* est utilisé.
+             */
+            std::vector<Vec2i> findPath(Vec2i start, Vec2i dest);
+
+            /* @brief Renvoie le nombre de case du chemin entre start et dest utilisant A*.
+             */
+            int pathDistance(Vec2i start, Vec2i dest);
+
             Vector2i toTileCoord(float x, float y) const;
 
             int getGridWidth() const { return m_gridWidth; };

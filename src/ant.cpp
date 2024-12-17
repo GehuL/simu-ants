@@ -132,7 +132,9 @@ DemoAnt::DemoAnt(const long id, Vector2f position) : Ant(id, position) {}
 
 void DemoAnt::update()
 {
-    if(m_rotateCd-- <= 0)
+    moveForward();
+
+   /* if(m_rotateCd-- <= 0)
     {
         m_rotateCd = GetRandomValue(30, 100);
         m_angle += GetRandomValue(-100, 100) * 0.01f * PI / 4;
@@ -159,7 +161,7 @@ void DemoAnt::update()
     if(GetRandomValue(0, 40) == 0)
         put();
 
-    pheromone();
+    pheromone(); */ 
 }
 
 void DemoAnt::save(json &json) const

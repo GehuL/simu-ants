@@ -191,8 +191,17 @@ namespace simu
     {
         public:
             virtual ~WorldListener() {};
+
+            // executé lors du chargement de la scene
             virtual void onInit() = 0;
+
+            // executé lors de la fermeture de la scene
             virtual void onUnload() = 0;
+
+            // executé à la fréquence de rafraichissement de l'écran
+            virtual void onDraw() = 0;
+
+                // executé à la frequence de mise à jour de la logique de la simulation
             virtual void onUpdate() = 0;
     };
 

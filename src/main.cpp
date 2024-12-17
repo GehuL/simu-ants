@@ -8,25 +8,41 @@ class Scene: public WorldListener
     public:
         void onInit() override
         {
-            getWorld().getGrid().fromImage("maze.png");
+            Grid& grid = getWorld().getGrid();
+            grid.fromImage("maze.png");
             getWorld().centerCamera();
             
-            auto ants = getWorld().spawnEntities<DemoAnt>(10, getWorld().gridCoordToWorld(Vector2i{89, 161}));
-        };
+           /* double startTime = GetTime();
+            auto path = grid.findPath(Vec2i{89, 161}, Vec2i{6, 10});
 
-        void onUnload() override
-        {
-
-        };
+            double deltaTime = (GetTime() - startTime) * 1000.f;
+            TraceLog(LOG_DEBUG, "A*: %.1lf ms", deltaTime);
         
-        void onUpdate() override
-        {
-
+            for(Vec2i tile : path)
+                grid.setTile(FOOD, tile.x, tile.y);*/
         };
+
+        void onDraw() override
+        {
+            Grid& grid = getWorld().getGrid();
+            auto path = grid.findPath(Vec2i{89, 161}, getWorld().mouseToGridCoord());
+
+            const int tileSize = grid.getTileSize();
+            for(Vec2i tile : path)
+            {
+                DrawRectangle(tile.x * tileSize, tile.y * tileSize, tileSize, tileSize, RED);
+            }
+        }
+
+        void onUnload() override {};
+        
+        void onUpdate() override {};
 };
 
 int main(void)
 {   
+    SetTraceLogLevel(LOG_DEBUG);
+
     simu::World& world = simu::getWorld(); 
     world.setListener(std::make_shared<Scene>());
     return world.run(800, 800, "ants-simulation");
