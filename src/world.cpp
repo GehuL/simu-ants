@@ -42,9 +42,9 @@ Vector2i World::mouseToGridCoord() const
     return m_grid.toTileCoord(pos.x, pos.y);
 }
 
-Vector2f World::gridToWorld(Vector2i pos) const
+Vec2f World::gridToWorld(Vector2i pos) const
 {
-    return Vector2f{static_cast<float>(pos.x * m_grid.getTileSize()), static_cast<float>(pos.y * m_grid.getTileSize())};
+    return Vec2f{pos * m_grid.getTileSize()};
 }
 
 void World::centerCamera()

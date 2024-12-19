@@ -19,9 +19,9 @@ void Ant::draw()
     DrawRectangle(this->m_pos.x, this->m_pos.y, 5, 5, DARKBROWN);
 
     if(m_carried_object.type != Type::AIR)
-     {
+    {
         DrawRectangle(this->m_pos.x, this->m_pos.y, 3, 3, m_carried_object.color);
-     }
+    }
 }
 
 void Ant::save(json &json) const

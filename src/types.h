@@ -6,6 +6,7 @@
 #include <vector>
 #include <iterator>
 #include <functional>
+#include <ostream>
 
 namespace simu
 {
@@ -17,20 +18,38 @@ namespace simu
 
         Vec2() : x(0), y(0) {};
         Vec2(T _x, T _y) : x(_x), y(_y) {};
-        Vec2(const Vec2& vec) : x(vec.x), y(vec.y) {};
+
+        template<typename V>
+        Vec2(const Vec2<V>& vec) : x(vec.x), y(vec.y) {};
         Vec2(const Vector2& vec): x(vec.x), y(vec.y) {}; // Raylib compatiblity
         
         T mag() const { return x*x + y*y; };
 
-        // Distance de Manhattan
-        T distance(Vec2& vec) const { return std::abs(vec.x - x) + std::abs(vec.y - y); };
-        bool operator==(const Vec2& vec) const { return x == vec.x && y == vec.y; };
-        bool operator!=(const Vec2& vec) const { return !operator==(vec); };
-        Vec2 operator+(const Vec2& vec) const { return Vec2{x + vec.x, y + vec.y}; };
+        T distance(const Vec2<T>& vec) const { return std::abs(vec.x - x) + std::abs(vec.y - y); };  // Distance de Manhattan
+
+        bool operator==(const Vec2<T>& vec) const { return x == vec.x && y == vec.y; };
+        bool operator!=(const Vec2<T>& vec) const { return !operator==(vec); };
+
+        Vec2<T> operator+(const Vec2<T>& vec) const { return Vec2<T>{x + vec.x, y + vec.y}; };
+        
+        Vec2<T> operator*(const float scalar) const { return Vec2<T>{static_cast<T>(x * scalar), static_cast<T>(y * scalar)}; };
+        Vec2<T> operator/(const float scalar) const { return Vec2<T>{static_cast<T>(x / scalar), static_cast<T>(y / scalar)}; };
+    
         size_t operator()() const { return x*x + y*y; };
-        size_t operator()(const Vec2& vec) const { return vec(); }; // Utile pour les fonctions de Hash
-        bool operator<(const Vec2& vec) const {return mag() < vec.mag(); };
+
+        bool operator<(const Vec2<T>& vec) const {return mag() < vec.mag(); };
+
+        template<typename V>
+        friend std::ostream& operator<<(std::ostream& os, const Vec2<V>& vec);
     };
+
+    template<typename V>
+    std::ostream& operator<<(std::ostream& os, const Vec2<V>& vec)
+    {
+        os << '{' << vec.x << ',' << vec.y << '}'; 
+        return os;
+    };
+
 
     template<typename T>
     struct VecHasher
@@ -42,8 +61,7 @@ namespace simu
     };
 
     typedef Vec2<int> Vector2i, Vec2i;
-    typedef Vec2<float> Vec2f;
-    typedef Vector2 Vector2f;
+    typedef Vec2<float> Vector2f, Vec2f;
     
     // Fonction optimisé pour retiré un élément d'une liste (l'ordre des éléments n'est pas respecté)
     // source: https://dev.to/dinhluanbmt/c-deleteerase-item-from-vector-in-o1-time-3okb
