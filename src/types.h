@@ -16,8 +16,9 @@ namespace simu
         T y;
 
         Vec2() : x(0), y(0) {};
-        Vec2(T _x, T _y) : x(_x), y(_y) {}; 
+        Vec2(T _x, T _y) : x(_x), y(_y) {};
         Vec2(const Vec2& vec) : x(vec.x), y(vec.y) {};
+        Vec2(const Vector2& vec): x(vec.x), y(vec.y) {}; // Raylib compatiblity
         
         T mag() const { return x*x + y*y; };
 

@@ -49,9 +49,17 @@ void Ant::move(Direction dir)
     moveForward();
 }
 
-void Ant::moveForward()
+bool Ant::moveForward()
 {
-    m_pos = Vector2Add(m_pos, m_velocity);
+    Vec2f newPos = m_pos + m_velocity;
+    Type tileOnType = getWorld().getGrid().getTile(newPos).type; // C'est long, devrait être simplifier
+    
+    if(tileOnType != Type::GROUND && tileOnType != Type::BORDER)
+    {
+        m_pos = newPos;
+        return true;
+    }
+    return false;
 }
 
 void Ant::eat()
@@ -132,36 +140,20 @@ DemoAnt::DemoAnt(const long id, Vector2f position) : Ant(id, position) {}
 
 void DemoAnt::update()
 {
-    moveForward();
-
-   /* if(m_rotateCd-- <= 0)
+    if(m_rotateCd-- <= 0)
     {
         m_rotateCd = GetRandomValue(30, 100);
-        m_angle += GetRandomValue(-100, 100) * 0.01f * PI / 4;
+        m_angle += GetRandomValue(-100, 100) * 0.01f * PI / 4; // Rotation de +- 45°
         rotate(m_angle);
     }
     
-    Vector2 lastPos = m_pos;
-    moveForward();
+    if(!moveForward())
+        m_rotateCd = 0;
 
-    // Tuile dans la direction de la fourmis
-    Vector2i facingPos = getTileFacingPos();
-    Tile facingTile = getWorld().getGrid().getTile(facingPos);
-
-    if(facingTile.type == Type::BORDER || facingTile.type == Type::GROUND)
-    {
-        // Fait revenir a son ancienne position car elle risque de foncer dans un mur
-        m_pos = lastPos;
-        m_rotateCd = 0; // Elle prendra une nouvelle décision
-    }
-
-    // if(facingTile.type == Type::GROUND || facingTile.type == Type::FOOD)
-    //     take();
-    
     if(GetRandomValue(0, 40) == 0)
         put();
 
-    pheromone(); */ 
+    pheromone(); 
 }
 
 void DemoAnt::save(json &json) const

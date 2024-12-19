@@ -33,7 +33,7 @@ namespace simu
             // ------ ACTIONS IA -------
             void move(Direction dir);
             void rotate(float angle);  // Définie la direction et le sens de la fourmis en radian
-            void moveForward();        // Se déplace devant elle (en fonction de son angle)
+            bool moveForward();        // Se déplace devant elle (en fonction de son angle), renvoie vrai si aucun obstacle ne l'empeche de faire l'action
             void eat();                // Mange sur sa position (si il y a quelque chose)
             void pheromone();          // Pose un phéromone sur sa position
             void beat();               // Mord l'entité devant elle

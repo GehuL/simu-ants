@@ -5,6 +5,8 @@ using namespace simu;
 
 class Scene: public WorldListener
 {
+    std::vector<std::weak_ptr<DemoAnt>> ants;
+
     public:
         void onInit() override
         {
@@ -20,17 +22,32 @@ class Scene: public WorldListener
         
             for(Vec2i tile : path)
                 grid.setTile(FOOD, tile.x, tile.y);*/
+
+            ants = getWorld().spawnEntities<DemoAnt>(10, getWorld().gridToWorld(Vec2i{89, 161}));
         };
 
         void onDraw() override
         {
-            Grid& grid = getWorld().getGrid();
-            auto path = grid.findPath(Vec2i{89, 161}, getWorld().mouseToGridCoord());
-
-            const int tileSize = grid.getTileSize();
-            for(Vec2i tile : path)
+            if(IsKeyPressed(KEY_G))
             {
-                DrawRectangle(tile.x * tileSize, tile.y * tileSize, tileSize, tileSize, RED);
+                Grid& grid = getWorld().getGrid();
+
+                for(const auto& ant: ants)
+                {
+                    if(ant.expired())
+                        continue;
+
+                    Vec2i antPos = grid.toTileCoord((Vec2f)(ant.lock()->getPos()));
+
+                    auto path = grid.findPath(antPos, getWorld().mouseToGridCoord());
+
+                    const int tileSize = grid.getTileSize();
+
+                    for(Vec2i tile : path)
+                    {
+                        DrawRectangle(tile.x * tileSize, tile.y * tileSize, tileSize, tileSize, RED);
+                    }
+                }
             }
         }
 

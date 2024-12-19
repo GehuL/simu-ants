@@ -86,7 +86,7 @@ namespace simu
              * est en dehors de la grille et que le _check est activé.
              */
             template<bool _check = true>
-            Tile getTile(Vector2f pos) const
+            Tile getTile(Vec2f pos) const
             {
                 const int tileX = pos.x / getTileSize();
                 const int tileY = pos.y / getTileSize();
@@ -139,6 +139,8 @@ namespace simu
             int pathDistance(Vec2i start, Vec2i dest);
 
             Vector2i toTileCoord(float x, float y) const;
+            Vector2i toTileCoord(Vec2f pos) const;
+
 
             int getGridWidth() const { return m_gridWidth; };
             int getTileSize() const { return m_tileSize; };

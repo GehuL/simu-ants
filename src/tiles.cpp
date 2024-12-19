@@ -120,9 +120,13 @@ Vector2i Grid::toTileCoord(float x, float y) const
 {
     int tileX = x / getTileSize();
     int tileY = y / getTileSize();
-    return (Vector2i) {tileX, tileY};
+    return Vector2i{tileX, tileY};
 }
 
+Vec2i Grid::toTileCoord(Vec2f pos) const
+{
+    return toTileCoord(pos.x, pos.y);
+}
 
 void simu::to_json(json &json, const Grid &grid)
 {

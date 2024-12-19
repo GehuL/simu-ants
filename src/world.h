@@ -153,7 +153,7 @@ namespace simu
              * @param pos Position d'une tuile dans la grille courante
              * @return Les coordonées par rapport au repère de la caméra 2D
              */
-            Vector2f gridCoordToWorld(Vector2i pos) const;
+            Vector2f gridToWorld(Vector2i pos) const;
 
             /**
              * Positionne la caméra au centre de la grille
