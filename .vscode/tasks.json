@@ -12,7 +12,7 @@
                 "BUILD_MODE=DEBUG",
                 "PROJECT_NAME=simu-ants",
                 //"OBJS=src/*.cpp"
-                "OBJS=src/engine/*.cpp src/NEAT/*.cpp src/main.cpp"
+                "OBJS=src/engine/*.cpp src/NEAT/*.cpp src/mainlab.cpp"
             ],
             "windows": {
                 "command": "mingw32-make.exe",

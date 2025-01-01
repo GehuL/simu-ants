@@ -1,7 +1,7 @@
 #include "engine/world.h"
 #include "engine/ant.h"
 #include "NEAT/population.h"
-#include "ComputeFitness.h"
+#include "NEAT/ComputeFitness.h"
 #include <fstream>
 #include <iostream>
 

@@ -3,6 +3,8 @@
 
     #include "RNG.h"  // Inclure la classe RNG (générateur de nombres aléatoires)
     #include "Genome.h"  // Inclure la définition du Genome
+    #include "../engine/tiles.h"  
+    #include "../engine/types.h"
 
     class ComputeFitness {
     public:
@@ -22,6 +24,7 @@
 
     private:
         RNG &rng;  // Référence au générateur RNG utilisé pour l'évaluation
+        
     };
 
     #endif // COMPUTEFITNESS_H
