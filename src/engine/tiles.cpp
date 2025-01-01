@@ -20,10 +20,12 @@ Grid::~Grid()
 void Grid::unload()
 {
     if(m_grid != NULL)
+    {
         MemFree(m_grid);
+        m_grid = NULL;
+    }
     
     m_updateBuff.clear();
-    m_grid = NULL;
 
     UnloadImage(m_img);
     UnloadTexture(m_tex);
@@ -118,9 +120,13 @@ Vector2i Grid::toTileCoord(float x, float y) const
 {
     int tileX = x / getTileSize();
     int tileY = y / getTileSize();
-    return (Vector2i) {tileX, tileY};
+    return Vector2i{tileX, tileY};
 }
 
+Vec2i Grid::toTileCoord(Vec2f pos) const
+{
+    return toTileCoord(pos.x, pos.y);
+}
 
 void simu::to_json(json &json, const Grid &grid)
 {
@@ -133,7 +139,6 @@ void simu::to_json(json &json, const Grid &grid)
 
 void simu::from_json(const json & json, Grid & grid)
 {
-    // TODO: Décompresser les données
     // TODO: Ajouter les phéromones dans m_updateBuffer
     auto rowdata = json.at("data");
     
@@ -171,11 +176,26 @@ void simu::decompressGrid(Grid& grid, std::string &data, int gridWidth)
     if(decoded)
         MemFree(decoded);
 
-    if(grid.m_grid)
-        MemFree(grid.m_grid);
-   
+    grid.unload();
+
     grid.m_gridWidth = gridWidth;
     grid.m_grid = reinterpret_cast<Tile*>(decompressed);
+
+    grid.m_img = GenImageColor(grid.m_gridWidth, grid.m_gridWidth, WHITE);
+    grid.m_tex = LoadTextureFromImage(grid.m_img);
+    SetTextureFilter(grid.m_tex, TEXTURE_FILTER_POINT);
+
+    // Update l'image et les phéromones
+    for(int index = 0; index < grid.m_gridWidth*grid.m_gridWidth; index++)
+    {
+        const Tile tile = grid.m_grid[index];
+        grid.setTile(tile, index);
+        if(tile.type == Type::PHEROMONE)
+        {
+            grid.m_updateBuff.push_back(index);
+        }
+    }
+
 }
 
 void Grid::fromImage(const std::string& file)

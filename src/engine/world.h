@@ -158,7 +158,7 @@ namespace simu
              * @param pos Position d'une tuile dans la grille courante
              * @return Les coordonées par rapport au repère de la caméra 2D
              */
-            Vector2f gridCoordToWorld(Vector2i pos) const;
+            Vec2f gridToWorld(Vector2i pos) const;
 
             /**
              * Positionne la caméra au centre de la grille
@@ -196,8 +196,17 @@ namespace simu
     {
         public:
             virtual ~WorldListener() {};
+
+            // executé lors du chargement de la scene
             virtual void onInit() = 0;
+
+            // executé lors de la fermeture de la scene
             virtual void onUnload() = 0;
+
+            // executé à la fréquence de rafraichissement de l'écran
+            virtual void onDraw() = 0;
+
+                // executé à la frequence de mise à jour de la logique de la simulation
             virtual void onUpdate() = 0;
     };
 

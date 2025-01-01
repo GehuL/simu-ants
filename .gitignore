@@ -1,4 +1,5 @@
 .vscode
+.vscode/
 main.code-workspace
 *.exe
 *.json

@@ -19,6 +19,7 @@
                 "args": [
                     "RAYLIB_PATH=C:/raylib/raylib",
                     "PROJECT_NAME=simu-ants",
+                    // "OBJS=src/engine/*.cpp src/NEAT/*.cpp src/main.cpp",
                     "OBJS=src/*.cpp",
                     "BUILD_MODE=DEBUG"
                 ],
@@ -28,14 +29,6 @@
                     "RAYLIB_PATH=<path_to_raylib>/raylib",
                     "PROJECT_NAME=${fileBasenameNoExtension}",
                     "OBJS=${fileBasenameNoExtension}.c",
-                    "BUILD_MODE=DEBUG"
-                ],
-            },
-            "linux": {
-                "args": [
-                    "RAYLIB_PATH=/home/lauric/Documents/raylib",
-                    "PROJECT_NAME=simu-ants",
-                    "OBJS=src/engine/*.cpp src/NEAT/*.cpp src/main.cpp",
                     "BUILD_MODE=DEBUG"
                 ],
             },

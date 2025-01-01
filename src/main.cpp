@@ -8,6 +8,8 @@ RNG rng;
 
 class Scene: public WorldListener
 {
+    std::vector<std::weak_ptr<DemoAnt>> ants;
+
     public:
         Scene(): mPop((NeatConfig) {}, rng) {};
 
@@ -21,6 +23,30 @@ class Scene: public WorldListener
         {
 
         };
+        void onDraw() override
+        {
+            if(IsKeyPressed(KEY_G))
+            {
+                Grid& grid = getWorld().getGrid();
+
+                for(const auto& ant: ants)
+                {
+                    if(ant.expired())
+                        continue;
+
+                    Vec2i antPos = grid.toTileCoord((Vec2f)(ant.lock()->getPos()));
+
+                    auto path = grid.findPath(antPos, getWorld().mouseToGridCoord());
+
+                    const int tileSize = grid.getTileSize();
+
+                    for(Vec2i tile : path)
+                    {
+                        DrawRectangle(tile.x * tileSize, tile.y * tileSize, tileSize, tileSize, RED);
+                    }
+                }
+            }
+        }
         
         void onUpdate() override
         {
@@ -58,6 +84,8 @@ class Scene: public WorldListener
 
 int main(void)
 {   
+    SetTraceLogLevel(LOG_DEBUG);
+
     simu::World& world = simu::getWorld(); 
     world.setListener(std::make_shared<Scene>());
     return world.run(800, 800, "ants-simulation");

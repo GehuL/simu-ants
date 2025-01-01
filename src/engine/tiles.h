@@ -3,7 +3,7 @@
 
 #include "raylib.h"
 #include "engine.h"
-#include "others.h"
+#include "types.h"
 #include "../external/json.hpp"
 
 namespace simu
@@ -86,7 +86,7 @@ namespace simu
              * est en dehors de la grille et que le _check est activé.
              */
             template<bool _check = true>
-            Tile getTile(Vector2f pos) const
+            Tile getTile(Vec2f pos) const
             {
                 const int tileX = pos.x / getTileSize();
                 const int tileY = pos.y / getTileSize();
@@ -130,7 +130,17 @@ namespace simu
                 setTile(tile, idx);
             }
 
+            /** @brief Trouve un chemin depuis start a dest. L'algorithme A* est utilisé.
+             */
+            std::vector<Vec2i> findPath(Vec2i start, Vec2i dest);
+
+            /* @brief Renvoie le nombre de case du chemin entre start et dest utilisant A*.
+             */
+            int pathDistance(Vec2i start, Vec2i dest);
+
             Vector2i toTileCoord(float x, float y) const;
+            Vector2i toTileCoord(Vec2f pos) const;
+
 
             int getGridWidth() const { return m_gridWidth; };
             int getTileSize() const { return m_tileSize; };

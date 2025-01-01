@@ -9,7 +9,7 @@
 
 #include "raylib.h"
 #include "tiles.h"
-#include "others.h"
+#include "types.h"
 #include "variant"
 
 using json = nlohmann::json;
@@ -38,6 +38,8 @@ namespace simu
             
             virtual const char* getType() const = 0;
 
+            void setPos(Vector2f pos) { this-> m_pos = pos; };
+
             Tile getTileOn() const;
             Tile getTileFacing() const;
 
@@ -46,8 +48,8 @@ namespace simu
 
             const long getId() const { return m_id; };
 
-            Vector2 getPos() const { return m_pos; };
-            Vector2 getVel() const { return m_velocity; };
+            Vec2f getPos() const { return m_pos; };
+            Vec2f getVel() const { return m_velocity; };
 
             const float getAngle() const { return m_angle; };
 
@@ -57,8 +59,8 @@ namespace simu
         private:
             const long m_id;
         protected:
-            Vector2 m_pos = Vector2{0.f, 0.f};
-            Vector2 m_velocity = Vector2{0.f, 0.f};
+            Vec2f m_pos = Vector2{0.f, 0.f};
+            Vec2f m_velocity = Vector2{0.f, 0.f};
             float m_angle;
     };
 

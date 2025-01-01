@@ -21,9 +21,9 @@ void Ant::draw()
     DrawRectangle(this->m_pos.x, this->m_pos.y, 5, 5, DARKBROWN);
 
     if(m_carried_object.type != Type::AIR)
-     {
+    {
         DrawRectangle(this->m_pos.x, this->m_pos.y, 3, 3, m_carried_object.color);
-     }
+    }
 }
 
 void Ant::save(json &json) const
@@ -45,16 +45,23 @@ void Ant::rotate(float angle)
     m_velocity = Vector2Rotate((Vector2) {1.0, 0.0}, angle);
 }
 
-void Ant::moveForward()
+void Ant::move(Direction dir)
 {
-    Vector2f lastPos = m_pos;
-    m_pos = Vector2Add(m_pos, m_velocity);
+    rotate(dir);
+    moveForward();
+}
 
-    Tile tileAhead = getTileFacing();
-
-    if(tileAhead.type == Type::BORDER ||
-        tileAhead.type == Type::GROUND) 
-        m_pos = lastPos;
+bool Ant::moveForward()
+{
+    Vec2f newPos = m_pos + m_velocity;
+    Type tileOnType = getWorld().getGrid().getTile(newPos).type; // C'est long, devrait être simplifier
+    
+    if(tileOnType != Type::GROUND && tileOnType != Type::BORDER)
+    {
+        m_pos = newPos;
+        return true;
+    }
+    return false;
 }
 
 void Ant::eat()
@@ -138,31 +145,17 @@ void DemoAnt::update()
     if(m_rotateCd-- <= 0)
     {
         m_rotateCd = GetRandomValue(30, 100);
-        m_angle += GetRandomValue(-100, 100) * 0.01f * PI / 4;
+        m_angle += GetRandomValue(-100, 100) * 0.01f * PI / 4; // Rotation de +- 45°
         rotate(m_angle);
     }
     
-    Vector2 lastPos = m_pos;
-    moveForward();
+    if(!moveForward())
+        m_rotateCd = 0;
 
-    // Tuile dans la direction de la fourmis
-    Vector2i facingPos = getTileFacingPos();
-    Tile facingTile = getWorld().getGrid().getTile(facingPos);
-
-    if(facingTile.type == Type::BORDER || facingTile.type == Type::GROUND)
-    {
-        // Fait revenir a son ancienne position car elle risque de foncer dans un mur
-        m_pos = lastPos;
-        m_rotateCd = 0; // Elle prendra une nouvelle décision
-    }
-
-    // if(facingTile.type == Type::GROUND || facingTile.type == Type::FOOD)
-    //     take();
-    
     if(GetRandomValue(0, 40) == 0)
         put();
 
-    pheromone();
+    pheromone(); 
 }
 
 void DemoAnt::save(json &json) const
