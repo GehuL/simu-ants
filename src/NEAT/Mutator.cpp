@@ -2,7 +2,7 @@
 #include "Genome.h"
 #include"neuron_mutator.h"
 #include "link_mutator.h"
-#include "rng.h"
+#include "RNG.h"
 #include <iostream>
 #include <functional>
 

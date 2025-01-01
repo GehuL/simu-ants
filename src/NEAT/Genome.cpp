@@ -1,5 +1,5 @@
 #include "Genome.h"
-#include "Neat.h"
+#include "neat.h"
 #include <optional>
 #include <iostream>
 #include <vector>
@@ -50,7 +50,8 @@ Genome Genome::create_genome(int id, int num_inputs, int num_outputs, int num_hi
 
     // Ajoute neurones de sortie
     for (int i = 0; i < num_outputs; ++i) {
-        genome.add_neuron(neat::NeuronGene{num_inputs + i, 0.0, Activation(Activation::Type::Sigmoid)});
+        int output_id = num_inputs + i;
+        genome.add_neuron(neat::NeuronGene{output_id, 0.0, Activation(Activation::Type::Sigmoid)});
     }
 
     // Ajoute neurones cachés
@@ -59,29 +60,26 @@ Genome Genome::create_genome(int id, int num_inputs, int num_outputs, int num_hi
         genome.add_neuron(neat::NeuronGene{hidden_id, 0.0, Activation(Activation::Type::Sigmoid)});
     }
 
-    std::cout << "Genome ID: " << id << ", Neurones: " << genome.get_neurons().size() 
-              << ", Liens: " << genome.get_links().size() << std::endl;
-
-    // Créer des liens sans cycles
+    // Liens : entrée -> cachés
     for (int input_id = 0; input_id < num_inputs; ++input_id) {
         for (int hidden_id = num_inputs + num_outputs; hidden_id < num_inputs + num_outputs + num_hidden_neurons; ++hidden_id) {
             if (!genome.would_create_cycle(input_id, hidden_id)) {
                 genome.add_link(genome.create_link(input_id, hidden_id, rng));
             }
         }
-        for (int output_id = num_inputs; output_id < num_inputs + num_outputs; ++output_id) {
-            if (!genome.would_create_cycle(input_id, output_id)) {
-                genome.add_link(genome.create_link(input_id, output_id, rng));
-            }
-        }
     }
 
+    // Liens : cachés -> cachés (pour favoriser l'émergence de structures complexes)
     for (int hidden_id = num_inputs + num_outputs; hidden_id < num_inputs + num_outputs + num_hidden_neurons; ++hidden_id) {
         for (int target_hidden_id = hidden_id + 1; target_hidden_id < num_inputs + num_outputs + num_hidden_neurons; ++target_hidden_id) {
             if (!genome.would_create_cycle(hidden_id, target_hidden_id)) {
                 genome.add_link(genome.create_link(hidden_id, target_hidden_id, rng));
             }
         }
+    }
+
+    // Liens : cachés -> sorties
+    for (int hidden_id = num_inputs + num_outputs; hidden_id < num_inputs + num_outputs + num_hidden_neurons; ++hidden_id) {
         for (int output_id = num_inputs; output_id < num_inputs + num_outputs; ++output_id) {
             if (!genome.would_create_cycle(hidden_id, output_id)) {
                 genome.add_link(genome.create_link(hidden_id, output_id, rng));
@@ -89,11 +87,23 @@ Genome Genome::create_genome(int id, int num_inputs, int num_outputs, int num_hi
         }
     }
 
-    std::cout << "Final Genome ID: " << id << ", Neurones: " << genome.get_neurons().size() 
-              << ", Liens: " << genome.get_links().size() << std::endl;
+    // Affichage pour débogage
+    std::cout << "Genome ID: " << id << std::endl;
+    std::cout << "Neurones:" << std::endl;
+    for (const auto &neuron : genome.get_neurons()) {
+        std::cout << "  Neuron ID: " << neuron.neuron_id 
+                  << ", Biais: " << neuron.bias << std::endl;
+    }
+    std::cout << "Liens:" << std::endl;
+    for (const auto &link : genome.get_links()) {
+        std::cout << "  Link from " << link.link_id.input_id 
+                  << " to " << link.link_id.output_id 
+                  << " with weight " << link.weight << std::endl;
+    }
 
     return genome;
 }
+
 
 
 

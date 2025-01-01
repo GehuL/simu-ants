@@ -1,7 +1,7 @@
 #ifndef GENOME_H
 #define GENOME_H
 
-#include "Neat.h"
+#include "neat.h"
 #include "Activation.h"
 #include "rng.h"
 #include <vector>
