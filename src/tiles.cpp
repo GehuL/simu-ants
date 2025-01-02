@@ -65,7 +65,6 @@ void Grid::update()
                
                 if(tile->color.a <= 0)
                 {
-                    *tile = AIR;
                     setTile(AIR, index);
                     erase(m_updateBuff, it);
                     it--;

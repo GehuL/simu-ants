@@ -52,9 +52,9 @@ void Ant::move(Direction dir)
 bool Ant::moveForward()
 {
     Vec2f newPos = m_pos + m_velocity;
-    Type tileOnType = getWorld().getGrid().getTile(newPos).type; // C'est long, devrait être simplifier
-    
-    if(tileOnType != Type::GROUND && tileOnType != Type::BORDER)
+    Tile tile = getWorld().getGrid().getTile(newPos);
+
+    if(!tile.flags.solid)
     {
         m_pos = newPos;
         return true;
@@ -66,7 +66,7 @@ void Ant::eat()
 {
     Tile tile = getWorld().getGrid().getTile(m_pos);
     
-    if(tile.type == Type::FOOD)
+    if(tile.flags.eatable)
     {
        if(m_life < 100.f)
             m_life += 10.f;
@@ -78,7 +78,7 @@ void Ant::eat()
 void Ant::pheromone()
 {
     Tile tile = getWorld().getGrid().getTile(m_pos);
-    if(tile.type == Type::AIR || tile.type == Type::PHEROMONE)
+    if(!tile.flags.solid)
     {
         getWorld().getGrid().setTile(PHEROMONE, m_pos.x, m_pos.y);
     }
@@ -101,7 +101,7 @@ void Ant::take()
     Vector2i facingTilePos = getTileFacingPos();
     Tile facingTile = grid.getTile(facingTilePos);
 
-    if(facingTile.type == Type::FOOD || facingTile.type == Type::GROUND)
+    if(facingTile.flags.carriable)
     {
         this->m_carried_object = facingTile;
         grid.setTile(AIR, facingTilePos.x, facingTilePos.y);
@@ -118,7 +118,7 @@ void Ant::put()
     Vector2i facingTilePos = getTileFacingPos();
     Tile facingTile = grid.getTile(facingTilePos);
 
-    if(facingTile.type == Type::AIR || facingTile.type == Type::PHEROMONE)
+    if(!facingTile.flags.solid)
     {
         grid.setTile(this->m_carried_object, facingTilePos.x, facingTilePos.y);
         this->m_carried_object = AIR;

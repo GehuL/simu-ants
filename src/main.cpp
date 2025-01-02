@@ -14,6 +14,8 @@ class Scene: public WorldListener
             grid.fromImage("maze.png");
             getWorld().centerCamera();
             
+            TraceLog(LOG_DEBUG, "Size of Type: %d  Size of Tiles: %d", sizeof(Type), sizeof(Tile));
+            
            /* double startTime = GetTime();
             auto path = grid.findPath(Vec2i{89, 161}, Vec2i{6, 10});
 

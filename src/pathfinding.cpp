@@ -37,7 +37,7 @@ std::vector<Vec2i> Grid::findPath(Vec2i start, Vec2i dest)
             const Vec2i newEdge = current + dir;
             Tile tile = getTile<true>(newEdge);
 
-            if(tile.type == Type::BORDER || tile.type == Type::GROUND)
+            if(tile.flags.solid)
                 continue;
 
             int cost = reached[current] + 1;

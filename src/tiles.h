@@ -17,21 +17,37 @@ namespace simu
         FOOD,
         PHEROMONE,
         BORDER,  
+    }; 
+ 
+    struct TileFlags
+    {
+        union
+        {
+            uint8_t all;
+            struct
+            {
+                uint8_t solid: 1;
+                uint8_t carriable: 1;
+                uint8_t updatable: 1;
+                uint8_t eatable: 1;
+            };        
+        };
     };
 
     // TODO: Optimiser l'occupation en mémoire de la grille 
     struct Tile
     {
+        TileFlags flags;
         Type type;
         Color color;
     };
 
-    const Tile AIR = (Tile) {Type::AIR, WHITE};
-    const Tile GROUND = (Tile) {Type::GROUND, BROWN};
-    const Tile WALL = (Tile) {Type::GROUND, BLACK}; // Considère un mur comme le sol (utilisé pour le labyrinthe)
-    const Tile FOOD = (Tile) {Type::FOOD, GREEN};
-    const Tile PHEROMONE = (Tile) {Type::PHEROMONE, PINK};
-    const Tile BORDER = (Tile) {Type::BORDER, WHITE};
+    const Tile AIR = (Tile) {0x2, Type::AIR, WHITE};
+    const Tile GROUND = (Tile) {0x3, Type::GROUND, BROWN};
+    const Tile WALL = (Tile) {0x3, Type::GROUND, BLACK}; // Considère un mur comme le sol (utilisé pour le labyrinthe)
+    const Tile FOOD = (Tile) {0x10, Type::FOOD, GREEN};
+    const Tile PHEROMONE = (Tile) {0x4, Type::PHEROMONE, PINK};
+    const Tile BORDER = (Tile) {0x1, Type::BORDER, WHITE};
 
     Tile fromColor(const Color& color);
     bool operator==(const Color &c1, const Color &c2);
@@ -121,11 +137,8 @@ namespace simu
 
                 const int idx = y*m_gridWidth + x; 
                 
-                // On évite d'ajouter un index qui est déjà présent
-                if(tile.type == Type::PHEROMONE && tileOn.type != Type::PHEROMONE) 
-                {
+                if(!tileOn.flags.updatable) // Évite d'ajouter un index est déjà présent
                      m_updateBuff.push_back(idx);
-                }
                
                 setTile(tile, idx);
             }
@@ -138,9 +151,8 @@ namespace simu
              */
             int pathDistance(Vec2i start, Vec2i dest);
 
-            Vector2i toTileCoord(float x, float y) const;
-            Vector2i toTileCoord(Vec2f pos) const;
-
+            Vec2i toTileCoord(float x, float y) const;
+            Vec2i toTileCoord(Vec2f pos) const;
 
             int getGridWidth() const { return m_gridWidth; };
             int getTileSize() const { return m_tileSize; };
