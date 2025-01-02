@@ -3,8 +3,8 @@
 
 struct NeatConfig {
     int population_size = 10;        // Taille de la population
-    int num_inputs = 4;               // Nombre d'entrées
-    int num_outputs = 4;              // Nombre de sorties
+    int num_inputs = 1;               // Nombre d'entrées
+    int num_outputs = 3;              // Nombre de sorties
 
     // Probabilités de mutation
     double probability_add_link = 0.05;       // Probabilité d'ajouter un lien

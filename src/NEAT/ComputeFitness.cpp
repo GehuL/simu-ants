@@ -1,7 +1,10 @@
 #include "ComputeFitness.h"
+#include "NeuralNetwork.h"
 #include "Genome.h"
 #include <iostream>
 #include <cmath> // Pour calculer la distance
+#include <algorithm> // Pour std::max_element
+
 
 // Constructeur qui initialise la référence RNG
 ComputeFitness::ComputeFitness(RNG &rng) : rng(rng) {}
@@ -45,3 +48,77 @@ double ComputeFitness::evaluate(const Genome &genome, int ant_id) const {
 */
     return 0;
 }
+
+double ComputeFitness::evaluate_rpc(const Genome &genome, int ant_id) const {
+    FeedForwardNeuralNetwork network = FeedForwardNeuralNetwork::create_from_genome(genome);
+
+    int wins = 0;
+    int rounds = 10;
+
+    // Stratégie fixe de l'adversaire : alterner entre "Papier", "Ciseaux", et "Pierre"
+    int opponent_moves[] = {1, 1, 1};
+    
+
+    for (int round = 0; round < rounds; ++round) {
+        int opponent_move = opponent_moves[round % 3];  // Alternance fixe
+
+        //Affichage le mouvement de l'adversaire
+        //std::cout << "Opponent move: " << opponent_move << std::endl;
+
+        // Obtenir l'action du réseau neuronal
+        std::vector<double> inputs = { double(opponent_move) };
+        std::vector<double> outputs = network.activate(inputs);
+
+        // Décoder l'action
+        int player_move = std::distance(outputs.begin(), std::max_element(outputs.begin(), outputs.end()));
+
+        // Calculer le résultat
+        int result = (3 + player_move - opponent_move) % 3 - 1;
+
+        if (result == 1) wins++;
+    }
+
+    return static_cast<double>(wins) / rounds;
+}
+
+double ComputeFitness::evaluate_lab(const Genome &genome, const Vec2i &startPos, const Vec2i &goalPos, Grid &grid) const {
+    FeedForwardNeuralNetwork network = FeedForwardNeuralNetwork::create_from_genome(genome);
+
+    Vec2i antPos = startPos;
+    double initial_distance = static_cast<double>(grid.findPath(startPos, goalPos).size()); // Distance initiale avec A*
+    double fitness = 0.0;
+
+    const int max_steps = 100;  // Limite de mouvements qu'on pourra remplacer par autre chose 
+    for (int step = 0; step < max_steps; ++step) {
+        // Obtenir l'état actuel du jeu
+        auto inputs = get_game_state_lab(antPos, goalPos, grid);
+
+        // Calculer la sortie du réseau neuronal
+        auto outputs = network.activate(inputs);
+
+        // Effectuer l'action
+        Ant ant(antPos);  // Créer une fourmi temporaire pour tester les mouvements,genre je pense que c'est comme ça que font les gens qui teste des ia sur des jeux au loieu d'avoir plusieurs objets en déplacements ?
+        perform_action_lab(outputs, ant);
+
+        // Mettre à jour la position
+        antPos = ant.getPosition();
+
+        // Calculer la distance actuelle (via A*)
+        double current_distance = static_cast<double>(grid.findPath(antPos, goalPos).size());
+
+        // Score basé sur la réduction de la distance (Comme ce que tu voulais)
+        fitness += (initial_distance - current_distance);
+
+        // Terminer si la fourmi atteint la sortie
+        if (antPos == goalPos) {
+            fitness += 10000.0;  // Bonus pour atteindre la sortie (Comme Sergey)
+            break;
+        }
+    }
+
+    // Pénalité pour les mouvements inutiles
+    fitness -= 0.1 * max_steps;
+
+    return fitness > 0 ? fitness : 0.0;  // Éviter les valeurs négatives
+}
+

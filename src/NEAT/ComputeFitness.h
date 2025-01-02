@@ -1,8 +1,10 @@
     #ifndef COMPUTEFITNESS_H
     #define COMPUTEFITNESS_H
 
-    #include "rng.h"  // Inclure la classe RNG (générateur de nombres aléatoires)
+    #include "RNG.h"  // Inclure la classe RNG (générateur de nombres aléatoires)
     #include "Genome.h"  // Inclure la définition du Genome
+    #include "../engine/tiles.h"  
+    #include "../engine/types.h"
 
     class ComputeFitness {
     public:
@@ -15,8 +17,14 @@
         // Méthode pour évaluer la fitness d'un génome (si besoin d'une version nommée)
         double evaluate(const Genome &genome, int ant_id) const;
 
+        double evaluate_rpc(const Genome &genome, int ant_id) const;
+
+        double evaluate_lab(const Genome &genome, const Vec2i &startPos, const Vec2i &goalPos, Grid &grid) const;
+        
+
     private:
         RNG &rng;  // Référence au générateur RNG utilisé pour l'évaluation
+        
     };
 
     #endif // COMPUTEFITNESS_H

@@ -2,7 +2,7 @@
 #define POPULATION_H
 
 #include "Mutator.h"
-#include "rng.h"
+#include "RNG.h"
 #include "ComputeFitness.h"
 #include "Genome.h"
 #include "NeatConfig.h"
@@ -13,6 +13,8 @@
 class Population
 {
 public:
+
+   
    /**
     * @brief Constructeur de la classe Population.
     *

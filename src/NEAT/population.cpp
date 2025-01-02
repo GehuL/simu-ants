@@ -1,11 +1,13 @@
-#include "population.h"
+#include "Population.h"
 #include "Mutator.h"
-#include "rng.h"
+#include "RNG.h"
 #include "ComputeFitness.h"
 #include "Neat.h"
 #include "Genome.h"
 #include <iostream>
 #include <memory>
+
+
 
 Population::Population(NeatConfig config, RNG &rng) 
     : config{config}, rng{rng}, next_genome_id{0} {
@@ -57,6 +59,9 @@ std::vector<neat::Individual> Population::reproduce() {
 
     return new_generation;
 }
+
+
+
 
 std::vector<neat::Individual> Population::reproduce_from_genomes(const std::vector<std::shared_ptr<Genome>>& genomes) {
     if (genomes.empty()) {

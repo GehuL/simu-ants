@@ -53,7 +53,6 @@ Genome Neat::crossover(const Individual &dominant, const Individual &recessive, 
         }
     }
 
-    std::cout << "Crossover2 " << std::endl;
 
     for (const auto &dominant_link : dominant.genome->get_links()) {
         LinkId link_id = dominant_link.link_id;
