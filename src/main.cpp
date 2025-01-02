@@ -8,6 +8,8 @@ RNG rng;
 
 class Scene: public WorldListener
 {
+    std::vector<std::weak_ptr<DemoAnt>> ants;
+
     public:
         Scene(): mPop((NeatConfig) {}, rng) {};
 
@@ -17,10 +19,8 @@ class Scene: public WorldListener
             m_ants = getWorld().spawnEntities<AntIA>(10);
         };
 
-        void onUnload() override
-        {
-
-        };
+            double deltaTime = (GetTime() - startTime) * 1000.f;
+            TraceLog(LOG_DEBUG, "A*: %.1lf ms", deltaTime);
         
         void onUpdate() override
         {
@@ -48,6 +48,7 @@ class Scene: public WorldListener
                 m_ants.push_back(getWorld().spawnEntity<AntIA>(*genome.genome.get()));
             }
 
+            ants = getWorld().spawnEntities<DemoAnt>(10, getWorld().gridToWorld(Vec2i{89, 161}));
         };
 
     private:
@@ -58,6 +59,8 @@ class Scene: public WorldListener
 
 int main(void)
 {   
+    SetTraceLogLevel(LOG_DEBUG);
+
     simu::World& world = simu::getWorld(); 
     world.setListener(std::make_shared<Scene>());
     return world.run(800, 800, "ants-simulation");

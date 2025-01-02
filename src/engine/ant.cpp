@@ -21,9 +21,9 @@ void Ant::draw()
     DrawRectangle(this->m_pos.x, this->m_pos.y, 5, 5, DARKBROWN);
 
     if(m_carried_object.type != Type::AIR)
-     {
+    {
         DrawRectangle(this->m_pos.x, this->m_pos.y, 3, 3, m_carried_object.color);
-     }
+    }
 }
 
 void Ant::save(json &json) const
@@ -45,23 +45,30 @@ void Ant::rotate(float angle)
     m_velocity = Vector2Rotate((Vector2) {1.0, 0.0}, angle);
 }
 
-void Ant::moveForward()
+void Ant::move(Direction dir)
 {
-    Vector2f lastPos = m_pos;
-    m_pos = Vector2Add(m_pos, m_velocity);
+    rotate(dir);
+    moveForward();
+}
 
-    Tile tileAhead = getTileFacing();
+bool Ant::moveForward()
+{
+    Vec2f newPos = m_pos + m_velocity;
+    Tile tile = getWorld().getGrid().getTile(newPos);
 
-    if(tileAhead.type == Type::BORDER ||
-        tileAhead.type == Type::GROUND) 
-        m_pos = lastPos;
+    if(!tile.flags.solid)
+    {
+        m_pos = newPos;
+        return true;
+    }
+    return false;
 }
 
 void Ant::eat()
 {
     Tile tile = getWorld().getGrid().getTile(m_pos);
     
-    if(tile.type == Type::FOOD)
+    if(tile.flags.eatable)
     {
        if(m_life < 100.f)
             m_life += 10.f;
@@ -73,7 +80,7 @@ void Ant::eat()
 void Ant::pheromone()
 {
     Tile tile = getWorld().getGrid().getTile(m_pos);
-    if(tile.type == Type::AIR || tile.type == Type::PHEROMONE)
+    if(!tile.flags.solid)
     {
         getWorld().getGrid().setTile(PHEROMONE, m_pos.x, m_pos.y);
     }
@@ -96,7 +103,7 @@ void Ant::take()
     Vector2i facingTilePos = getTileFacingPos();
     Tile facingTile = grid.getTile(facingTilePos);
 
-    if(facingTile.type == Type::FOOD || facingTile.type == Type::GROUND)
+    if(facingTile.flags.carriable)
     {
         this->m_carried_object = facingTile;
         grid.setTile(AIR, facingTilePos.x, facingTilePos.y);
@@ -113,7 +120,7 @@ void Ant::put()
     Vector2i facingTilePos = getTileFacingPos();
     Tile facingTile = grid.getTile(facingTilePos);
 
-    if(facingTile.type == Type::AIR || facingTile.type == Type::PHEROMONE)
+    if(!facingTile.flags.solid)
     {
         grid.setTile(this->m_carried_object, facingTilePos.x, facingTilePos.y);
         this->m_carried_object = AIR;
@@ -138,31 +145,17 @@ void DemoAnt::update()
     if(m_rotateCd-- <= 0)
     {
         m_rotateCd = GetRandomValue(30, 100);
-        m_angle += GetRandomValue(-100, 100) * 0.01f * PI / 4;
+        m_angle += GetRandomValue(-100, 100) * 0.01f * PI / 4; // Rotation de +- 45°
         rotate(m_angle);
     }
     
-    Vector2 lastPos = m_pos;
-    moveForward();
+    if(!moveForward())
+        m_rotateCd = 0;
 
-    // Tuile dans la direction de la fourmis
-    Vector2i facingPos = getTileFacingPos();
-    Tile facingTile = getWorld().getGrid().getTile(facingPos);
-
-    if(facingTile.type == Type::BORDER || facingTile.type == Type::GROUND)
-    {
-        // Fait revenir a son ancienne position car elle risque de foncer dans un mur
-        m_pos = lastPos;
-        m_rotateCd = 0; // Elle prendra une nouvelle décision
-    }
-
-    // if(facingTile.type == Type::GROUND || facingTile.type == Type::FOOD)
-    //     take();
-    
     if(GetRandomValue(0, 40) == 0)
         put();
 
-    pheromone();
+    pheromone(); 
 }
 
 void DemoAnt::save(json &json) const

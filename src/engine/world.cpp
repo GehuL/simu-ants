@@ -42,9 +42,9 @@ Vector2i World::mouseToGridCoord() const
     return m_grid.toTileCoord(pos.x, pos.y);
 }
 
-Vector2f World::gridCoordToWorld(Vector2i pos) const
+Vec2f World::gridToWorld(Vector2i pos) const
 {
-    return Vector2f{static_cast<float>(pos.x * m_grid.getTileSize()), static_cast<float>(pos.y * m_grid.getTileSize())};
+    return Vec2f{pos * m_grid.getTileSize()};
 }
 
 void World::centerCamera()
@@ -92,7 +92,6 @@ void World::load(const std::string& filename)
 {
     TRACELOG(LOG_INFO, "Loading file %s", filename.c_str());
     
-    // TODO: Optimiser la fonction
     try
     {
         auto file = std::ifstream(filename, std::ios_base::in);
@@ -201,6 +200,9 @@ void World::drawFrame()
     {
         en->draw();
     }
+
+    if(m_listener)
+        m_listener.get()->onDraw();
 }
 
 void World::drawUI()
