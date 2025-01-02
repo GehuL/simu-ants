@@ -19,9 +19,9 @@ class Scene: public WorldListener
             m_ants = getWorld().spawnEntities<AntIA>(10);
         };
 
-            double deltaTime = (GetTime() - startTime) * 1000.f;
-            TraceLog(LOG_DEBUG, "A*: %.1lf ms", deltaTime);
-        
+        void onUnload() override {};
+        void onDraw() override {};
+
         void onUpdate() override
         {
             if(m_count ++  < 1000)

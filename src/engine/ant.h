@@ -19,7 +19,7 @@ namespace simu
 
             Ant(const long id = -1);
             Ant(const long id, const Ant& ant);
-            Ant(const long id, Vector2f position);
+            Ant(const long id, Vec2f position);
 
             virtual ~Ant() {};
 
