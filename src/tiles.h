@@ -10,7 +10,7 @@ namespace simu
 {
     using json = nlohmann::json;
 
-    enum class Type
+    enum class Type: uint8_t
     {
         AIR,
         GROUND,
@@ -37,17 +37,17 @@ namespace simu
     // TODO: Optimiser l'occupation en mémoire de la grille 
     struct Tile
     {
-        TileFlags flags;
-        Type type;
         Color color;
+        Type type;
+        TileFlags flags;
     };
 
-    const Tile AIR = (Tile) {0x2, Type::AIR, WHITE};
-    const Tile GROUND = (Tile) {0x3, Type::GROUND, BROWN};
-    const Tile WALL = (Tile) {0x3, Type::GROUND, BLACK}; // Considère un mur comme le sol (utilisé pour le labyrinthe)
-    const Tile FOOD = (Tile) {0x10, Type::FOOD, GREEN};
-    const Tile PHEROMONE = (Tile) {0x4, Type::PHEROMONE, PINK};
-    const Tile BORDER = (Tile) {0x1, Type::BORDER, WHITE};
+    const Tile AIR = (Tile) {.color=WHITE, .type=Type::AIR, .flags=0x2};
+    const Tile GROUND = (Tile) {.color=BROWN, .type=Type::GROUND, .flags=0x3};
+    const Tile WALL = (Tile) {.color=BLACK, .type=Type::GROUND, .flags=0x3}; // Considère un mur comme le sol (utilisé pour le labyrinthe)
+    const Tile FOOD = (Tile) {.color=GREEN, .type=Type::FOOD, .flags=0x10};
+    const Tile PHEROMONE = (Tile) {.color=PINK, .type=Type::PHEROMONE, .flags=0x4};
+    const Tile BORDER = (Tile) {.color=WHITE, .type=Type::BORDER, .flags=0x1};
 
     Tile fromColor(const Color& color);
     bool operator==(const Color &c1, const Color &c2);
