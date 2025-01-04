@@ -5,6 +5,8 @@
 #include <random>
 #include <algorithm>
 
+using namespace simu;
+
 /**
  * @brief Sauvegarde un génome dans un fichier.
  * 

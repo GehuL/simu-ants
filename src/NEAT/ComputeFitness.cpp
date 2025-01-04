@@ -1,10 +1,13 @@
 #include "ComputeFitness.h"
 #include "NeuralNetwork.h"
 #include "Genome.h"
+#include "../engine/ant.h"
 #include <iostream>
 #include <cmath> // Pour calculer la distance
 #include <algorithm> // Pour std::max_element
+#include "Utils.h"
 
+using namespace simu;
 
 // Constructeur qui initialise la référence RNG
 ComputeFitness::ComputeFitness(RNG &rng) : rng(rng) {}
@@ -101,7 +104,7 @@ double ComputeFitness::evaluate_lab(const Genome &genome, const Vec2i &startPos,
         perform_action_lab(outputs, ant);
 
         // Mettre à jour la position
-        antPos = ant.getPosition();
+        antPos = ant.getPos();
 
         // Calculer la distance actuelle (via A*)
         double current_distance = static_cast<double>(grid.findPath(antPos, goalPos).size());
