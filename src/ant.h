@@ -26,6 +26,7 @@ namespace simu
             void save(json& json) const override;
             void load(const json& json) override;
 
+            bool isCarrying() const { return m_carried_object.type != Type::AIR; };
             Tile getCarriedObject() const { return m_carried_object; };
 
             float getLife() const { return m_life; };

@@ -150,8 +150,16 @@ void DemoAnt::update()
     if(!moveForward())
         m_rotateCd = 0;
 
-    if(GetRandomValue(0, 40) == 0)
-        put();
+
+    if(isCarrying())
+    {
+        if(GetRandomValue(0, 100) == 0)
+            put();
+    }else if(getTileFacing().flags.carriable)
+    {
+        if(GetRandomValue(0, 100) == 0)
+            take();
+    }
 
     pheromone(); 
 }
