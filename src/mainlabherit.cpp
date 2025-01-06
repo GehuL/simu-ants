@@ -2,17 +2,15 @@
 #include "engine/ant.h"
 #include "NEAT/population.h"
 #include "NEAT/ComputeFitness.h"
-#include "NEAT/Utils.h"
 #include <fstream>
 #include <iostream>
-
 
 using namespace simu;
 
 RNG rng;
 
 class Scene : public WorldListener {
-    std::vector<std::weak_ptr<AntIA>> ants;
+    std::vector<std::shared_ptr<AntIALab>> ants;
     Population mPop;
     ComputeFitness compute_fitness;
 
@@ -22,15 +20,24 @@ class Scene : public WorldListener {
     int current_generation = 0;
 
     std::vector<double> avg_fitness_per_gen; // Suivi des fitness moyennes
-    std::vector<int> steps_count;           // Compteur d'étapes par fourmi
 
 public:
     Scene() : mPop((NeatConfig){}, rng), compute_fitness(rng) {}
 
     void onInit() override {
         getWorld().getGrid().fromImage("rsc/maze.png");
-        ants = getWorld().spawnEntities<AntIA>(num_ants);
-        steps_count.resize(num_ants, 0); // Initialiser les compteurs d'étapes
+        Grid &grid = getWorld().getGrid();
+
+        Vec2i goalPos(73, 0);
+        Vec2i startPos(90, 160);
+        ants.clear();
+
+        for (int i = 0; i < num_ants; ++i) {
+            auto path = grid.findPath(startPos, goalPos);
+            int max_steps = static_cast<int>(path.size() * 1.5);
+            auto ant = getWorld().spawnEntity<AntIALab>(ants);
+            ants.push_back(ant);
+        }
     }
 
     void onUnload() override {}
@@ -40,10 +47,10 @@ public:
             Grid &grid = getWorld().getGrid();
 
             for (const auto &ant : ants) {
-                if (ant.expired())
+                if (!ant)
                     continue;
 
-                Vec2i antPos = grid.toTileCoord((Vec2f)(ant.lock()->getPos()));
+                Vec2i antPos = grid.toTileCoord((Vec2f)(ant->getPos()));
                 auto path = grid.findPath(antPos, getWorld().mouseToGridCoord());
 
                 const int tileSize = grid.getTileSize();
@@ -61,43 +68,27 @@ public:
         }
 
         Grid &grid = getWorld().getGrid();
-        Vec2i startPos(90, 160);
         Vec2i goalPos(73, 0);
 
         bool all_done = true;
         double total_fitness = 0.0;
 
-        for (size_t i = 0; i < ants.size(); ++i) {
-            auto &ant = ants[i];
-            if (ant.expired())
+        for (auto &ant : ants) {
+            if (!ant || !ant->canAct()) 
                 continue;
 
-            auto locked_ant = ant.lock();
-            Vec2i antPos = grid.toTileCoord((Vec2f)(locked_ant->getPos()));
-
-            // Calculer le nombre maximal d'actions
-            auto path = grid.findPath(startPos, goalPos);
-            double path_length = static_cast<double>(path.size());
-            int max_steps = static_cast<int>(path_length * 1.5);
-
-            // Vérifier si la fourmi peut encore effectuer des actions
-            if (steps_count[i] < max_steps) {
-                auto inputs = get_game_state_lab(antPos, goalPos, grid);
-                auto outputs = locked_ant->getNetwork().activate(inputs);
-                perform_action_lab(outputs, *locked_ant);
-                steps_count[i]++;
-                all_done = false; // Au moins une fourmi n'a pas fini
-            }
-
-            // Évaluer la fitness après les étapes
-            if (steps_count[i] == max_steps) {
-                double fitness = compute_fitness.evaluate_lab(antPos, goalPos, grid, *locked_ant);
-                total_fitness += fitness;
-            }
+            ant->act(grid);
+            all_done = false; // Au moins une fourmi n'a pas fini
         }
 
         if (all_done) {
             // Calcul de la fitness moyenne
+            for (auto &ant : ants) {
+                double fitness = compute_fitness.evaluate_lab(
+                    grid.toTileCoord(ant->getPos()), goalPos, grid, *ant);
+                total_fitness += fitness;
+            }
+
             double avg_fitness = total_fitness / ants.size();
             avg_fitness_per_gen.push_back(avg_fitness);
 
@@ -106,19 +97,17 @@ public:
 
             // Remplacement par la nouvelle génération
             std::vector<std::shared_ptr<Genome>> genomes;
-            for (const auto &ant : ants) {
-                if (!ant.expired()) {
-                    genomes.push_back(std::make_shared<Genome>(ant.lock()->getGenome()));
-                }
+            for (auto &ant : ants) {
+                genomes.push_back(std::make_shared<Genome>(ant->getGenome()));
             }
 
             auto new_genomes = mPop.reproduce_from_genomes(genomes);
             ants.clear();
-            steps_count.clear();
 
             for (auto &genome : new_genomes) {
-                ants.push_back(getWorld().spawnEntity<AntIA>(*genome.genome));
-                steps_count.push_back(0); // Réinitialiser les compteurs d'étapes
+                auto path = grid.findPath(Vec2i(0, 0), goalPos);
+                int max_steps = static_cast<int>(path.size() * 1.5);
+                ants.push_back(getWorld().spawnEntity<AntIALab>(*genome.genome, goalPos, max_steps));
             }
 
             current_generation++;

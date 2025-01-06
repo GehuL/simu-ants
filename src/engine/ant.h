@@ -7,6 +7,7 @@
 #include "types.h"
 #include "entity.h"
 #include "tiles.h"
+#include "../NEAT/Utils.h"
 
 #include "../NEAT/Genome.h"
 #include "../NEAT/NeuralNetwork.h"
@@ -103,6 +104,29 @@ namespace simu
             Genome m_genome;
             FeedForwardNeuralNetwork m_network;
     };
+
+    class AntIALab : public AntIA {
+    int steps_count;  // Compteur d'étapes
+    int max_steps;    // Nombre maximal d'étapes autorisées
+    simu::Vec2i goalPos;
+
+public:
+    AntIALab(const Genome &genome, simu::Vec2i goal, int max_steps)
+        : simu::AntIA(genome), goalPos(goal), max_steps(max_steps), steps_count(0) {}
+
+    bool canAct() const {
+        return steps_count < max_steps;
+    }
+
+    void act(simu::Grid &grid) {
+        if (canAct()) {
+            auto inputs = simu::get_game_state_lab(getPos(), goalPos, grid);
+            auto outputs = getNetwork().activate(inputs);
+            simu::perform_action_lab(outputs, *this);
+            steps_count++;
+        }
+    }
+};
 
     class Test: public Entity
     {

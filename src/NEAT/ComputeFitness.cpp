@@ -84,44 +84,24 @@ double ComputeFitness::evaluate_rpc(const Genome &genome, int ant_id) const {
     return static_cast<double>(wins) / rounds;
 }
 
-double ComputeFitness::evaluate_lab( const Vec2i &startPos, const Vec2i &goalPos, Grid &grid,AntIA &ant)  {
-    FeedForwardNeuralNetwork network = ant.getNetwork();
+double ComputeFitness::evaluate_lab(const Vec2i &startPos, const Vec2i &goalPos, Grid &grid, AntIA &ant) {
+    // Distance initiale entre la position de départ et l'objectif
+    double initial_distance = static_cast<double>(grid.findPath(startPos, goalPos).size());
 
-    Vec2i antPos = startPos;
-    double initial_distance = static_cast<double>(grid.findPath(startPos, goalPos).size()); // Distance initiale avec A*
-    double fitness = 0.0;
+    // Distance actuelle après que la fourmi ait exécuté ses actions
+    Vec2i antPos = ant.getPos();
+    double current_distance = static_cast<double>(grid.findPath(antPos, goalPos).size());
 
-    const int max_steps = 100;  // Limite de mouvements qu'on pourra remplacer par autre chose 
-    for (int step = 0; step < max_steps; ++step) {
-        // Obtenir l'état actuel du jeu
-        auto inputs = get_game_state_lab(antPos, goalPos, grid);
+    // Voeu Gehul :
+    double fitness = initial_distance - current_distance;
 
-        // Calculer la sortie du réseau neuronal
-        auto outputs = network.activate(inputs);
-
-        // Effectuer l'action
-        
-        perform_action_lab(outputs, ant);
-
-        // Mettre à jour la position
-        antPos = ant.getPos();
-
-        // Calculer la distance actuelle (via A*)
-        double current_distance = static_cast<double>(grid.findPath(antPos, goalPos).size());
-
-        // Score basé sur la réduction de la distance (Comme ce que tu voulais)
-        fitness += (initial_distance - current_distance);
-
-        // Terminer si la fourmi atteint la sortie
-        if (antPos == goalPos) {
-            fitness += 10000.0;  // Bonus pour atteindre la sortie (Comme Sergey)
-            break;
-        }
+    // Voeu Sergey : Ajouter une récompense supplémentaire si la fourmi atteint l'objectif
+    if (antPos == goalPos) {
+        fitness += 10000.0;
     }
 
-    // Pénalité pour les mouvements inutiles
-    fitness -= 0.1 * max_steps;
-
-    return fitness > 0 ? fitness : 0.0;  // Éviter les valeurs négatives
+    // Retourner la fitness finale, en s'assurant qu'elle n'est pas négative
+    return fitness > 0 ? fitness : 0.0;
 }
+
 

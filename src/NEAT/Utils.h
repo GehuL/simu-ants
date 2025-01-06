@@ -6,6 +6,8 @@
 #include <string>
 #include "Genome.h"  // Inclure la définition de Genome
 
+
+
 /**
  * @brief Sauvegarde un génome dans un fichier.
  * 
