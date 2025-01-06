@@ -84,7 +84,7 @@ double ComputeFitness::evaluate_rpc(const Genome &genome, int ant_id) const {
     return static_cast<double>(wins) / rounds;
 }
 
-double ComputeFitness::evaluate_lab(const Genome &genome, const Vec2i &startPos, const Vec2i &goalPos, Grid &grid) const {
+double ComputeFitness::evaluate_lab(const Genome &genome, const Vec2i &startPos, const Vec2i &goalPos, Grid &grid)  {
     FeedForwardNeuralNetwork network = FeedForwardNeuralNetwork::create_from_genome(genome);
 
     Vec2i antPos = startPos;

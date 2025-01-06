@@ -16,7 +16,6 @@ class Scene : public WorldListener {
 
     int m_count = 0;
     const int num_generations = 10; // Nombre total de générations
-    const int num_steps = 100;      // Nombre d'actions maximales par fourmi
     const int num_ants = 10;        // Nombre de fourmis par génération
     int current_generation = 0;
 
@@ -61,14 +60,12 @@ public:
             return;
         }
 
-        if (m_count++ < num_steps)
-            return;
-
-        m_count = 0;
+        
 
         // Pour les calculs de fitness
         Grid &grid = getWorld().getGrid();
-        Vec2i goalPos = getWorld().mouseToGridCoord(); 
+        Vec2i goalPos(73, 0);
+
 
         std::vector<std::shared_ptr<Genome>> genomes;
         double total_fitness = 0.0;
@@ -101,7 +98,9 @@ public:
         ants.clear();
 
         for (auto &genome : new_genomes) {
-            ants.push_back(getWorld().spawnEntity<AntIA>(*genome.get()));
+            ants.push_back(getWorld().spawnEntity<AntIA>(*genome));//De ce que j'ai compris c'est censé être automatique la gestion d'id de fourmi non ?
+
+
         }
 
         current_generation++;

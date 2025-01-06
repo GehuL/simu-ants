@@ -46,7 +46,7 @@ void default_perform_action(const std::vector<double> &actions, int ant_id);
 
 void perform_action_rpc(const std::vector<double> &actions, int ant_id);
 
-std::vector<double> get_game_state_lab(const simu::Vec2i &antPos, const simu::Vec2i &goalPos, const simu::Grid &grid);
+std::vector<double> get_game_state_lab(const simu::Vec2i &antPos, const simu::Vec2i &goalPos,  simu::Grid &grid);
 
 void perform_action_lab(const std::vector<double> &actions, simu::Ant &ant);
 

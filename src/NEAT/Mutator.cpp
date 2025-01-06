@@ -5,6 +5,7 @@
 #include "RNG.h"
 #include <iostream>
 #include <functional>
+#include <algorithm>
 
 
 void Mutator::mutate(Genome &genome, const NeatConfig &config, RNG &rng) {

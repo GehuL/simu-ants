@@ -166,7 +166,7 @@ void perform_action_rpc(const std::vector<double> &actions, int ant_id) {
               << std::endl;
 }
 
-std::vector<double> get_game_state_lab(const Vec2i &antPos, const Vec2i &goalPos, const Grid &grid) {
+std::vector<double> get_game_state_lab(const Vec2i &antPos, const Vec2i &goalPos,  Grid &grid) {
     std::vector<double> state;
 
     // Position actuelle de la fourmi
