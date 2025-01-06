@@ -88,6 +88,7 @@ namespace simu
 
             const char* getType() const override { return "antIA"; };
             const Genome& getGenome() { return m_genome; };
+            const FeedForwardNeuralNetwork& getNetwork() { return m_network; };
 
             static constexpr int inputCount() { return 3; } ;
             static constexpr int outputCount() { return 2; };

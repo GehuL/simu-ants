@@ -80,7 +80,7 @@ public:
             auto genome = std::make_shared<Genome>(locked_ant->getGenome());
 
             // Évaluation de la fitness ainsi que les actions de la fourmi vu que tout est encapsulé dans la fonction
-            double fitness = compute_fitness.evaluate_lab(*genome, antPos, goalPos, grid);
+            double fitness = compute_fitness.evaluate_lab(antPos, goalPos, grid,*locked_ant);
             total_fitness += fitness;
 
             genomes.push_back(genome);
@@ -98,7 +98,7 @@ public:
         ants.clear();
 
         for (auto &genome : new_genomes) {
-            ants.push_back(getWorld().spawnEntity<AntIA>(*genome));//De ce que j'ai compris c'est censé être automatique la gestion d'id de fourmi non ?
+            ants.push_back(getWorld().spawnEntity<AntIA>(*genome.genome));//De ce que j'ai compris c'est censé être automatique la gestion d'id de fourmi non ?
 
 
         }

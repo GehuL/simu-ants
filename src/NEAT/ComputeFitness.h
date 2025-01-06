@@ -5,6 +5,7 @@
     #include "Genome.h"  // Inclure la définition du Genome
     #include "../engine/tiles.h"  
     #include "../engine/types.h"
+    #include "../engine/ant.h"
 
     class ComputeFitness {
     public:
@@ -19,7 +20,7 @@
 
         double evaluate_rpc(const Genome &genome, int ant_id) const;
 
-        double evaluate_lab(const Genome &genome, const simu::Vec2i &startPos, const simu::Vec2i &goalPos, simu::Grid &grid) ;
+        double evaluate_lab( const simu::Vec2i &startPos, const simu::Vec2i &goalPos, simu::Grid &grid,simu::AntIA &ant) ;
         
 
     private:

@@ -84,8 +84,8 @@ double ComputeFitness::evaluate_rpc(const Genome &genome, int ant_id) const {
     return static_cast<double>(wins) / rounds;
 }
 
-double ComputeFitness::evaluate_lab(const Genome &genome, const Vec2i &startPos, const Vec2i &goalPos, Grid &grid)  {
-    FeedForwardNeuralNetwork network = FeedForwardNeuralNetwork::create_from_genome(genome);
+double ComputeFitness::evaluate_lab( const Vec2i &startPos, const Vec2i &goalPos, Grid &grid,AntIA &ant)  {
+    FeedForwardNeuralNetwork network = ant.getNetwork();
 
     Vec2i antPos = startPos;
     double initial_distance = static_cast<double>(grid.findPath(startPos, goalPos).size()); // Distance initiale avec A*
@@ -100,7 +100,7 @@ double ComputeFitness::evaluate_lab(const Genome &genome, const Vec2i &startPos,
         auto outputs = network.activate(inputs);
 
         // Effectuer l'action
-        Ant ant(antPos);  // Créer une fourmi temporaire pour tester les mouvements,genre je pense que c'est comme ça que font les gens qui teste des ia sur des jeux au loieu d'avoir plusieurs objets en déplacements ?
+        
         perform_action_lab(outputs, ant);
 
         // Mettre à jour la position
