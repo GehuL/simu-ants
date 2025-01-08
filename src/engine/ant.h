@@ -92,7 +92,7 @@ namespace simu
             const FeedForwardNeuralNetwork& getNetwork() { return m_network; };
 
             static constexpr int inputCount() { return 3; } ;
-            static constexpr int outputCount() { return 2; };
+            static constexpr int outputCount() { return 4; };
 
             void update() override;
             void save(json& json) const override;
@@ -117,6 +117,12 @@ public:
 
     bool canAct() const {
         return steps_count < max_steps;
+    }
+
+    void update() override
+    {
+    
+    
     }
 
     void act(simu::Grid &grid) {

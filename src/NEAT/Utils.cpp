@@ -166,17 +166,21 @@ void perform_action_rpc(const std::vector<double> &actions, int ant_id) {
               << std::endl;
 }
 
-std::vector<double> get_game_state_lab(const Vec2i &antPos, const Vec2i &goalPos,  Grid &grid) {
+std::vector<double> get_game_state_lab(const Vec2i &antPos,   Grid &grid) {
     std::vector<double> state;
 
     // Position actuelle de la fourmi
     state.push_back(static_cast<double>(antPos.x));
     state.push_back(static_cast<double>(antPos.y));
 
+/*
     // Distance via A* entre la fourmi et l'obj final
     auto path = grid.findPath(antPos, goalPos);  //Je crois que c'est ça la syntaxe
     double path_length = static_cast<double>(path.size()); // Taille du chemin trouvé normalement ?
     state.push_back(path_length);
+
+*/
+
 
 /*
     // Obstacles environnants (haut, bas, gauche, droite) qu'on peut rajouter en entrée genre la fourmi voit que devant elle y'a un mur ce qui peut peut être retirer une option de mouvemet à force ?
@@ -185,7 +189,7 @@ std::vector<double> get_game_state_lab(const Vec2i &antPos, const Vec2i &goalPos
     state.push_back(grid.isWalkable(antPos.x, antPos.y + 1) ? 1.0 : 0.0); // Nord
     state.push_back(grid.isWalkable(antPos.x, antPos.y - 1) ? 1.0 : 0.0); // Sud
 */
-
+    
     return state;
 }
 

@@ -32,13 +32,22 @@ public:
 
     void onInit() override {
         getWorld().getGrid().fromImage("rsc/maze.png");
+        Vec2i startPos(90, 160);
+    Vec2i goalPos(73, 0);
         ants = getWorld().spawnEntities<AntIA>(num_ants);
+        for (const auto &ant : ants) {
+            if (ant.expired())
+                continue;
+
+            auto locked_ant = ant.lock();
+            locked_ant->setPos(getWorld().gridToWorld(startPos));
+        }
+        
         steps_count.resize(num_ants, 0); // Initialiser les compteurs d'étapes
 
         // Calculer le nombre maximal d'actions
         Grid &grid = getWorld().getGrid();
-        Vec2i startPos(90, 160);
-        Vec2i goalPos(73, 0);
+        
         auto path = grid.findPath(startPos, goalPos);
         double path_length = static_cast<double>(path.size());
         max_steps = static_cast<int>(path_length * 1.5);
@@ -74,11 +83,11 @@ public:
         }
 
         Grid &grid = getWorld().getGrid();
-        Vec2i startPos(90, 160);
-        Vec2i goalPos(73, 0);
 
         bool all_done = true;
         double total_fitness = 0.0;
+        Vec2i startPos(90, 160);
+        Vec2i goalPos(73, 0);
 
         for (size_t i = 0; i < ants.size(); ++i) {
             auto &ant = ants[i];
@@ -90,15 +99,17 @@ public:
 
             // Vérifier si la fourmi peut encore effectuer des actions
             if (steps_count[i] < max_steps) {
-                auto inputs = get_game_state_lab(antPos, goalPos, grid);
+                /*
+                auto inputs = get_game_state_lab(antPos,  grid);
+                std::cout << "Activation du réseau de neurones avec " << inputs.size() << " entrées." << std::endl;
                 auto outputs = const_cast<FeedForwardNeuralNetwork&>(locked_ant->getNetwork()).activate(inputs);
 
                 perform_action_lab(outputs, *locked_ant);
 
                  // Ajout des logs pour suivre les actions des fourmis
-                //int direction = std::distance(outputs.begin(), std::max_element(outputs.begin(), outputs.end()));
-                //std::cout << "Fourmi " << i << " action: " << direction << std::endl;
-
+                int direction = std::distance(outputs.begin(), std::max_element(outputs.begin(), outputs.end()));
+                std::cout << "Fourmi " << i << " action: " << direction << std::endl;
+*/
                 steps_count[i]++;
                 all_done = false; // Au moins une fourmi n'a pas fini
 
@@ -135,7 +146,15 @@ public:
 
             for (auto &genome : new_genomes) {
                 ants.push_back(getWorld().spawnEntity<AntIA>(*genome.genome));
+                for (const auto &ant : ants) {
+            if (ant.expired())
+                continue;
+
+            auto locked_ant = ant.lock();
+            locked_ant->setPos(getWorld().gridToWorld(startPos));
+        }
                 steps_count.push_back(0); // Réinitialiser les compteurs d'étapes
+
             }
 
             current_generation++;
