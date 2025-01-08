@@ -1,5 +1,5 @@
-#ifndef __OTHERS_H__
-#define __OTHERS_H__
+#ifndef __TYPES_H__
+#define __TYPES_H__
 
 #include "raylib.h"
 

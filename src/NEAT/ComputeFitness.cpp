@@ -84,18 +84,15 @@ double ComputeFitness::evaluate_rpc(const Genome &genome, int ant_id) const {
     return static_cast<double>(wins) / rounds;
 }
 
-double ComputeFitness::evaluate_lab(const Vec2i &startPos, const Vec2i &goalPos, Grid &grid, AntIA &ant) {
-    // Distance initiale entre la position de départ et l'objectif
-    double initial_distance = static_cast<double>(grid.findPath(startPos, goalPos).size());
-
+double ComputeFitness::evaluate_lab(const simu::Vec2i &startPos, const simu::Vec2i &goalPos, simu::Grid &grid, simu::AntIA &ant, double initial_distance) {
     // Distance actuelle après que la fourmi ait exécuté ses actions
     Vec2i antPos = ant.getPos();
     double current_distance = static_cast<double>(grid.findPath(antPos, goalPos).size());
 
-    // Voeu Gehul :
+    // Calcul de la fitness
     double fitness = initial_distance - current_distance;
 
-    // Voeu Sergey : Ajouter une récompense supplémentaire si la fourmi atteint l'objectif
+    // Ajouter une récompense supplémentaire si la fourmi atteint l'objectif
     if (antPos == goalPos) {
         fitness += 10000.0;
     }
@@ -103,5 +100,6 @@ double ComputeFitness::evaluate_lab(const Vec2i &startPos, const Vec2i &goalPos,
     // Retourner la fitness finale, en s'assurant qu'elle n'est pas négative
     return fitness > 0 ? fitness : 0.0;
 }
+
 
 

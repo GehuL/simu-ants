@@ -105,6 +105,7 @@ namespace simu
             FeedForwardNeuralNetwork m_network;
     };
 
+/*
     class AntIALab : public AntIA {
     int steps_count;  // Compteur d'étapes
     int max_steps;    // Nombre maximal d'étapes autorisées
@@ -127,6 +128,7 @@ public:
         }
     }
 };
+*/
 
     class Test: public Entity
     {

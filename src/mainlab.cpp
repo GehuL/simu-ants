@@ -23,6 +23,9 @@ class Scene : public WorldListener {
 
     std::vector<double> avg_fitness_per_gen; // Suivi des fitness moyennes
     std::vector<int> steps_count;           // Compteur d'étapes par fourmi
+    int max_steps;                          // Nombre maximal d'actions
+    double initial_distance; // Distance initiale pré-calculée
+
 
 public:
     Scene() : mPop((NeatConfig){}, rng), compute_fitness(rng) {}
@@ -31,6 +34,16 @@ public:
         getWorld().getGrid().fromImage("rsc/maze.png");
         ants = getWorld().spawnEntities<AntIA>(num_ants);
         steps_count.resize(num_ants, 0); // Initialiser les compteurs d'étapes
+
+        // Calculer le nombre maximal d'actions
+        Grid &grid = getWorld().getGrid();
+        Vec2i startPos(90, 160);
+        Vec2i goalPos(73, 0);
+        auto path = grid.findPath(startPos, goalPos);
+        double path_length = static_cast<double>(path.size());
+        max_steps = static_cast<int>(path_length * 1.5);
+
+        initial_distance = path_length;
     }
 
     void onUnload() override {}
@@ -75,23 +88,27 @@ public:
             auto locked_ant = ant.lock();
             Vec2i antPos = grid.toTileCoord((Vec2f)(locked_ant->getPos()));
 
-            // Calculer le nombre maximal d'actions
-            auto path = grid.findPath(startPos, goalPos);
-            double path_length = static_cast<double>(path.size());
-            int max_steps = static_cast<int>(path_length * 1.5);
-
             // Vérifier si la fourmi peut encore effectuer des actions
             if (steps_count[i] < max_steps) {
                 auto inputs = get_game_state_lab(antPos, goalPos, grid);
-                auto outputs = locked_ant->getNetwork().activate(inputs);
+                auto outputs = const_cast<FeedForwardNeuralNetwork&>(locked_ant->getNetwork()).activate(inputs);
+
                 perform_action_lab(outputs, *locked_ant);
+
+                 // Ajout des logs pour suivre les actions des fourmis
+                //int direction = std::distance(outputs.begin(), std::max_element(outputs.begin(), outputs.end()));
+                //std::cout << "Fourmi " << i << " action: " << direction << std::endl;
+
                 steps_count[i]++;
                 all_done = false; // Au moins une fourmi n'a pas fini
+
+
             }
 
             // Évaluer la fitness après les étapes
             if (steps_count[i] == max_steps) {
-                double fitness = compute_fitness.evaluate_lab(antPos, goalPos, grid, *locked_ant);
+                double fitness = compute_fitness.evaluate_lab(antPos, goalPos, grid, *locked_ant, initial_distance);
+
                 total_fitness += fitness;
             }
         }

@@ -6,6 +6,11 @@
 #include <string>
 #include "Genome.h"  // Inclure la définition de Genome
 
+using namespace simu;
+namespace simu {
+    class AntIA;
+}
+
 
 
 /**
@@ -50,6 +55,6 @@ void perform_action_rpc(const std::vector<double> &actions, int ant_id);
 
 std::vector<double> get_game_state_lab(const simu::Vec2i &antPos, const simu::Vec2i &goalPos,  simu::Grid &grid);
 
-void perform_action_lab(const std::vector<double> &actions, simu::Ant &ant);
+void perform_action_lab(const std::vector<double> &actions, simu::AntIA &ant);
 
 #endif // UTILS_H

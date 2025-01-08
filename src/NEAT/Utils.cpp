@@ -189,7 +189,7 @@ std::vector<double> get_game_state_lab(const Vec2i &antPos, const Vec2i &goalPos
     return state;
 }
 
-void perform_action_lab(const std::vector<double> &actions, Ant &ant) {
+void perform_action_lab(const std::vector<double> &actions, simu::AntIA &ant) {
     
     int direction = std::distance(actions.begin(), std::max_element(actions.begin(), actions.end()));
 
