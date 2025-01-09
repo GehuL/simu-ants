@@ -5,7 +5,7 @@
 #include <vector>
 #include <memory>
 #include <optional>
-#include <stack>
+#include <unordered_set>
 #include <algorithm>
 #include <array>
 #include <fstream>
@@ -160,19 +160,7 @@ namespace simu
                 return std::vector<std::weak_ptr<Entity>>(m_entities.begin(), m_entities.end());
             }
 
-            void removeEntity(unsigned long id)
-            {
-                if(m_entities.size() < 0)
-                    return;
-
-                auto it = std::lower_bound(m_entities.begin(), m_entities.end(), nullptr, [id](const std::shared_ptr<Entity>& v1, const std::shared_ptr<Entity>& v2) 
-                {
-                    return v1 && v1->getId() < id;
-                });
-
-                if(it != m_entities.end())
-                    m_en_to_remove.push(it);
-            };
+            bool removeEntity(unsigned long id);
 
 >>>>>>> ebba413 (ajout fonction supprimer entitié):src/world.h
             void clearEntities() { m_entities.clear(); };
@@ -227,7 +215,7 @@ namespace simu
 
             std::shared_ptr<WorldListener> m_listener;
 
-            std::stack<std::vector<std::shared_ptr<Entity>>::iterator> m_en_to_remove;
+            std::unordered_set<unsigned long> m_en_to_remove;
             std::vector<std::shared_ptr<Entity>> m_entities;
 
             Grid m_grid;
