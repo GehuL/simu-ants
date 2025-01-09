@@ -5,6 +5,8 @@
 
 #include "world.h"
 
+#include <random> 
+
 using namespace simu;
 
 Ant::Ant(const long id) : Entity(id) {}
@@ -59,8 +61,10 @@ bool Ant::moveForward()
     if(!tile.flags.solid)
     {
         m_pos = newPos;
+        //std::cout << "Nouvelle position : (" << m_pos.x << ", " << m_pos.y << ")" << std::endl;
         return true;
     }
+    //std::cout << "Déplacement bloqué à : (" << newPos.x << ", " << newPos.y << ")" << std::endl;
     return false;
 }
 
@@ -200,10 +204,35 @@ void AntIA::update()
     static_cast<double>(getPos().x),
     static_cast<double>(getPos().y)
     };
+/*
+    std::cout << "Inputs: ";
+for (double input : inputs) {
+    std::cout << input << " ";
+}
+std::cout << std::endl;
+*/
 
     // Activation des sorties
     auto actions = m_network.activate(inputs);
 
+    // Ajouter du bruit aléatoire aux actions
+    std::random_device rd;  // Générateur aléatoire
+    std::mt19937 gen(rd()); // Mersenne Twister
+    std::uniform_real_distribution<> dis(-0.1, 0.1); // Bruit entre -0.1 et 0.1
+
+    for (double &action : actions)
+    {
+        action += dis(gen); // Ajouter un bruit aléatoire
+    }
+
+
+/*
+    std::cout << "Outputs: ";
+for (double action : actions) {
+    std::cout << action << " ";
+}
+std::cout << std::endl;
+*/
     // Décisions
     int direction = std::distance(actions.begin(), std::max_element(actions.begin(), actions.end()));
 
