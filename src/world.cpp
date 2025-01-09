@@ -233,9 +233,25 @@ void World::drawUI()
 void World::updateTick()
 {
     m_grid.update();
-    for(auto& en : m_entities)
+
+    for(size_t i = 0; i < m_entities.size(); i++)
     {
-        en->update();
+        auto en = m_entities[i];
+        if(en != nullptr)
+        {
+            en->update();
+        }
+    }
+
+    // Remove pending entities
+    while(!m_en_to_remove.empty())
+    {
+        const int id = m_en_to_remove.top();
+        std::remove_if(m_entities.begin(), m_entities.end(), [id](auto en){
+
+            return en && en->getId() == id;
+        });
+        m_en_to_remove.pop();
     }
 
     if(m_listener)

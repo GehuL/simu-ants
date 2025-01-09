@@ -51,6 +51,16 @@ class Scene: public WorldListener
                     }
                 }
             }
+
+            if(IsKeyPressed(KEY_SPACE))
+            {
+                // getWorld().clearEntities();
+                 for(auto& en : getWorld().getEntities())
+                {
+                    getWorld().removeEntity(en.lock()->getId());
+                }
+            }
+
         }
 
         void onUnload() override {};

@@ -5,6 +5,7 @@
 #include <vector>
 #include <memory>
 #include <optional>
+#include <stack>
 #include <algorithm>
 #include <array>
 #include <fstream>
@@ -96,7 +97,7 @@ namespace simu
                 CHECK_TEMPLATE_ST(T)
 
                 std::shared_ptr<T> en = std::make_shared<T>(m_entity_cnt, args...);
-
+                
                 m_entities.push_back(en);
                 m_entity_cnt++;
                 
@@ -129,6 +130,25 @@ namespace simu
                 });
                 return it != m_entities.end() ;
             }
+
+            std::vector<std::weak_ptr<Entity>> getEntities()
+            {
+                return std::vector<std::weak_ptr<Entity>>(m_entities.begin(), m_entities.end());
+            }
+
+            void removeEntity(int id)
+            {
+                m_en_to_remove.push(id);
+              /* for(size_t i = 0; i < m_entities.size(); i++)
+                {
+                    auto& en = m_entities[i];
+                    if(en->getId() == id)
+                        en.reset();
+                }
+                */
+            };
+
+            void clearEntities() { m_entities.clear(); };
 
             void setListener(std::shared_ptr<WorldListener> listener)
             {
@@ -179,6 +199,8 @@ namespace simu
             unsigned int m_seed;
 
             std::shared_ptr<WorldListener> m_listener;
+
+            std::stack<int> m_en_to_remove;
             std::vector<std::shared_ptr<Entity>> m_entities;
 
             Grid m_grid;
