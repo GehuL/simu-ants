@@ -246,15 +246,27 @@ void World::updateTick()
     // Remove pending entities
     while(!m_en_to_remove.empty())
     {
-        const int id = m_en_to_remove.top();
-        std::remove_if(m_entities.begin(), m_entities.end(), [id](auto en){
-
-            return en && en->getId() == id;
-        });
+        auto it = m_en_to_remove.top();
         m_en_to_remove.pop();
+        m_entities.erase(it);    
+        // m_entities.erase(
+        //     std::remove_if(m_entities.begin(), m_entities.end(), [id](std::shared_ptr<Entity> en) {
+        //         return en && en->getId() == id;
+        //     }));
     }
 
     if(m_listener)
         m_listener.get()->onUpdate();
+}
+
+bool World::exist(unsigned long id) const
+{
+    if(m_entities.size() < 0)
+        return false;
+
+    return std::binary_search(m_entities.begin(), m_entities.end(), nullptr, [id](const std::shared_ptr<Entity>& v1, const std::shared_ptr<Entity>& v2) 
+    {
+        return v1 && v1->getId() < id;
+    });
 }
 

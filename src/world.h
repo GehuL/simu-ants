@@ -97,7 +97,7 @@ namespace simu
                 CHECK_TEMPLATE_ST(T)
 
                 std::shared_ptr<T> en = std::make_shared<T>(m_entity_cnt, args...);
-                
+
                 m_entities.push_back(en);
                 m_entity_cnt++;
                 
@@ -105,7 +105,7 @@ namespace simu
             };
 
             template<class T, class = TEMPLATE_CONDITION(T)>
-            std::weak_ptr<T> getEntity(long id)
+            std::weak_ptr<T> getEntity(unsigned long id)
             {
                 CHECK_TEMPLATE_ST(T)
 
@@ -122,30 +122,25 @@ namespace simu
                 return ptr;
             };
 
-            bool const exist(long id)
-            {
-                auto it = std::find_if(m_entities.begin(), m_entities.end(), [id](std::shared_ptr<Entity> en)
-                {
-                    return (bool)en && en.get()->getId() == id;
-                });
-                return it != m_entities.end() ;
-            }
+            bool exist(unsigned long id) const;
 
             std::vector<std::weak_ptr<Entity>> getEntities()
             {
                 return std::vector<std::weak_ptr<Entity>>(m_entities.begin(), m_entities.end());
             }
 
-            void removeEntity(int id)
+            void removeEntity(unsigned long id)
             {
-                m_en_to_remove.push(id);
-              /* for(size_t i = 0; i < m_entities.size(); i++)
+                if(m_entities.size() < 0)
+                    return;
+
+                auto it = std::lower_bound(m_entities.begin(), m_entities.end(), nullptr, [id](const std::shared_ptr<Entity>& v1, const std::shared_ptr<Entity>& v2) 
                 {
-                    auto& en = m_entities[i];
-                    if(en->getId() == id)
-                        en.reset();
-                }
-                */
+                    return v1 && v1->getId() < id;
+                });
+
+                if(it != m_entities.end())
+                    m_en_to_remove.push(it);
             };
 
             void clearEntities() { m_entities.clear(); };
@@ -153,7 +148,7 @@ namespace simu
             void setListener(std::shared_ptr<WorldListener> listener)
             {
                 m_listener = listener;
-            }
+            };
 
             Grid& getGrid() { return m_grid; };
             
@@ -195,12 +190,12 @@ namespace simu
             void drawUI() override;
             void updateTick() override;
         
-            long m_entity_cnt;
+            unsigned long m_entity_cnt;
             unsigned int m_seed;
 
             std::shared_ptr<WorldListener> m_listener;
 
-            std::stack<int> m_en_to_remove;
+            std::stack<std::vector<std::shared_ptr<Entity>>::iterator> m_en_to_remove;
             std::vector<std::shared_ptr<Entity>> m_entities;
 
             Grid m_grid;
@@ -228,6 +223,8 @@ namespace simu
     };
 
     inline World& getWorld() { return simu::World::world; };
+
+
 }
 
 #endif

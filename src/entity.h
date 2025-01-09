@@ -46,7 +46,7 @@ namespace simu
             Vector2i getTileFacingPos() const;
             Vector2i getTilePosOn() const;
 
-            const long getId() const { return m_id; };
+            const unsigned long getId() const { return m_id; };
 
             Vec2f getPos() const { return m_pos; };
             Vec2f getVel() const { return m_velocity; };
@@ -57,7 +57,7 @@ namespace simu
             Entity& operator=(const Entity& en);
 
         private:
-            const long m_id;
+            const unsigned long m_id;
         protected:
             Vec2f m_pos = Vector2{0.f, 0.f};
             Vec2f m_velocity = Vector2{0.f, 0.f};

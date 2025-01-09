@@ -212,7 +212,7 @@ void AntIA::update()
 {
     if(m_rotateCd-- <= 0)
     {
-        m_rotateCd = GetRandomValue(30, 100);
+        m_rotateCd = GetRandomValue(1, 100);
 
         static const Vec2i dirs[] = {LEFT, RIGHT, UP, DOWN}; 
         Vec2i dir = dirs[GetRandomValue(0, 4)];
