@@ -97,7 +97,7 @@ namespace simu
                 CHECK_TEMPLATE_ST(T)
 
                 std::shared_ptr<T> en = std::make_shared<T>(m_entity_cnt, args...);
-                
+
                 m_entities.push_back(en);
                 m_entity_cnt++;
                 
@@ -123,11 +123,14 @@ namespace simu
             };
 
             bool exist(unsigned long id) const;
+<<<<<<< HEAD:src/engine/world.h
 
             std::vector<std::weak_ptr<Entity>> getEntities()
             {
                 return std::vector<std::weak_ptr<Entity>>(m_entities.begin(), m_entities.end());
             }
+=======
+>>>>>>> ab17022 (optimisation mangement entite):src/world.h
 
 <<<<<<< HEAD:src/engine/world.h
             /** @brief Supprime une entitié en utilisant l'algo binary search. 
@@ -157,16 +160,18 @@ namespace simu
                 return std::vector<std::weak_ptr<Entity>>(m_entities.begin(), m_entities.end());
             }
 
-            void removeEntity(int id)
+            void removeEntity(unsigned long id)
             {
-                m_en_to_remove.push(id);
-              /* for(size_t i = 0; i < m_entities.size(); i++)
+                if(m_entities.size() < 0)
+                    return;
+
+                auto it = std::lower_bound(m_entities.begin(), m_entities.end(), nullptr, [id](const std::shared_ptr<Entity>& v1, const std::shared_ptr<Entity>& v2) 
                 {
-                    auto& en = m_entities[i];
-                    if(en->getId() == id)
-                        en.reset();
-                }
-                */
+                    return v1 && v1->getId() < id;
+                });
+
+                if(it != m_entities.end())
+                    m_en_to_remove.push(it);
             };
 
 >>>>>>> ebba413 (ajout fonction supprimer entitié):src/world.h
@@ -222,7 +227,7 @@ namespace simu
 
             std::shared_ptr<WorldListener> m_listener;
 
-            std::stack<int> m_en_to_remove;
+            std::stack<std::vector<std::shared_ptr<Entity>>::iterator> m_en_to_remove;
             std::vector<std::shared_ptr<Entity>> m_entities;
 
             Grid m_grid;
