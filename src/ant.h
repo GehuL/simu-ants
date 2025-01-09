@@ -80,11 +80,13 @@ namespace simu
         public:
             AntIA(const long id = -1);
             AntIA(const long id, const AntIA& ant);
-            AntIA(const long id, Vector2f position);
+            AntIA(const long id, Vec2i position);
 
             virtual ~AntIA() {};
 
             const char* getType() const override { return "antIA"; };
+
+            bool move(Vec2i vec);
 
             void update() override;
             void save(json& json) const override;
@@ -93,6 +95,9 @@ namespace simu
             AntIA& operator=(const AntIA& en);
 
         private:
+            int m_rotateCd;
+            Vec2i m_dir;
+            Vec2i m_gridPos;
             // TODO: Ajouter neural network
     };
 

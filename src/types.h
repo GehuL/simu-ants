@@ -62,6 +62,11 @@ namespace simu
 
     typedef Vec2<int> Vector2i, Vec2i;
     typedef Vec2<float> Vector2f, Vec2f;
+
+    const Vec2i LEFT(-1, 0);
+    const Vec2i RIGHT(1, 0);
+    const Vec2i UP(0, -1);
+    const Vec2i DOWN(0, 1);
     
     // Fonction optimisé pour retiré un élément d'une liste (l'ordre des éléments n'est pas respecté)
     // source: https://dev.to/dinhluanbmt/c-deleteerase-item-from-vector-in-o1-time-3okb

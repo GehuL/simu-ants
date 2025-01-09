@@ -186,7 +186,7 @@ DemoAnt& DemoAnt::operator=(const DemoAnt& ant)
 // ==================[ANT IA]==================
 AntIA::AntIA(const long id) : Ant(id) {}
 AntIA::AntIA(const long id, const AntIA& ant) : Ant(id, ant) {}
-AntIA::AntIA(const long id, Vector2f position): Ant(id, position) {}
+AntIA::AntIA(const long id, Vec2i position): Ant(id), m_gridPos(position) {}
 
 void AntIA::save(json &json) const
 {
@@ -194,8 +194,35 @@ void AntIA::save(json &json) const
     // TODO: Save genome
 }
 
+bool AntIA::move(Vec2i dir)
+{
+    Vec2i newPos = m_gridPos + dir;
+    Tile tile = getWorld().getGrid().getTile(newPos);
+
+    if(!tile.flags.solid)
+    {
+        m_gridPos = newPos;
+        m_pos = getWorld().gridToWorld(newPos);
+        return true;
+    }
+    return false;
+}
+
 void AntIA::update()
 {
+    if(m_rotateCd-- <= 0)
+    {
+        m_rotateCd = GetRandomValue(30, 100);
+
+        static const Vec2i dirs[] = {LEFT, RIGHT, UP, DOWN}; 
+        Vec2i dir = dirs[GetRandomValue(0, 4)];
+        m_dir = dir;
+    }
+
+    if(!move(m_dir))
+        m_rotateCd = 0;
+
+    pheromone(); 
     // TODO: Activate neurones
 }
 
