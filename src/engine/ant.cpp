@@ -180,7 +180,7 @@ DemoAnt& DemoAnt::operator=(const DemoAnt& ant)
 // ==================[ANT IA]==================
 RNG gRng;
 
-AntIA::AntIA(const long id) : Ant(id), m_genome(Genome::create_genome(0, 3, 4, 3, gRng)), m_network(FeedForwardNeuralNetwork::create_from_genome(m_genome)) {}
+AntIA::AntIA(const long id) : Ant(id), m_genome(Genome::create_genome(0, 5, 4, 3, gRng)), m_network(FeedForwardNeuralNetwork::create_from_genome(m_genome)) {}
 AntIA::AntIA(const long id, const AntIA& ant) : Ant(id, ant), m_network(ant.m_network), m_genome(ant.m_genome) {}
 AntIA::AntIA(const long id, const Genome genome) : Ant(id), m_genome(genome), m_network(FeedForwardNeuralNetwork::create_from_genome(genome)) {}
 
@@ -196,7 +196,10 @@ void AntIA::update()
     const std::vector<double> inputs = {
     static_cast<double>(getAngle()), 
     static_cast<double>(getTileOn().type), 
-    static_cast<double>(getTileFacing().type)};
+    static_cast<double>(getTileFacing().type),
+    static_cast<double>(getPos().x),
+    static_cast<double>(getPos().y)
+    };
 
     // Activation des sorties
     auto actions = m_network.activate(inputs);
@@ -204,7 +207,7 @@ void AntIA::update()
     // Décisions
     int direction = std::distance(actions.begin(), std::max_element(actions.begin(), actions.end()));
 
-    std::cout << "Ant " << getId() << " action: " << direction << std::endl;
+    //std::cout << "Ant " << getId() << " action: " << direction << std::endl;
 
 
     switch (direction) {
