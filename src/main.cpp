@@ -36,6 +36,20 @@ class Scene: public WorldListener
                     genomes.push_back(genome);
                 }
             }
+<<<<<<< HEAD
+=======
+
+            if(IsKeyPressed(KEY_SPACE))
+            {
+                // getWorld().clearEntities();
+                 for(auto& en : getWorld().getEntities())
+                {
+                    getWorld().removeEntity(en.lock()->getId());
+                }
+            }
+
+        }
+>>>>>>> ebba413 (ajout fonction supprimer entitié)
 
             m_ants.clear();
             auto newlies = mPop.reproduce_from_genomes(genomes);
