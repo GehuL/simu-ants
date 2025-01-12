@@ -5,7 +5,6 @@
 #include <vector>
 #include <memory>
 #include <optional>
-#include <unordered_set>
 #include <algorithm>
 #include <array>
 #include <fstream>
@@ -129,7 +128,26 @@ namespace simu
                 return std::vector<std::weak_ptr<Entity>>(m_entities.begin(), m_entities.end());
             }
 
+            /** @brief Supprime une entitié en utilisant l'algo binary search. 
+             *  @param id L'ID de l'entité.
+             *  @return Renvoie vrai si l'entité à été supprimé et que l'ID existe.
+             * 
+             *  @warning A ne pas utiliser dans un update d'une entitié. 
+             */
             bool removeEntity(unsigned long id);
+
+            /** @brief Supprime toutes les entités fournis en paramètres.
+             *  @param beg Début de la liste
+             *  @param end Fin de la lite
+             *  @example std::vector<std::weak_ptr<Ant>> en; \
+             *  getWorld().removeEntities(en.begin(), en.end())
+             */
+            template<typename T>
+            void removeEntities(T beg, T end)
+            {
+                for(auto it = beg; it != end; it++)
+                    if(auto sp = it->lock()) removeEntity(sp->getId());
+            }
 
             void clearEntities() { m_entities.clear(); };
 
@@ -182,8 +200,6 @@ namespace simu
             unsigned int m_seed;
 
             std::shared_ptr<WorldListener> m_listener;
-
-            std::unordered_set<unsigned long> m_en_to_remove;
             std::vector<std::shared_ptr<Entity>> m_entities;
 
             Grid m_grid;

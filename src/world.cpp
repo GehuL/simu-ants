@@ -243,23 +243,6 @@ void World::updateTick()
         }
     }
 
-    // Remove pending entities
-    while(!m_en_to_remove.empty())
-    {
-        auto id = *m_en_to_remove.begin();
-        m_en_to_remove.erase(id);
-
-        auto it = std::lower_bound(m_entities.begin(), m_entities.end(), nullptr, [id](const std::shared_ptr<Entity>& v1, const std::shared_ptr<Entity>& v2) 
-        {
-            return v1 && v1->getId() < id;
-        });
-
-        if(it != m_entities.end())
-        {
-            m_entities.erase(it);    
-        }
-    }
-
     if(m_listener)
         m_listener.get()->onUpdate();
 }
@@ -279,7 +262,12 @@ bool World::removeEntity(unsigned long id)
 {
     if(m_entities.size() < 1)
         return false;
-    m_en_to_remove.insert(id);
-    return true;
-}
 
+    auto it = std::lower_bound(m_entities.begin(), m_entities.end(), nullptr, [id](const auto& v1, const auto& v2) {
+        return v1->getId() < id;
+    });
+
+    m_entities.erase(it);
+
+    return it != m_entities.end();
+}
