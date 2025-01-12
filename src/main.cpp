@@ -42,10 +42,11 @@ class Scene: public WorldListener
             if(IsKeyPressed(KEY_SPACE))
             {
                 // getWorld().clearEntities();
-                 for(auto& en : getWorld().getEntities())
-                {
-                    getWorld().removeEntity(en.lock()->getId());
-                }
+                //  for(auto& en : getWorld().getEntities())
+                // {
+                //     getWorld().removeEntity(en.lock()->getId());
+                // }
+                getWorld().removeEntities(ants.begin(), ants.end());
             }
 
         }

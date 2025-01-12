@@ -5,7 +5,6 @@
 #include <vector>
 #include <memory>
 #include <optional>
-#include <unordered_set>
 #include <algorithm>
 #include <array>
 #include <fstream>
@@ -123,16 +122,21 @@ namespace simu
             };
 
             bool exist(unsigned long id) const;
-<<<<<<< HEAD:src/engine/world.h
 
+            /** @brief Supprime une entitié en utilisant l'algo binary search. 
+             *  @param id L'ID de l'entité.
+             *  @return Renvoie vrai si l'entité à été supprimé et que l'ID existe.
+             * 
+             *  @warning A ne pas utiliser dans un update d'une entitié. 
+             */
+            bool removeEntity(unsigned long id);
+
+        
             std::vector<std::weak_ptr<Entity>> getEntities()
             {
                 return std::vector<std::weak_ptr<Entity>>(m_entities.begin(), m_entities.end());
             }
-=======
->>>>>>> ab17022 (optimisation mangement entite):src/world.h
 
-<<<<<<< HEAD:src/engine/world.h
             /** @brief Supprime une entitié en utilisant l'algo binary search. 
              *  @param id L'ID de l'entité.
              *  @return Renvoie vrai si l'entité à été supprimé et que l'ID existe.
@@ -154,15 +158,6 @@ namespace simu
                     if(auto sp = it->lock()) removeEntity(sp->getId());
             }
 
-=======
-            std::vector<std::weak_ptr<Entity>> getEntities()
-            {
-                return std::vector<std::weak_ptr<Entity>>(m_entities.begin(), m_entities.end());
-            }
-
-            bool removeEntity(unsigned long id);
-
->>>>>>> ebba413 (ajout fonction supprimer entitié):src/world.h
             void clearEntities() { m_entities.clear(); };
 
             void setListener(std::shared_ptr<WorldListener> listener)
@@ -214,8 +209,6 @@ namespace simu
             unsigned int m_seed;
 
             std::shared_ptr<WorldListener> m_listener;
-
-            std::unordered_set<unsigned long> m_en_to_remove;
             std::vector<std::shared_ptr<Entity>> m_entities;
 
             Grid m_grid;
