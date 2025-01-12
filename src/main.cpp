@@ -5,7 +5,7 @@ using namespace simu;
 
 class Scene: public WorldListener
 {
-    std::vector<std::weak_ptr<AntIA>> ants;
+    std::vector<std::weak_ptr<DemoAnt>> ants;
 
     public:
         void onInit() override
@@ -25,7 +25,7 @@ class Scene: public WorldListener
             for(Vec2i tile : path)
                 grid.setTile(FOOD, tile.x, tile.y);*/
 
-            ants = getWorld().spawnEntities<AntIA>(10, Vec2i{89, 161});
+            ants = getWorld().spawnEntities<DemoAnt>(1000, getWorld().gridToWorld(Vec2i{89, 161}));
         };
 
         void onDraw() override
@@ -60,6 +60,7 @@ class Scene: public WorldListener
                 //     getWorld().removeEntity(en.lock()->getId());
                 // }
                 getWorld().removeEntities(ants.begin(), ants.end());
+                // getWorld().clearEntities();
             }
 
         }

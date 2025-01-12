@@ -56,6 +56,8 @@ namespace simu
             int m_lastFrameCounter;
             int m_lastTickCounter;
 
+            double m_averageTickLoad;
+
             bool m_noDelay;
 
             bool m_pause;

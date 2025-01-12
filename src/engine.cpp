@@ -23,6 +23,9 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
     int tickCounter = 0;
     int frameCounter = 0;
 
+    double tickSumLoad = 0;
+    int tickCounterLoad = 0;
+
     InitWindow(screenWidth, screenHeight, title.c_str());
     SetWindowState(FLAG_WINDOW_RESIZABLE);
     
@@ -54,6 +57,9 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
                 if(m_noDelay) 
                     break;
             }
+
+           tickSumLoad += GetTime() - lastUpdateTime; // Combien de temps à pris un tick
+           tickCounterLoad++;
         }
 
         // lastDrawTime += lag;
@@ -110,6 +116,10 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
 
             m_lastTickCounter = tickCounter;
             tickCounter = 0;
+
+            m_averageTickLoad = tickSumLoad / tickCounterLoad; 
+            tickSumLoad = 0;
+            tickCounterLoad = 0;
         }
     
         double delta = GetTime() - start;
@@ -145,12 +155,7 @@ void Engine::setFPS(float fps)
 void Engine::setTPS(float tps)
 {
     // Si fps = 0, m_tickPeriod = infinite
-    m_noDelay = false;
-    if(tps >= 1000)
-    {
-        m_noDelay = true;
-        tps = 999999999;
-    }else if(tps <= 0)
+    if(tps <= 0)
     {
         setPause(true);
         tps = 1;
@@ -201,7 +206,12 @@ void Engine::updateUI()
 
     drawUI();
     
-    DrawText(TextFormat("%d FPS\n%d TPS", m_lastFrameCounter, m_lastTickCounter), 5, 0, 20, GREEN);
+    DrawText(TextFormat("%d FPS\n%d TPS\nTick load: %d/%d ms (%.1f%%)", 
+    m_lastFrameCounter, 
+    m_lastTickCounter, 
+    static_cast<int>(m_averageTickLoad * 1000), 
+    static_cast<int>(m_tickPeriod * 1000) ,
+    100 * m_averageTickLoad / m_tickPeriod), 5, 0, 20, GREEN);
 
     if(m_pause)
     {
@@ -215,11 +225,19 @@ void Engine::updateUI()
     GuiSlider((Rectangle){ GetScreenWidth() / 2.f - 100.f, GetScreenHeight() - 20.f, 200, 16 }, TextFormat("FPS %d", static_cast<int>(framePerSecond)), "100%", &framePerSecond, 1, 300);
     GuiSlider((Rectangle){ GetScreenWidth() / 2.f - 100.f, GetScreenHeight() - 50.f, 200, 16 }, TextFormat("TPS %d", static_cast<int>(tickPerSecond)), "100%", &tickPerSecond, 0, 1000);
     
-    if(static_cast<int>(framePerSecond) != getFPS())
+    if(static_cast<int>(framePerSecond) != getFPS()) {
         setFPS(framePerSecond);
+    }
 
-    if(static_cast<int>(tickPerSecond) != getTPS())
+    if(static_cast<int>(tickPerSecond) != getTPS()) {
         setTPS(tickPerSecond);
+    }
     
+    bool lastStateNoDelay = m_noDelay;
+    GuiCheckBox((Rectangle){ GetScreenWidth() / 2.f + 150, GetScreenHeight() - 50.f, 16, 16 }, "No limit", &m_noDelay);
+    if(m_noDelay && !lastStateNoDelay) {
+        setTPS(99999999);
+    }
+
     EndTextureMode();
 }
