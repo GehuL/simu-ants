@@ -9,7 +9,7 @@ RNG rng;
 
 class Scene: public WorldListener
 {
-    std::vector<std::weak_ptr<DemoAnt>> ants;
+    std::vector<std::weak_ptr<AntIA>> ants;
 
     public:
         Scene(): mPop((NeatConfig) {}, rng) {};
