@@ -233,12 +233,41 @@ void World::drawUI()
 void World::updateTick()
 {
     m_grid.update();
-    for(auto& en : m_entities)
+
+    for(size_t i = 0; i < m_entities.size(); i++)
     {
-        en->update();
+        auto en = m_entities[i];
+        if(en != nullptr)
+        {
+            en->update();
+        }
     }
 
     if(m_listener)
         m_listener.get()->onUpdate();
 }
 
+bool World::exist(unsigned long id) const
+{
+    if(m_entities.size() < 0)
+        return false;
+
+    return std::binary_search(m_entities.begin(), m_entities.end(), nullptr, [id](const std::shared_ptr<Entity>& v1, const std::shared_ptr<Entity>& v2) 
+    {
+        return v1 && v1->getId() < id;
+    });
+}
+
+bool World::removeEntity(unsigned long id)
+{
+    if(m_entities.size() < 1)
+        return false;
+
+    auto it = std::lower_bound(m_entities.begin(), m_entities.end(), nullptr, [id](const auto& v1, const auto& v2) {
+        return v1->getId() < id;
+    });
+
+    m_entities.erase(it);
+
+    return it != m_entities.end();
+}

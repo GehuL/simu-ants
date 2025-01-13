@@ -84,6 +84,7 @@ namespace simu
             AntIA(const long id = -1);
             AntIA(const long id, const AntIA& ant);
             AntIA(const long id, const Genome ant);
+            AntIA(const long id, Vec2i position);
 
             virtual ~AntIA() {};
 
@@ -92,6 +93,8 @@ namespace simu
 
             static constexpr int inputCount() { return 3; } ;
             static constexpr int outputCount() { return 2; };
+
+            bool move(Vec2i vec);
 
             void update() override;
             void save(json& json) const override;
@@ -102,6 +105,10 @@ namespace simu
         private:
             Genome m_genome;
             FeedForwardNeuralNetwork m_network;
+            int m_rotateCd;
+            Vec2i m_dir;
+            Vec2i m_gridPos;
+            // TODO: Ajouter neural network
     };
 
     class Test: public Entity

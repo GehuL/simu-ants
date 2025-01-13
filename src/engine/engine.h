@@ -22,6 +22,8 @@ namespace simu
             const inline int getTPS(){return 1.0/m_tickPeriod;};
             const inline int getFPS(){return 1.0/m_framePeriod;};
 
+            Camera2D getCamera() const { return m_camera; };
+
             void setPause(bool pause);
             bool isPaused() const { return m_pause; };
 
@@ -29,6 +31,8 @@ namespace simu
             virtual void drawUI();
             virtual void updateTick();
 
+            int getWidth() const { return m_renderer.texture.width; };
+            int getHeight() const { return m_renderer.texture.height; };
             /**
              * Executé après le démarrage de raylib
              */
@@ -52,6 +56,8 @@ namespace simu
 
             int m_lastFrameCounter;
             int m_lastTickCounter;
+
+            double m_averageTickLoad;
 
             bool m_noDelay;
 

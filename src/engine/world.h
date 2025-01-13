@@ -104,7 +104,7 @@ namespace simu
             };
 
             template<class T, class = TEMPLATE_CONDITION(T)>
-            std::weak_ptr<T> getEntity(long id)
+            std::weak_ptr<T> getEntity(unsigned long id)
             {
                 CHECK_TEMPLATE_ST(T)
 
@@ -121,19 +121,35 @@ namespace simu
                 return ptr;
             };
 
+            bool exist(unsigned long id) const;
+
             std::vector<std::weak_ptr<Entity>> getEntities()
             {
                 return std::vector<std::weak_ptr<Entity>>(m_entities.begin(), m_entities.end());
             }
 
-            bool const exist(long id)
+            /** @brief Supprime une entitié en utilisant l'algo binary search. 
+             *  @param id L'ID de l'entité.
+             *  @return Renvoie vrai si l'entité à été supprimé et que l'ID existe.
+             * 
+             *  @warning A ne pas utiliser dans un update d'une entitié. 
+             */
+            bool removeEntity(unsigned long id);
+
+            /** @brief Supprime toutes les entités fournis en paramètres.
+             *  @param beg Début de la liste
+             *  @param end Fin de la lite
+             *  @example std::vector<std::weak_ptr<Ant>> en; \
+             *  getWorld().removeEntities(en.begin(), en.end())
+             */
+            template<typename T>
+            void removeEntities(T beg, T end)
             {
-                auto it = std::find_if(m_entities.begin(), m_entities.end(), [id](std::shared_ptr<Entity> en)
-                {
-                    return (bool)en && en.get()->getId() == id;
-                });
-                return it != m_entities.end() ;
-            };
+                for(auto it = beg; it != end; it++)
+                    if(auto sp = it->lock()) removeEntity(sp->getId());
+            }
+
+            void clearEntities() { m_entities.clear(); };
 
             void setListener(std::shared_ptr<WorldListener> listener)
             {
@@ -180,7 +196,7 @@ namespace simu
             void drawUI() override;
             void updateTick() override;
         
-            long m_entity_cnt;
+            unsigned long m_entity_cnt;
             unsigned int m_seed;
 
             std::shared_ptr<WorldListener> m_listener;
@@ -211,6 +227,8 @@ namespace simu
     };
 
     inline World& getWorld() { return simu::World::world; };
+
+
 }
 
 #endif
