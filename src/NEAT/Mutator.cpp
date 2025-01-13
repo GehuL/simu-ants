@@ -2,9 +2,10 @@
 #include "Genome.h"
 #include"neuron_mutator.h"
 #include "link_mutator.h"
-#include "rng.h"
+#include "RNG.h"
 #include <iostream>
 #include <functional>
+#include <algorithm>
 
 
 void Mutator::mutate(Genome &genome, const NeatConfig &config, RNG &rng) {
@@ -155,6 +156,8 @@ void Mutator::mutate_remove_neuron(Genome &genome) {
             return link.has_neuron(*neuron_it);
         }),
         genome.get_links().end());
+
+    std::cout << "Removing neuron " << neuron_it->neuron_id << " from genome " << genome.get_genome_id() << std::endl;
 
     genome.get_neurons().erase(neuron_it);
 }

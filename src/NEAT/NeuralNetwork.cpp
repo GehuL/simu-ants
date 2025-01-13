@@ -7,6 +7,9 @@
  */
 std::vector<double> FeedForwardNeuralNetwork::activate(const std::vector<double> &inputs)
 {
+    //std::cout << "Attending neural network with " << m_input_ids.size() << " inputs." << std::endl;
+    //std::cout << "Activating neural network with " << inputs.size() << " inputs." << std::endl;
+    
     assert(inputs.size() == m_input_ids.size());
     std::unordered_map<int, double> values;
 

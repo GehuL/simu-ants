@@ -3,8 +3,8 @@
 
 #include "raylib.h"
 #include "engine.h"
-#include "../external/json.hpp"
 #include "types.h"
+#include "../external/json.hpp"
 
 namespace simu
 {

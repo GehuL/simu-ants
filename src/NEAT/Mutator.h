@@ -3,7 +3,7 @@
 
 #include "Neat.h"
 #include "Genome.h"
-#include "rng.h"
+#include "RNG.h"
 #include "NeatConfig.h"
 
 class Mutator

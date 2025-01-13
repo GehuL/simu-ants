@@ -5,6 +5,8 @@
 
 #include "world.h"
 
+#include <random> 
+
 using namespace simu;
 
 Ant::Ant(const long id) : Entity(id) {}
@@ -12,7 +14,7 @@ Ant::Ant(const long id, const Ant& ant) : Entity(id, ant), m_life(ant.m_life),
 m_carried_object(ant.m_carried_object)
 {
 }
-Ant::Ant(const long id, Vector2f pos) : Entity(id, pos) {}
+Ant::Ant(const long id, Vec2f pos) : Entity(id, pos) {}
 
 void Ant::update() {}
 
@@ -59,8 +61,10 @@ bool Ant::moveForward()
     if(!tile.flags.solid)
     {
         m_pos = newPos;
+        //std::cout << "Nouvelle position : (" << m_pos.x << ", " << m_pos.y << ")" << std::endl;
         return true;
     }
+    //std::cout << "Déplacement bloqué à : (" << newPos.x << ", " << newPos.y << ")" << std::endl;
     return false;
 }
 
@@ -188,7 +192,8 @@ DemoAnt& DemoAnt::operator=(const DemoAnt& ant)
 // ==================[ANT IA]==================
 RNG gRng;
 
-AntIA::AntIA(const long id) : Ant(id), m_genome(Genome::create_genome(0, 3, 2, 3, gRng)), m_network(FeedForwardNeuralNetwork::create_from_genome(m_genome)) {}
+AntIA::AntIA(const long id) : Ant(id), m_genome(Genome::create_genome_div(0, 5, 4, 3, gRng)), m_network(FeedForwardNeuralNetwork::create_from_genome(m_genome)) {}
+AntIA::AntIA(const long id, const AntIA& ant) : Ant(id, ant), m_network(ant.m_network), m_genome(ant.m_genome) {}
 AntIA::AntIA(const long id, const Genome genome) : Ant(id), m_genome(genome), m_network(FeedForwardNeuralNetwork::create_from_genome(genome)) {}
 AntIA::AntIA(const long id, const AntIA& ant) : Ant(id, ant), m_genome(ant.m_genome), m_network(ant.m_network) {}
 AntIA::AntIA(const long id, Vec2i position): Ant(id),  m_genome(Genome::create_genome(0, 3, 2, 3, gRng)), m_network(FeedForwardNeuralNetwork::create_from_genome(m_genome))
@@ -222,14 +227,66 @@ void AntIA::update()
     const std::vector<double> inputs = {
     static_cast<double>(getAngle()), 
     static_cast<double>(getTileOn().type), 
-    static_cast<double>(getTileFacing().type)};
+    static_cast<double>(getTileFacing().type),
+    static_cast<double>(getPos().x),
+    static_cast<double>(getPos().y)
+    };
+/*
+    std::cout << "Inputs: ";
+for (double input : inputs) {
+    std::cout << input << " ";
+}
+std::cout << std::endl;
+*/
 
     // Activation des sorties
-    auto outputs = m_network.activate(inputs);
+    auto actions = m_network.activate(inputs);
 
+    // Ajouter du bruit aléatoire aux actions
+    std::random_device rd;  // Générateur aléatoire
+    std::mt19937 gen(rd()); // Mersenne Twister
+    std::uniform_real_distribution<> dis(-0.1, 0.1); // Bruit entre -0.1 et 0.1
+
+    for (double &action : actions)
+    {
+        action += dis(gen); // Ajouter un bruit aléatoire
+    }
+
+
+/*
+    std::cout << "Outputs: ";
+for (double action : actions) {
+    std::cout << action << " ";
+}
+std::cout << std::endl;
+*/
     // Décisions
-    rotate(outputs[0]);
-    moveForward();
+    int direction = std::distance(actions.begin(), std::max_element(actions.begin(), actions.end()));
+
+    //std::cout << "Ant " << getId() << " action: " << direction << std::endl;
+
+    // Vérifier les répétitions d'actions
+    if (direction == lastAction) {
+        repeatCount++;
+    } else {
+        directionChanges++;
+        repeatCount = 0; // Réinitialiser si la direction change
+    }
+    lastAction = direction;
+
+    // Ajouter la position actuelle à l'ensemble
+    visitedPositions.insert({static_cast<int>(getPos().x), static_cast<int>(getPos().y)});
+
+
+
+
+    switch (direction) {
+        case 0: move(EAST);  break;
+        case 1: move(WEST);  break;
+        case 2: move(NORTH); break;
+        case 3: move(SOUTH); break;
+        default: break;
+    }
 }
 
 void AntIA::load(const json &json)

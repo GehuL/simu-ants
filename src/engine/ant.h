@@ -3,23 +3,33 @@
 
 #include <map>
 #include <string>
+#include <unordered_set>
 
 #include "types.h"
 #include "entity.h"
 #include "tiles.h"
+#include "../NEAT/Utils.h"
 
 #include "../NEAT/Genome.h"
 #include "../NEAT/NeuralNetwork.h"
 
 namespace simu
 {
+
+    struct pair_hash {
+    template <class T1, class T2>
+    std::size_t operator()(const std::pair<T1, T2>& pair) const {
+        return std::hash<T1>()(pair.first) ^ std::hash<T2>()(pair.second);
+    }
+};
+
     class Ant : public Entity
     {
         public:
 
             Ant(const long id = -1);
             Ant(const long id, const Ant& ant);
-            Ant(const long id, Vector2f position);
+            Ant(const long id, Vec2f position);
 
             virtual ~Ant() {};
 
@@ -90,9 +100,14 @@ namespace simu
 
             const char* getType() const override { return "antIA"; };
             const Genome& getGenome() { return m_genome; };
+            const FeedForwardNeuralNetwork& getNetwork() { return m_network; };
+            const int getLastAction() { return lastAction; };
+            const int getDirectionChanges() { return directionChanges; };
+            const int getRepeatCount() { return repeatCount; };
+            const std::unordered_set<std::pair<int, int>, pair_hash>& getVisitedPositions() { return visitedPositions; };
 
-            static constexpr int inputCount() { return 3; } ;
-            static constexpr int outputCount() { return 2; };
+            static constexpr int inputCount() { return 5; } ;
+            static constexpr int outputCount() { return 4; };
 
             bool move(Vec2i vec);
 
@@ -107,7 +122,43 @@ namespace simu
             FeedForwardNeuralNetwork m_network;
             Vec2i m_dir;
             Vec2i m_gridPos;
+            int lastAction = -1; 
+            int directionChanges = 0;
+            int repeatCount = 0; 
+            std::unordered_set<std::pair<int, int>, simu::pair_hash> visitedPositions;
+
     };
+
+/*
+    class AntIALab : public AntIA {
+    int steps_count;  // Compteur d'étapes
+    int max_steps;    // Nombre maximal d'étapes autorisées
+    simu::Vec2i goalPos;
+
+public:
+    AntIALab(const Genome &genome, simu::Vec2i goal, int max_steps)
+        : simu::AntIA(genome), goalPos(goal), max_steps(max_steps), steps_count(0) {}
+
+    bool canAct() const {
+        return steps_count < max_steps;
+    }
+
+    void update() override
+    {
+    
+    
+    }
+
+    void act(simu::Grid &grid) {
+        if (canAct()) {
+            auto inputs = simu::get_game_state_lab(getPos(), goalPos, grid);
+            auto outputs = getNetwork().activate(inputs);
+            simu::perform_action_lab(outputs, *this);
+            steps_count++;
+        }
+    }
+};
+*/
 
     class Test: public Entity
     {
@@ -132,6 +183,8 @@ namespace simu
         private:
             std::string m_test = "this is a test";
     };
+
+    
 }
 
 #endif
