@@ -105,10 +105,8 @@ namespace simu
         private:
             Genome m_genome;
             FeedForwardNeuralNetwork m_network;
-            int m_rotateCd;
             Vec2i m_dir;
             Vec2i m_gridPos;
-            // TODO: Ajouter neural network
     };
 
     class Test: public Entity

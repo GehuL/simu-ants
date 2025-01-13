@@ -1,6 +1,7 @@
 #include "engine/world.h"
 #include "engine/ant.h"
 #include "NEAT/population.h"
+#include "raylib.h"
 
 using namespace simu;
 
@@ -18,9 +19,6 @@ class Scene: public WorldListener
             getWorld().getGrid().fromImage("rsc/maze.png");
             m_ants = getWorld().spawnEntities<AntIA>(10);
         };
-
-            double deltaTime = (GetTime() - startTime) * 1000.f;
-            TraceLog(LOG_DEBUG, "A*: %.1lf ms", deltaTime);
         
         void onUpdate() override
         {
@@ -51,53 +49,13 @@ class Scene: public WorldListener
             ants = getWorld().spawnEntities<DemoAnt>(1000, getWorld().gridToWorld(Vec2i{89, 161}));
         };
 
-<<<<<<< HEAD
+        void onDraw() override {};
+        void onUnload() override {};
+
     private:
         int m_count = 0;
         std::vector<std::weak_ptr<AntIA>> m_ants;
         Population mPop;
-=======
-        void onDraw() override
-        {
-            if(IsKeyPressed(KEY_G))
-            {
-                Grid& grid = getWorld().getGrid();
-
-                for(const auto& ant: ants)
-                {
-                    if(ant.expired())
-                        continue;
-
-                    Vec2i antPos = grid.toTileCoord((Vec2f)(ant.lock()->getPos()));
-
-                    auto path = grid.findPath(antPos, getWorld().mouseToGridCoord());
-
-                    const int tileSize = grid.getTileSize();
-
-                    for(Vec2i tile : path)
-                    {
-                        DrawRectangle(tile.x * tileSize, tile.y * tileSize, tileSize, tileSize, RED);
-                    }
-                }
-            }
-
-            if(IsKeyPressed(KEY_SPACE))
-            {
-                // getWorld().clearEntities();
-                //  for(auto& en : getWorld().getEntities())
-                // {
-                //     getWorld().removeEntity(en.lock()->getId());
-                // }
-                getWorld().removeEntities(ants.begin(), ants.end());
-                // getWorld().clearEntities();
-            }
-
-        }
-
-        void onUnload() override {};
-        
-        void onUpdate() override {};
->>>>>>> engine
 };
 
 int main(void)

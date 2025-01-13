@@ -12,7 +12,7 @@ Ant::Ant(const long id, const Ant& ant) : Entity(id, ant), m_life(ant.m_life),
 m_carried_object(ant.m_carried_object)
 {
 }
-Ant::Ant(const long id, Vector2 pos) : Entity(id, pos) {}
+Ant::Ant(const long id, Vector2f pos) : Entity(id, pos) {}
 
 void Ant::update() {}
 
