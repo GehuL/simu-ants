@@ -9,7 +9,7 @@ RNG rng;
 
 class Scene: public WorldListener
 {
-    std::vector<std::weak_ptr<AntIA>> ants;
+    std::vector<std::weak_ptr<AntIA>> m_ants;
 
     public:
         Scene(): mPop((NeatConfig) {}, rng) {};
@@ -17,7 +17,7 @@ class Scene: public WorldListener
         void onInit() override
         {
             getWorld().getGrid().fromImage("rsc/maze.png");
-            m_ants = getWorld().spawnEntities<AntIA>(10);
+            m_ants = getWorld().spawnEntities<AntIA>(10, Vec2i(90, 160));
         };
         
         void onUpdate() override
@@ -46,7 +46,6 @@ class Scene: public WorldListener
                 m_ants.push_back(getWorld().spawnEntity<AntIA>(*genome.genome.get()));
             }
 
-            ants = getWorld().spawnEntities<DemoAnt>(1000, getWorld().gridToWorld(Vec2i{89, 161}));
         };
 
         void onDraw() override {};
@@ -54,7 +53,6 @@ class Scene: public WorldListener
 
     private:
         int m_count = 0;
-        std::vector<std::weak_ptr<AntIA>> m_ants;
         Population mPop;
 };
 

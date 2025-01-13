@@ -96,8 +96,6 @@ namespace simu
 
             bool move(Vec2i vec);
 
-            bool move(Vec2i vec);
-
             void update() override;
             void save(json& json) const override;
             void load(const json& json) override;
