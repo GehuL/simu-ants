@@ -190,6 +190,14 @@ void World::handleKeyboard()
 
     if(IsKeyPressed(KEY_R))
         load("simu-save.json");
+    
+    if(IsKeyPressed(KEY_SPACE))
+    {
+        if(isPaused())
+        {
+            updateTick();
+        }
+    }  
 }
 
 void World::drawFrame()
