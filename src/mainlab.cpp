@@ -35,15 +35,8 @@ public:
     void onInit() override {
         getWorld().getGrid().fromImage("rsc/maze.png");
         Vec2i startPos(90, 150);
-    Vec2i goalPos(73, 0);
-        ants = getWorld().spawnEntities<AntIA>(num_ants);
-        for (const auto &ant : ants) {
-            if (ant.expired())
-                continue;
-
-            auto locked_ant = ant.lock();
-            locked_ant->setPos(getWorld().gridToWorld(startPos));
-        }
+        Vec2i goalPos(73, 0);
+        ants = getWorld().spawnEntities<AntIA>(num_ants, startPos);
         
         steps_count.resize(num_ants, 0); // Initialiser les compteurs d'étapes
 
@@ -131,16 +124,12 @@ public:
     auto new_genomes = mPop.reproduce_from_genomes(genomes);
     ants.clear();
     for (auto &genome : new_genomes) {
-        ants.push_back(getWorld().spawnEntity<AntIA>(*genome.genome));
+        ants.push_back(getWorld().spawnEntity<AntIA>(*genome.genome, Vec2i(90, 150)));
     }
 
     // Réinitialiser le compteur global et les positions
     current_tick = 0;
-    for (const auto &ant : ants) {
-        if (!ant.expired()) {
-            ant.lock()->setPos(getWorld().gridToWorld(Vec2i(90, 150)));
-        }
-    }
+    
 
     current_generation++;
 }

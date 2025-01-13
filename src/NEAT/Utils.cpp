@@ -193,15 +193,4 @@ std::vector<double> get_game_state_lab(const Vec2i &antPos,   Grid &grid) {
     return state;
 }
 
-void perform_action_lab(const std::vector<double> &actions, simu::AntIA &ant) {
-    
-    int direction = std::distance(actions.begin(), std::max_element(actions.begin(), actions.end()));
 
-    switch (direction) {
-        case 0: ant.move(EAST);  break;
-        case 1: ant.move(WEST);  break;
-        case 2: ant.move(NORTH); break;
-        case 3: ant.move(SOUTH); break;
-        default: break;
-    }
-}

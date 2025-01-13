@@ -193,7 +193,6 @@ DemoAnt& DemoAnt::operator=(const DemoAnt& ant)
 RNG gRng;
 
 AntIA::AntIA(const long id) : Ant(id), m_genome(Genome::create_genome_div(0, 5, 4, 3, gRng)), m_network(FeedForwardNeuralNetwork::create_from_genome(m_genome)) {}
-AntIA::AntIA(const long id, const AntIA& ant) : Ant(id, ant), m_network(ant.m_network), m_genome(ant.m_genome) {}
 AntIA::AntIA(const long id, const Genome genome) : Ant(id), m_genome(genome), m_network(FeedForwardNeuralNetwork::create_from_genome(genome)) {}
 AntIA::AntIA(const long id, const AntIA& ant) : Ant(id, ant), m_genome(ant.m_genome), m_network(ant.m_network) {}
 AntIA::AntIA(const long id, Vec2i position): Ant(id),  m_genome(Genome::create_genome(0, 3, 2, 3, gRng)), m_network(FeedForwardNeuralNetwork::create_from_genome(m_genome))
@@ -281,10 +280,10 @@ std::cout << std::endl;
 
 
     switch (direction) {
-        case 0: move(EAST);  break;
-        case 1: move(WEST);  break;
-        case 2: move(NORTH); break;
-        case 3: move(SOUTH); break;
+        case 0: move(RIGHT);  break;
+        case 1: move(LEFT);  break;
+        case 2: move(UP); break;
+        case 3: move(DOWN); break;
         default: break;
     }
 }
