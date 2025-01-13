@@ -104,12 +104,87 @@ Genome Genome::create_genome(int id, int num_inputs, int num_outputs, int num_hi
     return genome;
 }
 
+Genome Genome::create_genome_div(int id, int num_inputs, int num_outputs, int num_hidden_neurons, RNG &rng) {
+    Genome genome(id, num_inputs, num_outputs);
+
+    // Ajoute neurones d'entrée
+    for (int i = 0; i < num_inputs; ++i) {
+        // Les neurones d'entrée n'ont pas de biais, mais peuvent en avoir si nécessaire
+        genome.add_neuron(neat::NeuronGene{i, 0.0, Activation(Activation::Type::Sigmoid)});
+    }
+
+    // Ajoute neurones de sortie avec des biais initiaux aléatoires
+    for (int i = 0; i < num_outputs; ++i) {
+        int output_id = num_inputs + i;
+        double bias = rng.uniform(-1.0, 1.0); // Distribution uniforme entre -1 et 1
+        genome.add_neuron(neat::NeuronGene{output_id, bias, Activation(Activation::Type::Sigmoid)});
+    }
+
+    // Ajoute neurones cachés avec des biais initiaux aléatoires
+    for (int i = 0; i < num_hidden_neurons; ++i) {
+        int hidden_id = num_inputs + num_outputs + i;
+        double bias = rng.gaussian(0.0, 1.0); // Distribution gaussienne centrée sur 0 avec écart-type 1
+        genome.add_neuron(neat::NeuronGene{hidden_id, bias, Activation(Activation::Type::Sigmoid)});
+    }
+
+     // Liens : entrée -> cachés
+    for (int input_id = 0; input_id < num_inputs; ++input_id) {
+        for (int hidden_id = num_inputs + num_outputs; hidden_id < num_inputs + num_outputs + num_hidden_neurons; ++hidden_id) {
+            if (!genome.would_create_cycle(input_id, hidden_id)) {
+                genome.add_link(genome.create_link_div(input_id, hidden_id, rng));
+            }
+        }
+    }
+
+    // Liens : cachés -> cachés (pour favoriser l'émergence de structures complexes)
+    for (int hidden_id = num_inputs + num_outputs; hidden_id < num_inputs + num_outputs + num_hidden_neurons; ++hidden_id) {
+        for (int target_hidden_id = hidden_id + 1; target_hidden_id < num_inputs + num_outputs + num_hidden_neurons; ++target_hidden_id) {
+            if (!genome.would_create_cycle(hidden_id, target_hidden_id)) {
+                genome.add_link(genome.create_link_div(hidden_id, target_hidden_id, rng));
+            }
+        }
+    }
+
+    // Liens : cachés -> sorties
+    for (int hidden_id = num_inputs + num_outputs; hidden_id < num_inputs + num_outputs + num_hidden_neurons; ++hidden_id) {
+        for (int output_id = num_inputs; output_id < num_inputs + num_outputs; ++output_id) {
+            if (!genome.would_create_cycle(hidden_id, output_id)) {
+                genome.add_link(genome.create_link_div(hidden_id, output_id, rng));
+            }
+        }
+    }
+
+    // Affichage pour débogage
+    std::cout << "Genome ID: " << id << std::endl;
+    std::cout << "Neurones:" << std::endl;
+    for (const auto &neuron : genome.get_neurons()) {
+        std::cout << "  Neuron ID: " << neuron.neuron_id 
+                  << ", Bias: " << neuron.bias << std::endl;
+    }
+    std::cout << "Liens:" << std::endl;
+    for (const auto &link : genome.get_links()) {
+        std::cout << "  Link from " << link.link_id.input_id 
+                  << " to " << link.link_id.output_id 
+                  << " with weight " << link.weight << std::endl;
+    }
+
+    return genome;
+}
+
+
 
 
 
 // Crée un lien avec des poids aléatoires
 neat::LinkGene Genome::create_link(int input_id, int output_id, RNG &rng) {
     return neat::LinkGene{{input_id, output_id}, rng.next_gaussian(0.0, 1.0), true};
+}
+
+neat::LinkGene Genome::create_link_div(int input_id, int output_id, RNG &rng) {
+    double weight = (rng.next_bool()) 
+        ? rng.uniform(-3.0, 3.0)  // Poids uniformes
+        : rng.next_gaussian(0.0, 2.0);  // Poids gaussiens
+    return neat::LinkGene{{input_id, output_id}, weight, true};
 }
 
 neat::NeuronGene Genome::create_neuron(int neuron_id) {

@@ -3,6 +3,7 @@
 
 #include <map>
 #include <string>
+#include <unordered_set>
 
 #include "types.h"
 #include "entity.h"
@@ -14,6 +15,14 @@
 
 namespace simu
 {
+
+    struct pair_hash {
+    template <class T1, class T2>
+    std::size_t operator()(const std::pair<T1, T2>& pair) const {
+        return std::hash<T1>()(pair.first) ^ std::hash<T2>()(pair.second);
+    }
+};
+
     class Ant : public Entity
     {
         public:
@@ -90,6 +99,10 @@ namespace simu
             const char* getType() const override { return "antIA"; };
             const Genome& getGenome() { return m_genome; };
             const FeedForwardNeuralNetwork& getNetwork() { return m_network; };
+            const int getLastAction() { return lastAction; };
+            const int getDirectionChanges() { return directionChanges; };
+            const int getRepeatCount() { return repeatCount; };
+            const std::unordered_set<std::pair<int, int>, pair_hash>& getVisitedPositions() { return visitedPositions; };
 
             static constexpr int inputCount() { return 5; } ;
             static constexpr int outputCount() { return 4; };
@@ -103,6 +116,11 @@ namespace simu
         private:
             Genome m_genome;
             FeedForwardNeuralNetwork m_network;
+            int lastAction = -1; 
+            int directionChanges = 0;
+            int repeatCount = 0; 
+            std::unordered_set<std::pair<int, int>, simu::pair_hash> visitedPositions;
+
     };
 
 /*
@@ -159,6 +177,8 @@ public:
         private:
             std::string m_test = "this is a test";
     };
+
+    
 }
 
 #endif

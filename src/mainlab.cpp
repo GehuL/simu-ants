@@ -107,7 +107,7 @@ public:
         auto locked_ant = ant.lock();
         Vec2i antPos = getWorld().getGrid().toTileCoord((Vec2f)(locked_ant->getPos()));
         total_fitness += compute_fitness.evaluate_lab(
-            antPos, Vec2i(73, 0), getWorld().getGrid(), *locked_ant, initial_distance);
+            antPos, Vec2i(73, 0), getWorld().getGrid(), *locked_ant, initial_distance,current_generation);
     }
 
     double avg_fitness = total_fitness / ants.size();

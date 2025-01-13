@@ -157,6 +157,8 @@ void Mutator::mutate_remove_neuron(Genome &genome) {
         }),
         genome.get_links().end());
 
+    std::cout << "Removing neuron " << neuron_it->neuron_id << " from genome " << genome.get_genome_id() << std::endl;
+
     genome.get_neurons().erase(neuron_it);
 }
 

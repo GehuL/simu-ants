@@ -184,7 +184,7 @@ DemoAnt& DemoAnt::operator=(const DemoAnt& ant)
 // ==================[ANT IA]==================
 RNG gRng;
 
-AntIA::AntIA(const long id) : Ant(id), m_genome(Genome::create_genome(0, 5, 4, 3, gRng)), m_network(FeedForwardNeuralNetwork::create_from_genome(m_genome)) {}
+AntIA::AntIA(const long id) : Ant(id), m_genome(Genome::create_genome_div(0, 5, 4, 3, gRng)), m_network(FeedForwardNeuralNetwork::create_from_genome(m_genome)) {}
 AntIA::AntIA(const long id, const AntIA& ant) : Ant(id, ant), m_network(ant.m_network), m_genome(ant.m_genome) {}
 AntIA::AntIA(const long id, const Genome genome) : Ant(id), m_genome(genome), m_network(FeedForwardNeuralNetwork::create_from_genome(genome)) {}
 
@@ -237,6 +237,20 @@ std::cout << std::endl;
     int direction = std::distance(actions.begin(), std::max_element(actions.begin(), actions.end()));
 
     //std::cout << "Ant " << getId() << " action: " << direction << std::endl;
+
+    // Vérifier les répétitions d'actions
+    if (direction == lastAction) {
+        repeatCount++;
+    } else {
+        directionChanges++;
+        repeatCount = 0; // Réinitialiser si la direction change
+    }
+    lastAction = direction;
+
+    // Ajouter la position actuelle à l'ensemble
+    visitedPositions.insert({static_cast<int>(getPos().x), static_cast<int>(getPos().y)});
+
+
 
 
     switch (direction) {

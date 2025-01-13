@@ -84,13 +84,32 @@ double ComputeFitness::evaluate_rpc(const Genome &genome, int ant_id) const {
     return static_cast<double>(wins) / rounds;
 }
 
-double ComputeFitness::evaluate_lab(const simu::Vec2i &startPos, const simu::Vec2i &goalPos, simu::Grid &grid, simu::AntIA &ant, double initial_distance) {
+double ComputeFitness::evaluate_lab(const simu::Vec2i &startPos, const simu::Vec2i &goalPos, simu::Grid &grid, simu::AntIA &ant, double initial_distance,int current_generation) const {
     // Distance actuelle après que la fourmi ait exécuté ses actions
+    int directionChanges = ant.getDirectionChanges();
+    int repeatCount = ant.getRepeatCount();
+    std::unordered_set<std::pair<int, int>, simu::pair_hash> visitedPositions = ant.getVisitedPositions();
     Vec2i antPos = ant.getPos();
     double current_distance = static_cast<double>(grid.findPath(antPos, goalPos).size());
 
     // Calcul de la fitness
     double fitness = initial_distance - current_distance;
+
+    fitness += visitedPositions.size() * 0.5;
+
+    // Ajouter une pénalité à la fitness si trop de répétitions
+    if (repeatCount > 10) { // Par exemple, plus de 10 répétitions
+        fitness -= 1.0; // Réduire la fitness
+    }
+
+    // Critère d'exploration pour les premières générations
+    if (current_generation < 10) { // Par exemple, pour les 10 premières générations
+        if (directionChanges < 5) { // Minimum 5 changements de direction
+            fitness -= 5.0; // Pénalité pour manque d'exploration
+        } else {
+            fitness += 5.0; // Récompense pour exploration
+        }
+    }
 
     // Ajouter une récompense supplémentaire si la fourmi atteint l'objectif
     if (antPos == goalPos) {

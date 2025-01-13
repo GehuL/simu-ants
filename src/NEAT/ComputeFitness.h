@@ -20,7 +20,7 @@
 
         double evaluate_rpc(const Genome &genome, int ant_id) const;
 
-        double evaluate_lab(const simu::Vec2i &startPos, const simu::Vec2i &goalPos, simu::Grid &grid, simu::AntIA &ant, double initial_distance);
+        double evaluate_lab(const simu::Vec2i &startPos, const simu::Vec2i &goalPos, simu::Grid &grid, simu::AntIA &ant, double initial_distance,int current_generation) const;
         
 
     private:
