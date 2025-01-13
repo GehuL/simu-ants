@@ -218,17 +218,11 @@ bool AntIA::move(Vec2i dir)
 
 void AntIA::update()
 {
-<<<<<<< HEAD:src/engine/ant.cpp
     // Variables de décisions
     const std::vector<double> inputs = {
     static_cast<double>(getAngle()), 
     static_cast<double>(getTileOn().type), 
     static_cast<double>(getTileFacing().type)};
-=======
-    if(m_rotateCd-- <= 0)
-    {
-        m_rotateCd = GetRandomValue(1, 100);
->>>>>>> ab17022 (optimisation mangement entite):src/ant.cpp
 
     // Activation des sorties
     auto outputs = m_network.activate(inputs);

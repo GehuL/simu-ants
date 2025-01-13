@@ -123,15 +123,6 @@ namespace simu
 
             bool exist(unsigned long id) const;
 
-            /** @brief Supprime une entitié en utilisant l'algo binary search. 
-             *  @param id L'ID de l'entité.
-             *  @return Renvoie vrai si l'entité à été supprimé et que l'ID existe.
-             * 
-             *  @warning A ne pas utiliser dans un update d'une entitié. 
-             */
-            bool removeEntity(unsigned long id);
-
-        
             std::vector<std::weak_ptr<Entity>> getEntities()
             {
                 return std::vector<std::weak_ptr<Entity>>(m_entities.begin(), m_entities.end());
