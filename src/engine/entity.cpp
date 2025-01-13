@@ -27,6 +27,25 @@ Tile Entity::getTileFacing() const
     return getWorld().getGrid().getTile(facingTilePos);
 }
 
+Tile simu::Entity::getTileLeft() const
+{
+    Vector2i leftTilePos = getTileLeftPos();
+    return getWorld().getGrid().getTile(leftTilePos);
+}
+
+Tile simu::Entity::getTileRight() const
+{
+    Vector2i rightTilePos = getTileRightPos();
+    return getWorld().getGrid().getTile(rightTilePos);
+}
+
+Tile simu::Entity::getTileBack() const
+{
+    Vector2i backTilePos = getTileBackPos();
+    return getWorld().getGrid().getTile(backTilePos);
+}
+
+
 Vector2i simu::Entity::getTileFacingPos() const
 {
     Grid& grid = getWorld().getGrid();
@@ -37,6 +56,40 @@ Vector2i simu::Entity::getTileFacingPos() const
     // Get the tile the ant is facing
     return (Vector2i){tilePos.x + static_cast<int>(round(vel.x)), tilePos.y + static_cast<int>(round(vel.y))};;
 }
+
+Vector2i simu::Entity::getTileLeftPos() const
+{
+    Grid& grid = getWorld().getGrid();
+    // Translate ant position to facing tile position
+    Vector2i tilePos = grid.toTileCoord(m_pos.x + grid.getTileSize() / 2.0, m_pos.y + grid.getTileSize() / 2.0);
+    Vector2 vel = Vector2Rotate((Vector2){1.0, 0}, m_angle - PI / 2); // Rotate 90 degrees counterclockwise (left)
+    
+    // Get the tile to the left of the ant
+    return (Vector2i){tilePos.x + static_cast<int>(round(vel.x)), tilePos.y + static_cast<int>(round(vel.y))};
+}
+
+Vector2i simu::Entity::getTileRightPos() const
+{
+    Grid& grid = getWorld().getGrid();
+    // Translate ant position to facing tile position
+    Vector2i tilePos = grid.toTileCoord(m_pos.x + grid.getTileSize() / 2.0, m_pos.y + grid.getTileSize() / 2.0);
+    Vector2 vel = Vector2Rotate((Vector2){1.0, 0}, m_angle + PI / 2); // Rotate 90 degrees clockwise (right)
+    
+    // Get the tile to the right of the ant
+    return (Vector2i){tilePos.x + static_cast<int>(round(vel.x)), tilePos.y + static_cast<int>(round(vel.y))};
+}
+
+Vector2i simu::Entity::getTileBackPos() const
+{
+    Grid& grid = getWorld().getGrid();
+    // Translate ant position to facing tile position
+    Vector2i tilePos = grid.toTileCoord(m_pos.x + grid.getTileSize() / 2.0, m_pos.y + grid.getTileSize() / 2.0);
+    Vector2 vel = Vector2Rotate((Vector2){1.0, 0}, m_angle + PI); // Rotate 180 degrees (backwards)
+    
+    // Get the tile behind the ant
+    return (Vector2i){tilePos.x + static_cast<int>(round(vel.x)), tilePos.y + static_cast<int>(round(vel.y))};
+}
+
 
 Vector2i simu::Entity::getTilePosOn() const
 {

@@ -192,12 +192,15 @@ DemoAnt& DemoAnt::operator=(const DemoAnt& ant)
 // ==================[ANT IA]==================
 RNG gRng;
 
-AntIA::AntIA(const long id) : Ant(id), m_genome(Genome::create_genome_div(0, 5, 4, 3, gRng)), m_network(FeedForwardNeuralNetwork::create_from_genome(m_genome)) {}
-AntIA::AntIA(const long id, const Genome genome) : Ant(id), m_genome(genome), m_network(FeedForwardNeuralNetwork::create_from_genome(genome)) {}
 AntIA::AntIA(const long id, const AntIA& ant) : Ant(id, ant), m_genome(ant.m_genome), m_network(ant.m_network) {}
-AntIA::AntIA(const long id, Vec2i position): Ant(id),  m_genome(Genome::create_genome(0, 3, 2, 3, gRng)), m_network(FeedForwardNeuralNetwork::create_from_genome(m_genome))
+AntIA::AntIA(const long id, Vec2i position): Ant(id),  m_genome(Genome::create_genome(0, 6, 4, 3, gRng)), m_network(FeedForwardNeuralNetwork::create_from_genome(m_genome)), m_gridPos(position)
 {
     m_pos = getWorld().gridToWorld(position);
+}
+
+AntIA::AntIA(const long id, const Genome genome, Vec2i pos) : Ant(id), m_genome(genome), m_network(FeedForwardNeuralNetwork::create_from_genome(genome)), m_gridPos(pos) 
+{
+    m_pos = getWorld().gridToWorld(pos);
 }
 
 void AntIA::save(json &json) const
@@ -224,11 +227,13 @@ void AntIA::update()
 {
     // Variables de décisions
     const std::vector<double> inputs = {
-    static_cast<double>(getAngle()), 
-    static_cast<double>(getTileOn().type), 
-    static_cast<double>(getTileFacing().type),
-    static_cast<double>(getPos().x),
-    static_cast<double>(getPos().y)
+    //static_cast<double>(getAngle()), 
+    static_cast<double>(getTileFacing().flags.solid),
+    static_cast<double>(getTileLeft().flags.solid),
+    static_cast<double>(getTileRight().flags.solid),
+    static_cast<double>(getTileBack().flags.solid),
+    static_cast<double>(m_gridPos.x),
+    static_cast<double>(m_gridPos.y)
     };
 /*
     std::cout << "Inputs: ";
@@ -264,6 +269,11 @@ std::cout << std::endl;
 
     //std::cout << "Ant " << getId() << " action: " << direction << std::endl;
 
+    if(getTileFacing().flags.solid || getTileLeft().flags.solid|| getTileRight().flags.solid || getTileBack().flags.solid)
+    {
+        wallHit++;
+    }
+
     // Vérifier les répétitions d'actions
     if (direction == lastAction) {
         repeatCount++;
@@ -274,7 +284,7 @@ std::cout << std::endl;
     lastAction = direction;
 
     // Ajouter la position actuelle à l'ensemble
-    visitedPositions.insert({static_cast<int>(getPos().x), static_cast<int>(getPos().y)});
+    visitedPositions.insert({static_cast<int>(m_gridPos.x), static_cast<int>(m_gridPos.y)});
 
 
 

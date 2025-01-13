@@ -91,22 +91,24 @@ namespace simu
     class AntIA: public Ant
     {
         public:
-            AntIA(const long id = -1);
             AntIA(const long id, const AntIA& ant);
-            AntIA(const long id, const Genome ant);
-            AntIA(const long id, Vec2i position);
+            AntIA(const long id, const Genome ant, Vec2i pos = Vec2i(0, 0));
+            AntIA(const long id = -1, Vec2i position = Vec2i(0, 0));
 
             virtual ~AntIA() {};
 
             const char* getType() const override { return "antIA"; };
             const Genome& getGenome() { return m_genome; };
             const FeedForwardNeuralNetwork& getNetwork() { return m_network; };
+
+            const Vec2i getGridPos() { return m_gridPos; };
             const int getLastAction() { return lastAction; };
             const int getDirectionChanges() { return directionChanges; };
             const int getRepeatCount() { return repeatCount; };
+            const int getWallHit() { return wallHit; };
             const std::unordered_set<std::pair<int, int>, pair_hash>& getVisitedPositions() { return visitedPositions; };
 
-            static constexpr int inputCount() { return 5; } ;
+            static constexpr int inputCount() { return 6; } ;
             static constexpr int outputCount() { return 4; };
 
             bool move(Vec2i vec);
@@ -125,6 +127,7 @@ namespace simu
             int lastAction = -1; 
             int directionChanges = 0;
             int repeatCount = 0; 
+            int wallHit = 0;
             std::unordered_set<std::pair<int, int>, simu::pair_hash> visitedPositions;
 
     };

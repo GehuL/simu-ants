@@ -18,7 +18,7 @@ class Scene : public WorldListener {
 
     int m_count = 0;
     const int num_generations = 1000; // Nombre total de générations
-    const int num_ants = 20;        // Nombre de fourmis par génération
+    const int num_ants = 50;        // Nombre de fourmis par génération
     int current_generation = 0;
 
     std::vector<double> avg_fitness_per_gen; // Suivi des fitness moyennes
@@ -33,7 +33,7 @@ public:
     Scene() : mPop((NeatConfig){}, rng), compute_fitness(rng) {}
 
     void onInit() override {
-        getWorld().getGrid().fromImage("rsc/maze.png");
+        getWorld().getGrid().fromImage("rsc/road.png");
         Vec2i startPos(90, 150);
         Vec2i goalPos(73, 0);
         ants = getWorld().spawnEntities<AntIA>(num_ants, startPos);
@@ -123,6 +123,9 @@ public:
 
     auto new_genomes = mPop.reproduce_from_genomes(genomes);
     ants.clear();
+
+    getWorld().clearEntities();
+
     for (auto &genome : new_genomes) {
         ants.push_back(getWorld().spawnEntity<AntIA>(*genome.genome, Vec2i(90, 150)));
     }
