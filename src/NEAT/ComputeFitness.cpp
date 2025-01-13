@@ -99,21 +99,24 @@ double ComputeFitness::evaluate_lab(const simu::Vec2i &startPos, const simu::Vec
 
     // Ajouter une pénalité à la fitness si trop de répétitions
     if (repeatCount > 10) { // Par exemple, plus de 10 répétitions
-        fitness -= 1.0; // Réduire la fitness
+        fitness -= 150.0; // Réduire la fitness
     }
 
     // Critère d'exploration pour les premières générations
-    if (current_generation < 10) { // Par exemple, pour les 10 premières générations
-        if (directionChanges < 5) { // Minimum 5 changements de direction
-            fitness -= 5.0; // Pénalité pour manque d'exploration
-        } else {
-            fitness += 5.0; // Récompense pour exploration
-        }
+    if (current_generation < 50) { // Par exemple, encourager l'exploration pendant 50 générations
+    if (directionChanges < 3) {
+        fitness -= 50.0;  // Pénalité modérée
+    } else if (directionChanges >= 5 && directionChanges <= 10) {
+        fitness += 30.0;  // Récompense pour exploration modérée
+    } else {
+        fitness -= 20.0;  // Légère pénalité pour trop de changements
     }
+}
+
 
     // Ajouter une récompense supplémentaire si la fourmi atteint l'objectif
     if (antPos == goalPos) {
-        fitness += 10000.0;
+        fitness += 12000.0;
     }
 
     // Retourner la fitness finale, en s'assurant qu'elle n'est pas négative

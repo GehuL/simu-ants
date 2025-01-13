@@ -17,8 +17,8 @@ class Scene : public WorldListener {
     ComputeFitness compute_fitness;
 
     int m_count = 0;
-    const int num_generations = 100; // Nombre total de générations
-    const int num_ants = 1;        // Nombre de fourmis par génération
+    const int num_generations = 1000; // Nombre total de générations
+    const int num_ants = 20;        // Nombre de fourmis par génération
     int current_generation = 0;
 
     std::vector<double> avg_fitness_per_gen; // Suivi des fitness moyennes
