@@ -257,6 +257,7 @@ void World::drawUI()
 
     // Nombre d'entités
     DrawText(TextFormat("Entity: %d", m_entities.size()), 0, 100, 20, BLUE);
+
 }
 
 void World::drawEntityInfo()
@@ -264,22 +265,29 @@ void World::drawEntityInfo()
     if(!m_selected_en.expired())
     {
         const Entity* en = m_selected_en.lock().get();
+       
         Vec2f pos = en->getPos();
        
         DrawRectangleLines(pos.x - 1, pos.y - 1, 6, 6, YELLOW);
        
         const char* text = TextFormat("Id: %d Type: %s", en->getId(), en->getType());
+        const Color boxColor = (Color) {0x03, 0xd3, 0xfc, 0x55};
+        const int buttonHeight = 50;
         int boxeWidth =  MeasureText(text, GuiGetStyle(LABEL, TEXT_SIZE));
 
         Rectangle boxPos = {pos.x + 50, pos.y + 50, (float) boxeWidth + 16, 50};
 
-        const Color boxColor = (Color) {0x03, 0xd3, 0xfc, 0x55};
+        if(typeid(*en) == typeid(AntIA))
+            boxPos.width += buttonHeight + 5;
 
         DrawRectangle(boxPos.x, boxPos.y, boxPos.width, boxPos.height, boxColor);
         DrawLineEx((Vector2) {pos.x, pos.y}, (Vector2) {boxPos.x, boxPos.y}, 4, boxColor);
 
         GuiSetStyle(LABEL, TEXT_COLOR_NORMAL, 0xffff);
         GuiLabel((Rectangle) {boxPos.x + 8, boxPos.y, boxPos.width, boxPos.height}, text);
+        
+        // if(typeid(*en) == typeid(AntIA))
+           // GuiButton((Rectangle){boxPos.x + 8, boxPos.y + 15, boxPos.width/2, buttonHeight}, "Open Genome");
     }
 }
 
