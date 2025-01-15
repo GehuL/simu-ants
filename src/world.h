@@ -195,12 +195,16 @@ namespace simu
             void drawFrame() override;
             void drawUI() override;
             void updateTick() override;
+
+            void drawEntityInfo();
         
             unsigned long m_entity_cnt;
             unsigned int m_seed;
 
             std::shared_ptr<WorldListener> m_listener;
             std::vector<std::shared_ptr<Entity>> m_entities;
+
+            std::weak_ptr<Entity> m_selected_en;
 
             Grid m_grid;
 

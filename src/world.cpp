@@ -5,6 +5,8 @@
 #include "ant.h"
 #include "external/json.hpp"
 
+#include "raygui.h"
+
 using namespace simu;
 using json = nlohmann::json;
 
@@ -149,20 +151,22 @@ void World::load(const std::string& filename)
 void World::handleMouse()
 {
     // TODO: Interpoler les points pour tracer des lignes
-    Vector2 pos = GetScreenToWorld2D(GetMousePosition(), m_camera);
-    if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)) // PUT WALL
+    Vector2 mousePos = GetScreenToWorld2D(GetMousePosition(), m_camera);
+    Vec2i tilePos = getGrid().toTileCoord(mousePos);
+
+    if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)) 
     {
-        m_grid.setTile(getSelectedTile(), pos.x, pos.y);
+        m_grid.setTile(getSelectedTile(), mousePos.x, mousePos.y);
     }else if(IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) // REMOVE TILE
     {
-        m_grid.setTile(AIR, pos.x, pos.y);
+        m_grid.setTile(AIR, mousePos.x, mousePos.y);
     }else
     {
-        Vector2i grid_pos = m_grid.toTileCoord(pos.x, pos.y);
         const int tileSize = m_grid.getTileSize();
-        DrawRectangle(grid_pos.x * tileSize , grid_pos.y * tileSize, tileSize, tileSize, (Color){50, 0, 253, 100});
+        DrawRectangle(tilePos.x * tileSize , tilePos.y * tileSize, tileSize, tileSize, (Color){50, 0, 253, 100});
     }
     
+    // Changer de type de tuile
     if(IsMouseButtonPressed(MOUSE_BUTTON_MIDDLE))
     {
         m_cursorTileIndex++;
@@ -197,7 +201,30 @@ void World::handleKeyboard()
         {
             updateTick();
         }
-    }  
+    }
+
+    if(IsKeyPressed(KEY_Q)) // Selection entité
+    {
+        Vector2 mousePos = GetScreenToWorld2D(GetMousePosition(), m_camera);
+        Vec2i tilePos = getGrid().toTileCoord(mousePos);
+
+        // Test si une entité est cliqué
+        auto en_it = std::find_if(m_entities.begin(), m_entities.end(), [&](const auto& en) {
+            return m_grid.toTileCoord(en.get()->getPos()) == tilePos;
+        });
+
+        // C'est une tuile
+        if(en_it != m_entities.end()) 
+        {
+            if(!m_selected_en.expired() && m_selected_en.lock()->getId() == en_it->get()->getId())
+            {
+                m_selected_en.reset(); // Déselectionne la fourmis
+            }else
+            {
+                m_selected_en = *en_it; // Sélectionne 
+            }
+        }
+    }
 }
 
 void World::drawFrame()
@@ -211,6 +238,8 @@ void World::drawFrame()
 
     if(m_listener)
         m_listener.get()->onDraw();
+
+    drawEntityInfo();
 }
 
 void World::drawUI()
@@ -228,6 +257,30 @@ void World::drawUI()
 
     // Nombre d'entités
     DrawText(TextFormat("Entity: %d", m_entities.size()), 0, 100, 20, BLUE);
+}
+
+void World::drawEntityInfo()
+{
+    if(!m_selected_en.expired())
+    {
+        const Entity* en = m_selected_en.lock().get();
+        Vec2f pos = en->getPos();
+       
+        DrawRectangleLines(pos.x - 1, pos.y - 1, 6, 6, YELLOW);
+       
+        const char* text = TextFormat("Id: %d Type: %s", en->getId(), en->getType());
+        int boxeWidth =  MeasureText(text, GuiGetStyle(LABEL, TEXT_SIZE));
+
+        Rectangle boxPos = {pos.x + 50, pos.y + 50, (float) boxeWidth + 16, 50};
+
+        const Color boxColor = (Color) {0x03, 0xd3, 0xfc, 0x55};
+
+        DrawRectangle(boxPos.x, boxPos.y, boxPos.width, boxPos.height, boxColor);
+        DrawLineEx((Vector2) {pos.x, pos.y}, (Vector2) {boxPos.x, boxPos.y}, 4, boxColor);
+
+        GuiSetStyle(LABEL, TEXT_COLOR_NORMAL, 0xffff);
+        GuiLabel((Rectangle) {boxPos.x + 8, boxPos.y, boxPos.width, boxPos.height}, text);
+    }
 }
 
 void World::updateTick()

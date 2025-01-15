@@ -1,9 +1,8 @@
 #ifndef __ENGINE_H__
 #define __ENGINE_H__
 
-#define RAYGUI_IMPLEMENTATION
-
 #include "config.h"
+
 #include "raylib.h"
 #include <string>
 

@@ -1,5 +1,7 @@
 #include "engine.h"
 #include "utils.h"
+
+#define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
 
 #define MIN(a, b) a > b ? b : a
