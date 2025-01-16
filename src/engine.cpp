@@ -204,6 +204,9 @@ void Engine::updateUI()
 {
     if(IsWindowResized())
     {
+        UnloadRenderTexture(m_renderer);
+        UnloadRenderTexture(m_gui_renderer);
+
         m_renderer = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
         m_gui_renderer = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
     }
