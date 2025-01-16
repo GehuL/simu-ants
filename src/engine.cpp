@@ -202,6 +202,12 @@ void Engine::drawUI()
 
 void Engine::updateUI()
 {
+    if(IsWindowResized())
+    {
+        m_renderer = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
+        m_gui_renderer = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
+    }
+
     BeginTextureMode(m_gui_renderer);
 
     ClearBackground((Color){255, 255, 255, 0});
