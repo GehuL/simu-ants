@@ -214,6 +214,15 @@ void Engine::drawUI()
 
 void Engine::updateUI()
 {
+    if(IsWindowResized())
+    {
+        UnloadRenderTexture(m_renderer);
+        UnloadRenderTexture(m_gui_renderer);
+
+        m_renderer = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
+        m_gui_renderer = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
+    }
+
     BeginTextureMode(m_gui_renderer);
 
     ClearBackground((Color){255, 255, 255, 0});
@@ -241,14 +250,14 @@ void Engine::updateUI()
         setFPS(framePerSecond);
     }
 
-    if(static_cast<int>(tickPerSecond) != getTPS()) {
+    if(static_cast<int>(tickPerSecond) != getTPS() && !m_noDelay) {
         setTPS(tickPerSecond);
     }
     
     bool lastStateNoDelay = m_noDelay;
     GuiCheckBox((Rectangle){ GetScreenWidth() / 2.f + 150, GetScreenHeight() - 50.f, 16, 16 }, "No limit", &m_noDelay);
     if(m_noDelay && !lastStateNoDelay) {
-        setTPS(99999999);
+        setTPS(999999999);
     }
 
     rlImGuiBegin();

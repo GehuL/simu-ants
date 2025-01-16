@@ -210,6 +210,8 @@ namespace simu
 
             int m_cursorTileIndex;
             const std::array<const Tile, 3> m_cursorTiles = {GROUND, FOOD, PHEROMONE};
+
+            bool m_showGenome;
     };
 
     class WorldListener
