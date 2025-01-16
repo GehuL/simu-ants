@@ -228,8 +228,11 @@ namespace simu
             // executé à la fréquence de rafraichissement de l'écran
             virtual void onDraw() = 0;
 
-                // executé à la frequence de mise à jour de la logique de la simulation
+            // executé à la frequence de mise à jour de la logique de la simulation
             virtual void onUpdate() = 0;
+
+            // executé à la fréquence de l'UI (30 FPS)
+            virtual void onDrawUI() = 0;
     };
 
     inline World& getWorld() { return simu::World::world; };

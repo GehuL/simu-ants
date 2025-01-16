@@ -147,7 +147,7 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
         }
     }
     unload();
-    rlImGuiEnd();
+    rlImGuiShutdown();
 
     CloseWindow();
     return 0;
@@ -204,12 +204,6 @@ void Engine::drawFrame()
 
 void Engine::drawUI()
 {
-    rlImGuiBegin();
-
-    bool open = true;
-    ImGui::ShowDemoWindow(&open);
-
-    rlImGuiEnd();
 }
 
 void Engine::updateUI()
@@ -261,13 +255,12 @@ void Engine::updateUI()
     }
 
     rlImGuiBegin();
-
     bool open = true;
     ImGui::ShowDemoWindow(&open);
+    drawUI();
 
     rlImGuiEnd();
 
-    drawUI();
 
     EndTextureMode();
 }

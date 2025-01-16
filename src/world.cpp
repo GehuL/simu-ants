@@ -7,6 +7,9 @@
 
 #include "raygui.h"
 
+#include "external/ui/imgui.h"
+#include "external/ui/rlImGui.h"
+
 using namespace simu;
 using json = nlohmann::json;
 
@@ -150,6 +153,9 @@ void World::load(const std::string& filename)
 
 void World::handleMouse()
 {
+    if(ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow))
+        return;
+
     // TODO: Interpoler les points pour tracer des lignes
     Vector2 mousePos = GetScreenToWorld2D(GetMousePosition(), m_camera);
 
@@ -272,6 +278,9 @@ void World::drawUI()
 
     // Nombre d'entités
     DrawText(TextFormat("Entity: %d", m_entities.size()), 0, 100, 20, BLUE);
+
+    if(m_listener)
+        m_listener.get()->onDrawUI();
 }
 
 void World::drawEntityInfo()

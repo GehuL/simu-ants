@@ -1,6 +1,9 @@
 #include "world.h"
 #include "ant.h"
 
+#include "external/ui/imgui.h"
+#include "external/ui/rlImGui.h"
+
 using namespace simu;
 
 class Scene: public WorldListener
@@ -18,45 +21,14 @@ class Scene: public WorldListener
             getWorld().spawnEntity<DemoAnt>(getWorld().gridToWorld(Vec2i{89, 161}));
         };
 
-        void onDraw() override
+        void onDrawUI() override 
         {
-            if(IsKeyPressed(KEY_G))
-            {
-                Grid& grid = getWorld().getGrid();
+            ImGui::Begin("Labyrinth settings");
+            ImGui::End();
+        };
 
-                for(const auto& ant: ants)
-                {
-                    if(ant.expired())
-                        continue;
-
-                    Vec2i antPos = grid.toTileCoord((Vec2f)(ant.lock()->getPos()));
-
-                    auto path = grid.findPath(antPos, getWorld().mouseToGridCoord());
-
-                    const int tileSize = grid.getTileSize();
-
-                    for(Vec2i tile : path)
-                    {
-                        DrawRectangle(tile.x * tileSize, tile.y * tileSize, tileSize, tileSize, RED);
-                    }
-                }
-            }
-
-            if(IsKeyPressed(KEY_SPACE))
-            {
-                // getWorld().clearEntities();
-                //  for(auto& en : getWorld().getEntities())
-                // {
-                //     getWorld().removeEntity(en.lock()->getId());
-                // }
-                getWorld().removeEntities(ants.begin(), ants.end());
-                // getWorld().clearEntities();
-            }
-
-        }
-
+        void onDraw() override {};
         void onUnload() override {};
-        
         void onUpdate() override {};
 };
 
