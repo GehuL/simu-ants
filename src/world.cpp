@@ -352,5 +352,19 @@ bool World::removeEntity(unsigned long id)
 
     m_entities.erase(it);
 
-    return it != m_entities.end();
+    if(it != m_entities.end())
+    {
+       // if(id == (m_entity_cnt - 1)) // Source de bugs .. avoir plus tard
+       //     m_entity_cnt--; // Maintient l'ordre tout en évitant la limite atteinte (casi impossible)
+
+        return true;
+    }
+    return false;
 }
+
+
+void World::clearEntities() 
+{ 
+    m_entities.clear();
+    m_entity_cnt = 0;
+};
