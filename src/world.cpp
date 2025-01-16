@@ -218,7 +218,7 @@ void World::handleKeyboard()
         // Test si une entité est cliqué
         auto en_it = std::find_if(m_entities.begin(), m_entities.end(), [&](const auto& en) {
             // Distance de manhattan (+ rapide que euclidien car lent pour beaucoup d'entité)
-            return (en.get()->getPos() + Vec2f(2.5f, 2.5f)).distance(mousePos) < 5; 
+            return (en.get()->getPos() + Vec2f(2.5f, 2.5f)).manhattan(mousePos) < 5; 
         });
 
         // C'est une tuile
