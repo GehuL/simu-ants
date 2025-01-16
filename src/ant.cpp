@@ -16,7 +16,7 @@ void Ant::update() {}
 
 void Ant::draw() 
 {
-    DrawRectangle(this->m_pos.x, this->m_pos.y, 5, 5, DARKBROWN);
+    DrawRectangle(this->m_pos.x, this->m_pos.y, 5, 5, DARKPURPLE);
 
     if(m_carried_object.type != Type::AIR)
     {
