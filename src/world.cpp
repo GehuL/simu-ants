@@ -152,7 +152,6 @@ void World::handleMouse()
 {
     // TODO: Interpoler les points pour tracer des lignes
     Vector2 mousePos = GetScreenToWorld2D(GetMousePosition(), m_camera);
-    Vec2i tilePos = getGrid().toTileCoord(mousePos);
 
     if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)) 
     {
@@ -160,10 +159,6 @@ void World::handleMouse()
     }else if(IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) // REMOVE TILE
     {
         m_grid.setTile(AIR, mousePos.x, mousePos.y);
-    }else
-    {
-        const int tileSize = m_grid.getTileSize();
-        DrawRectangle(tilePos.x * tileSize , tilePos.y * tileSize, tileSize, tileSize, (Color){50, 0, 253, 100});
     }
     
     // Changer de type de tuile
@@ -173,7 +168,20 @@ void World::handleMouse()
         m_cursorTileIndex %= m_cursorTiles.size();
     }
 
-    m_camera.zoom += GetMouseWheelMove() * 0.1f;
+    float zoomIncrement = GetMouseWheelMove() * 0.1f;
+    
+     if (zoomIncrement != 0.0f) 
+     {
+        m_camera.zoom += zoomIncrement;
+       
+        // Empêcher un zoom négatif ou trop petit
+        if (m_camera.zoom < 0.1f) m_camera.zoom = 0.1f; 
+
+        // Recalculer la position de la caméra pour garder la position de la souris au même endroit
+        Vector2 newWorldMousePosition = GetScreenToWorld2D(GetMousePosition(), m_camera);
+        m_camera.target.x -= (newWorldMousePosition.x - mousePos.x);
+        m_camera.target.y -= (newWorldMousePosition.y - mousePos.y);
+    }
 }
 
 void World::handleKeyboard()
@@ -257,7 +265,6 @@ void World::drawUI()
 
     // Nombre d'entités
     DrawText(TextFormat("Entity: %d", m_entities.size()), 0, 100, 20, BLUE);
-
 }
 
 void World::drawEntityInfo()
@@ -272,7 +279,7 @@ void World::drawEntityInfo()
        
         const char* text = TextFormat("Id: %d Type: %s", en->getId(), en->getType());
         const Color boxColor = (Color) {0x03, 0xd3, 0xfc, 0x55};
-        const int buttonHeight = 50;
+        const int buttonHeight = 18;
         int boxeWidth =  MeasureText(text, GuiGetStyle(LABEL, TEXT_SIZE));
 
         Rectangle boxPos = {pos.x + 50, pos.y + 50, (float) boxeWidth + 16, 50};
@@ -284,10 +291,22 @@ void World::drawEntityInfo()
         DrawLineEx((Vector2) {pos.x, pos.y}, (Vector2) {boxPos.x, boxPos.y}, 4, boxColor);
 
         GuiSetStyle(LABEL, TEXT_COLOR_NORMAL, 0xffff);
-        GuiLabel((Rectangle) {boxPos.x + 8, boxPos.y, boxPos.width, boxPos.height}, text);
+        GuiLabel((Rectangle) {boxPos.x + 8, boxPos.y - 8, boxPos.width, boxPos.height}, text);
         
-        // if(typeid(*en) == typeid(AntIA))
-           // GuiButton((Rectangle){boxPos.x + 8, boxPos.y + 15, boxPos.width/2, buttonHeight}, "Open Genome");
+        if(typeid(*en) == typeid(AntIA))
+        {
+            Rectangle buttonBox = (Rectangle) {boxPos.x + 2, boxPos.y + 28, boxPos.width - 8, buttonHeight};
+            Color btnColor = GREEN;            
+            if(CheckCollisionPointRec(GetScreenToWorld2D(GetMousePosition(), m_camera), buttonBox))
+            {
+                btnColor = DARKGREEN;
+                if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT));
+            }
+            
+            DrawRectangleRec(buttonBox, btnColor);
+            DrawRectangleLinesEx(buttonBox, 2.5, GRAY);
+            DrawText("Open Genome", boxPos.x + 8, boxPos.y + 30, 12, BLUE);
+        }
     }
 }
 

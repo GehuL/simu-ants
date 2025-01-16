@@ -25,7 +25,8 @@ class Scene: public WorldListener
             for(Vec2i tile : path)
                 grid.setTile(FOOD, tile.x, tile.y);*/
 
-            ants = getWorld().spawnEntities<AntIA>(1000, getWorld().gridToWorld(Vec2i{89, 161}));
+            ants = getWorld().spawnEntities<AntIA>(1000, Vec2i{89, 161});
+            getWorld().spawnEntity<DemoAnt>(getWorld().gridToWorld(Vec2i{89, 161}));
         };
 
         void onDraw() override
