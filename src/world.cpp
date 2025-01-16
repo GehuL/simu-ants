@@ -174,10 +174,9 @@ void World::handleMouse()
         m_camera.offset.y += GetMouseDelta().y;
     }
 
-    
     float zoomIncrement = GetMouseWheelMove() * 0.1f;
-     if (zoomIncrement != 0.0f) 
-     {
+    if (zoomIncrement != 0.0f) 
+    {
         m_camera.zoom += zoomIncrement;
        
         // Empêcher un zoom négatif ou trop petit
@@ -253,13 +252,15 @@ void World::drawFrame()
     if(m_listener)
         m_listener.get()->onDraw();
 
-    drawEntityInfo();
+    //drawEntityInfo();
 }
 
 void World::drawUI()
 {
     handleKeyboard();
     handleMouse();
+
+    drawEntityInfo();
 
     // Coordonnées de la souris
     Vector2i mousePos = mouseToGridCoord();
@@ -279,19 +280,17 @@ void World::drawEntityInfo()
     {
         const Entity* en = m_selected_en.lock().get();
        
-        Vec2f pos = en->getPos();
+        Vec2f enPos = en->getPos();
+        Vec2f pos = GetWorldToScreen2D((Vector2){enPos.x, enPos.y}, m_camera);
        
         DrawRectangleLines(pos.x - 1, pos.y - 1, 6, 6, YELLOW);
        
         const char* text = TextFormat("Id: %d Type: %s", en->getId(), en->getType());
-        const Color boxColor = (Color) {0x03, 0xd3, 0xfc, 0x55};
+        const Color boxColor = (Color) {0x03, 0xd3, 0xfc, 0xA5};
         const int buttonHeight = 18;
         int boxeWidth =  MeasureText(text, GuiGetStyle(LABEL, TEXT_SIZE));
 
         Rectangle boxPos = {pos.x + 50, pos.y + 50, (float) boxeWidth + 16, 50};
-
-        if(typeid(*en) == typeid(AntIA))
-            boxPos.width += buttonHeight + 5;
 
         DrawRectangle(boxPos.x, boxPos.y, boxPos.width, boxPos.height, boxColor);
         DrawLineEx((Vector2) {pos.x, pos.y}, (Vector2) {boxPos.x, boxPos.y}, 4, boxColor);
@@ -301,17 +300,15 @@ void World::drawEntityInfo()
         
         if(typeid(*en) == typeid(AntIA))
         {
-            Rectangle buttonBox = (Rectangle) {boxPos.x + 2, boxPos.y + 28, boxPos.width - 8, buttonHeight};
-            Color btnColor = GREEN;            
-            if(CheckCollisionPointRec(GetScreenToWorld2D(GetMousePosition(), m_camera), buttonBox))
-            {
-                btnColor = DARKGREEN;
-                if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT));
-            }
+            Rectangle buttonBox = (Rectangle) {boxPos.x + 4, boxPos.y + 28, boxPos.width - 8, buttonHeight};
             
-            DrawRectangleRec(buttonBox, btnColor);
-            DrawRectangleLinesEx(buttonBox, 2.5, GRAY);
-            DrawText("Open Genome", boxPos.x + 8, boxPos.y + 30, 12, BLUE);
+            if(GuiButton(buttonBox, "Open Genome")) m_showGenome = true;
+          
+            if(m_showGenome)
+            {
+                if(GuiWindowBox((Rectangle) {80, 80, GetScreenWidth() - 160, GetScreenHeight() - 160}, TextFormat("Génome N°%d", en->getId())))
+                    m_showGenome = false;
+            }
         }
     }
 }
