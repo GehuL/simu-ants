@@ -209,7 +209,7 @@ namespace simu
             Grid m_grid;
 
             int m_cursorTileIndex;
-            const std::array<const Tile, 3> m_cursorTiles = {GROUND, FOOD, PHEROMONE};  
+            const std::array<const Tile, 3> m_cursorTiles = {GROUND, FOOD, PHEROMONE};
     };
 
     class WorldListener

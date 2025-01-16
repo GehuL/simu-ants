@@ -168,8 +168,14 @@ void World::handleMouse()
         m_cursorTileIndex %= m_cursorTiles.size();
     }
 
-    float zoomIncrement = GetMouseWheelMove() * 0.1f;
+    if(IsMouseButtonDown(MOUSE_BUTTON_MIDDLE))
+    {
+        m_camera.offset.x += GetMouseDelta().x;
+        m_camera.offset.y += GetMouseDelta().y;
+    }
+
     
+    float zoomIncrement = GetMouseWheelMove() * 0.1f;
      if (zoomIncrement != 0.0f) 
      {
         m_camera.zoom += zoomIncrement;
