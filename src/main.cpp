@@ -13,18 +13,7 @@ class Scene: public WorldListener
             Grid& grid = getWorld().getGrid();
             grid.fromImage("maze.png");
             getWorld().centerCamera();
-            
-            TraceLog(LOG_DEBUG, "Size of Type: %d  Size of Tiles: %d", sizeof(Type), sizeof(Tile));
-            
-           /* double startTime = GetTime();
-            auto path = grid.findPath(Vec2i{89, 161}, Vec2i{6, 10});
-
-            double deltaTime = (GetTime() - startTime) * 1000.f;
-            TraceLog(LOG_DEBUG, "A*: %.1lf ms", deltaTime);
-        
-            for(Vec2i tile : path)
-                grid.setTile(FOOD, tile.x, tile.y);*/
-
+                        
             ants = getWorld().spawnEntities<AntIA>(1000, Vec2i{89, 161});
             getWorld().spawnEntity<DemoAnt>(getWorld().gridToWorld(Vec2i{89, 161}));
         };

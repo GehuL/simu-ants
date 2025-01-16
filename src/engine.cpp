@@ -4,6 +4,9 @@
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
 
+#include "external/ui/imgui.h"
+#include "external/ui/rlImGui.h"
+
 #define MIN(a, b) a > b ? b : a
 
 using namespace simu;
@@ -33,6 +36,9 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
     
     m_renderer = LoadRenderTexture(screenWidth, screenHeight);
     m_gui_renderer = LoadRenderTexture(screenWidth, screenHeight);
+
+
+    rlImGuiSetup(false);
 
     init();
 
@@ -141,6 +147,7 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
         }
     }
     unload();
+    rlImGuiEnd();
 
     CloseWindow();
     return 0;
@@ -197,7 +204,12 @@ void Engine::drawFrame()
 
 void Engine::drawUI()
 {
-    
+    rlImGuiBegin();
+
+    bool open = true;
+    ImGui::ShowDemoWindow(&open);
+
+    rlImGuiEnd();
 }
 
 void Engine::updateUI()
@@ -206,8 +218,6 @@ void Engine::updateUI()
 
     ClearBackground((Color){255, 255, 255, 0});
 
-    drawUI();
-    
     DrawText(TextFormat("%d FPS\n%d TPS\nTick load: %d/%d ms (%.1f%%)", 
     m_lastFrameCounter, 
     m_lastTickCounter, 
@@ -240,6 +250,15 @@ void Engine::updateUI()
     if(m_noDelay && !lastStateNoDelay) {
         setTPS(99999999);
     }
+
+    rlImGuiBegin();
+
+    bool open = true;
+    ImGui::ShowDemoWindow(&open);
+
+    rlImGuiEnd();
+
+    drawUI();
 
     EndTextureMode();
 }
