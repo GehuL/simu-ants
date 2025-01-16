@@ -214,11 +214,11 @@ void World::handleKeyboard()
     if(IsKeyPressed(KEY_Q)) // Selection entité
     {
         Vector2 mousePos = GetScreenToWorld2D(GetMousePosition(), m_camera);
-        Vec2i tilePos = getGrid().toTileCoord(mousePos);
 
         // Test si une entité est cliqué
         auto en_it = std::find_if(m_entities.begin(), m_entities.end(), [&](const auto& en) {
-            return m_grid.toTileCoord(en.get()->getPos()) == tilePos;
+            // Distance de manhattan (+ rapide que euclidien car lent pour beaucoup d'entité)
+            return (en.get()->getPos() + Vec2f(2.5f, 2.5f)).distance(mousePos) < 5; 
         });
 
         // C'est une tuile
