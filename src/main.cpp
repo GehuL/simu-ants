@@ -15,7 +15,6 @@ class Scene: public WorldListener
         {
             Grid& grid = getWorld().getGrid();
             grid.fromImage("maze.png");
-            getWorld().centerCamera();
                         
             ants = getWorld().spawnEntities<AntIA>(1000, Vec2i{89, 161});
             getWorld().spawnEntity<DemoAnt>(getWorld().gridToWorld(Vec2i{89, 161}));
@@ -23,7 +22,7 @@ class Scene: public WorldListener
 
         void onDrawUI() override 
         {
-            ImGui::Begin("Labyrinth settings");
+            ImGui::Begin("World");
             ImGui::End();
         };
 
@@ -38,5 +37,5 @@ int main(void)
 
     simu::World& world = simu::getWorld(); 
     world.setListener(std::make_shared<Scene>());
-    return world.run(800, 800, "ants-simulation");
+    return world.run(1600, 800, "ants-simulation");
 }

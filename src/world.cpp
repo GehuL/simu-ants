@@ -10,6 +10,7 @@
 #include "external/ui/imgui.h"
 #include "external/ui/rlImGui.h"
 
+
 using namespace simu;
 using json = nlohmann::json;
 
@@ -197,6 +198,9 @@ void World::handleMouse()
 
 void World::handleKeyboard()
 {
+    if(ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow))
+        return;
+
     constexpr float camera_speed = 5.0f; 
 
     if (IsKeyDown(KEY_DOWN)) m_camera.offset.y -= camera_speed;
@@ -278,6 +282,74 @@ void World::drawUI()
 
     // Nombre d'entités
     DrawText(TextFormat("Entity: %d", m_entities.size()), 0, 100, 20, BLUE);
+
+
+    ImGui::Begin("World");
+
+    if(m_listener && ImGui::CollapsingHeader("Level"))
+    {
+        ImGui::Text("Level name: %s", typeid(m_listener.get()).name());
+        if(ImGui::Button("Restart Level")) init();
+    }
+
+    if(ImGui::CollapsingHeader("Grid"))
+    {
+        ImGui::Text("Size: %dx%d", m_grid.getGridWidth(), m_grid.getGridWidth());
+        static char filename[128] = "/maze.png";
+        ImGui::InputText("File name", filename, IM_ARRAYSIZE(filename));
+        ImGui::SameLine();
+        static std::runtime_error last_error("");
+        if(ImGui::Button("Load grid"))
+        {
+            try
+            {
+                m_grid.fromImage(std::string(filename));
+            }catch(std::runtime_error& error)
+            {
+                last_error = error;
+                ImGui::OpenPopup("Error");
+            }
+        }
+        
+        if (ImGui::BeginPopupModal("Error"))
+        {
+            ImGui::Text(last_error.what());
+            if (ImGui::Button("Close"))
+                ImGui::CloseCurrentPopup();
+            ImGui::EndPopup();
+        }
+    }
+
+    if(ImGui::CollapsingHeader("Entity"))
+    {
+        ImGui::Text("Entity count: %d", m_entities.size());
+    
+        if(ImGui::Button("Remove all")) clearEntities();
+
+        if(ImGui::TreeNode("List"))
+        {
+            for(auto& en: m_entities)
+            {
+                Entity* entity = en.get();
+                if(ImGui::TreeNode((void*)(intptr_t)entity->getId() + 1, "%s Id:%ld", entity->getType(), entity->getId()))
+                {
+                    if(ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows) && ImGui::IsMouseClicked(ImGuiPopupFlags_MouseButtonLeft))
+                        m_selected_en = en;
+
+                    Vec2i gridPos = m_grid.toTileCoord(entity->getPos());
+                    Vec2f globalPos = entity->getPos();
+
+                    ImGui::Text("Grid pos: (%d, %d)", gridPos.x, gridPos.y);
+                    ImGui::Text("Global pos: (%.1f, %.1f)", globalPos.x, globalPos.y);
+
+                    ImGui::TreePop();
+                }
+            }
+            ImGui::TreePop();
+        }
+    }
+
+    ImGui::End();
 
     if(m_listener)
         m_listener.get()->onDrawUI();
