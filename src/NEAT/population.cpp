@@ -105,6 +105,95 @@ std::vector<neat::Individual> Population::reproduce_from_genomes(const std::vect
     return new_generation;
 }
 
+std::vector<neat::Individual> Population::reproduce_from_genomes_with_fitness(
+    const std::vector<std::shared_ptr<Genome>>& genomes,
+    const std::vector<double>& fitnesses
+) {
+    if (genomes.empty() || fitnesses.empty() || genomes.size() != fitnesses.size()) {
+        throw std::runtime_error("Erreur : Liste de génomes ou de fitness invalide.");
+    }
+
+    // Trier les génomes par fitness (en tenant compte de la configuration de seuil de survie)
+    std::vector<std::shared_ptr<Genome>> sorted_genomes = genomes;
+    std::vector<double> sorted_fitnesses = fitnesses;
+
+    // Tri des génomes et des fitness associés (du meilleur au moins bon)
+    std::vector<std::pair<std::shared_ptr<Genome>, double>> genome_fitness_pairs;
+    for (size_t i = 0; i < genomes.size(); ++i) {
+        genome_fitness_pairs.push_back({genomes[i], fitnesses[i]});
+    }
+
+    std::sort(genome_fitness_pairs.begin(), genome_fitness_pairs.end(),
+        [](const std::pair<std::shared_ptr<Genome>, double>& a, const std::pair<std::shared_ptr<Genome>, double>& b) {
+            return a.second > b.second;  // Tri décroissant selon la fitness
+        });
+
+    // Récupérer les génomes triés et les fitness correspondants
+    for (size_t i = 0; i < genome_fitness_pairs.size(); ++i) {
+        sorted_genomes[i] = genome_fitness_pairs[i].first;
+        sorted_fitnesses[i] = genome_fitness_pairs[i].second;
+    }
+
+    int reproduction_cutoff = std::ceil(config.survival_threshold * sorted_genomes.size());
+    std::vector<neat::Individual> new_generation;
+
+    std::cout << "Reproducing from sorted genome list with fitness..." << std::endl;
+
+    // Boucle pour créer la nouvelle génération
+    while (new_generation.size() < config.population_size) {
+        // Sélectionner deux parents parmi les meilleurs génomes (selon le seuil de survie)
+        const std::shared_ptr<Genome>& p1 = rng.choose_random(sorted_genomes, reproduction_cutoff);
+        const std::shared_ptr<Genome>& p2 = rng.choose_random(sorted_genomes, reproduction_cutoff);
+
+        std::cout << "Crossover between " << p1->get_genome_id() << " and " << p2->get_genome_id() << std::endl;
+
+        // Crossover
+        neat::Neat neat_instance;
+        Genome offspring_genome = neat_instance.alt_crossover(p1, p2, generate_next_genome_id());
+        std::shared_ptr<Genome> offspring = std::make_shared<Genome>(offspring_genome);
+
+        // Mutation
+        mutate(*offspring);
+
+        // Ajouter à la nouvelle génération
+        new_generation.push_back(neat::Individual(offspring));
+    }
+
+    return new_generation;
+}
+
+
+
+std::vector<neat::Individual> Population::reproduce_from_genome_roulette(
+    const std::vector<std::shared_ptr<Genome>>& genomes,
+    const std::vector<double>& fitnesses
+) {
+    if (genomes.empty() || fitnesses.empty() || genomes.size() != fitnesses.size()) {
+        throw std::runtime_error("Erreur : Liste de génomes ou de fitness invalide.");
+    }
+
+    std::vector<neat::Individual> new_generation;
+
+    while (new_generation.size() < config.population_size) {
+        // Sélection des parents par roulette
+        const auto& p1 = rng.roulette_selection(genomes, fitnesses);
+        const auto& p2 = rng.roulette_selection(genomes, fitnesses);
+
+        // Crossover
+        neat::Neat neat_instance;
+        Genome offspring_genome = neat_instance.alt_crossover(p1, p2, generate_next_genome_id());
+        std::shared_ptr<Genome> offspring = std::make_shared<Genome>(offspring_genome);
+
+        // Mutation
+        mutate(*offspring);
+
+        // Ajouter à la nouvelle génération
+        new_generation.push_back(neat::Individual(offspring));
+    }
+
+    return new_generation;
+}
+
 
 
 

@@ -138,7 +138,7 @@ double ComputeFitness::evaluate_lab(const simu::Vec2i &startPos, const simu::Vec
     }
     
     // Retourner la fitness finale, en s'assurant qu'elle n'est pas négative
-    return fitness ;
+    return fitness > 0.0 ? fitness : 0.0;
 }
 
 

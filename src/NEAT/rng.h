@@ -92,6 +92,28 @@ T& choose_random(const std::vector<T>& vec, int limit) {
 }
 
 
+template <typename T>
+T& roulette_selection(const std::vector<T>& items, const std::vector<double>& fitnesses) {
+    if (items.size() != fitnesses.size() || items.empty()) {
+        throw std::invalid_argument("Items and fitnesses must have the same non-zero size.");
+    }
+
+    double total_fitness = std::accumulate(fitnesses.begin(), fitnesses.end(), 0.0);
+    std::uniform_real_distribution<double> dist(0.0, total_fitness);
+    double random_value = dist(gen);
+
+    double cumulative_fitness = 0.0;
+    for (size_t i = 0; i < items.size(); ++i) {
+        cumulative_fitness += fitnesses[i];
+        if (random_value <= cumulative_fitness) {
+            return const_cast<T&>(items[i]);
+        }
+    }
+
+    return const_cast<T&>(items.back());  // Retourne le dernier par sécurité
+}
+
+
 private:
     std::random_device rd;  // Source d'entropie pour la génération aléatoire
     std::mt19937 gen;       // Générateur de nombres aléatoires basé sur Mersenne Twister

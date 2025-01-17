@@ -108,6 +108,9 @@ namespace simu
             const int getWallHit() { return wallHit; };
             const std::unordered_set<std::pair<int, int>, pair_hash>& getVisitedPositions() { return visitedPositions; };
 
+            double getFitness() { return fitness; };
+            double setFitness(double fit) { fitness = fit; return fitness; };
+
             static constexpr int inputCount() { return 6; } ;
             static constexpr int outputCount() { return 4; };
 
@@ -122,6 +125,7 @@ namespace simu
         private:
             Genome m_genome;
             FeedForwardNeuralNetwork m_network;
+            double fitness = 0.0;
             Vec2i m_dir;
             Vec2i m_gridPos;
             int lastAction = -1; 

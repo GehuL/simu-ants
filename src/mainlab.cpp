@@ -99,8 +99,15 @@ public:
 
         auto locked_ant = ant.lock();
         Vec2i antPos = getWorld().getGrid().toTileCoord((Vec2f)(locked_ant->getPos()));
-        total_fitness += compute_fitness.evaluate_lab(
-            antPos, Vec2i(73, 0), getWorld().getGrid(), *locked_ant, initial_distance,current_generation);
+        // Calculer la fitness individuelle
+        double fitness = compute_fitness.evaluate_lab(
+            antPos, Vec2i(73, 0), getWorld().getGrid(), *locked_ant, initial_distance, current_generation
+        );
+
+        total_fitness += fitness;
+
+        // Attribuer la fitness à l'AntIA
+        locked_ant->setFitness(fitness);
     }
 
     double avg_fitness = total_fitness / ants.size();
@@ -115,13 +122,15 @@ public:
 
     void nextGeneration() {
     std::vector<std::shared_ptr<Genome>> genomes;
+    std::vector<double> fitnesses;
     for (const auto &ant : ants) {
         if (!ant.expired()) {
             genomes.push_back(std::make_shared<Genome>(ant.lock()->getGenome()));
+            fitnesses.push_back(ant.lock()->getFitness());
         }
     }
 
-    auto new_genomes = mPop.reproduce_from_genomes(genomes);
+    auto new_genomes = mPop.reproduce_from_genome_roulette(genomes, fitnesses);
     ants.clear();
 
     getWorld().clearEntities();
