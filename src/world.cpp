@@ -154,7 +154,7 @@ void World::load(const std::string& filename)
 
 void World::handleMouse()
 {
-    if(ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow))
+    if(ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow))
         return;
 
     // TODO: Interpoler les points pour tracer des lignes
@@ -295,7 +295,7 @@ void World::drawUI()
     if(ImGui::CollapsingHeader("Grid"))
     {
         ImGui::Text("Size: %dx%d", m_grid.getGridWidth(), m_grid.getGridWidth());
-        static char filename[128] = "/maze.png";
+        static char filename[128] = "maze.png";
         ImGui::InputText("File name", filename, IM_ARRAYSIZE(filename));
         ImGui::SameLine();
         static std::runtime_error last_error("");
@@ -322,29 +322,39 @@ void World::drawUI()
 
     if(ImGui::CollapsingHeader("Entity"))
     {
-        ImGui::Text("Entity count: %d", m_entities.size());
+        ImGui::Text("Entity count: %lld", m_entities.size());
     
         if(ImGui::Button("Remove all")) clearEntities();
 
         if(ImGui::TreeNode("List"))
         {
-            for(auto& en: m_entities)
-            {
-                Entity* entity = en.get();
-                if(ImGui::TreeNode((void*)(intptr_t)entity->getId() + 1, "%s Id:%ld", entity->getType(), entity->getId()))
+            ImGuiListClipper clipper; // Evite d'itérer sur toutes les entités
+            clipper.Begin(m_entities.size());
+            static bool selected = false;
+            while(clipper.Step())
+                for(int row_n = clipper.DisplayStart; row_n < clipper.DisplayEnd; row_n++)
                 {
-                    if(ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows) && ImGui::IsMouseClicked(ImGuiPopupFlags_MouseButtonLeft))
-                        m_selected_en = en;
+                    Entity* entity = m_entities[row_n].get();
+                    char nodeId[32];
+                    sprintf(nodeId, "nodeId%ld", entity->getId());
 
-                    Vec2i gridPos = m_grid.toTileCoord(entity->getPos());
-                    Vec2f globalPos = entity->getPos();
+                    if(ImGui::TreeNode(nodeId, "%s Id:%ld", entity->getType(), entity->getId()))
+                    {
+                        // if(ImGui::Selectable(nodeId, ))
+                        // {
+                        //     m_selected_en = m_entities[row_n];
+                        // } 
+                        // if(ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows) && ImGui::IsMouseClicked(ImGuiPopupFlags_MouseButtonLeft))
 
-                    ImGui::Text("Grid pos: (%d, %d)", gridPos.x, gridPos.y);
-                    ImGui::Text("Global pos: (%.1f, %.1f)", globalPos.x, globalPos.y);
+                        Vec2i gridPos = m_grid.toTileCoord(entity->getPos());
+                        Vec2f globalPos = entity->getPos();
 
-                    ImGui::TreePop();
+                        ImGui::Text("Grid pos: (%d, %d)", gridPos.x, gridPos.y);
+                        ImGui::Text("Global pos: (%.1f, %.1f)", globalPos.x, globalPos.y);
+
+                        ImGui::TreePop();
+                    }
                 }
-            }
             ImGui::TreePop();
         }
     }

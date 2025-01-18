@@ -7,6 +7,8 @@
 #include "external/ui/imgui.h"
 #include "external/ui/rlImGui.h"
 
+#include "external/ui/imgui_spectrum.h"
+
 #define MIN(a, b) a > b ? b : a
 
 using namespace simu;
@@ -37,8 +39,8 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
     m_renderer = LoadRenderTexture(screenWidth, screenHeight);
     m_gui_renderer = LoadRenderTexture(screenWidth, screenHeight);
 
-
     rlImGuiSetup(false);
+    // ImGui::Spectrum::LoadStyleSynth();
 
     init();
 
