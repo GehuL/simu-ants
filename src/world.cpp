@@ -9,6 +9,7 @@
 
 #include "external/ui/imgui.h"
 #include "external/ui/rlImGui.h"
+#include "external/ui/imgui_internal.h"
 
 
 using namespace simu;
@@ -160,9 +161,26 @@ void World::handleMouse()
     // TODO: Interpoler les points pour tracer des lignes
     Vector2 mousePos = GetScreenToWorld2D(GetMousePosition(), m_camera);
 
-    if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)) 
+    if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
     {
-        m_grid.setTile(getSelectedTile(), mousePos.x, mousePos.y);
+        auto entity = getEntityAt(mousePos);
+
+        if(!entity.expired()) 
+        {
+            if(!m_selected_en.expired() && m_selected_en.lock()->getId() == entity.lock()->getId())
+            {
+                m_selected_en.reset(); // Déselectionne la fourmis
+            }else
+            {
+                m_selected_en = entity; // Sélectionne 
+                m_focus_en_gui = true;
+            }
+        }
+    }else if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)) 
+    {
+        auto entity = getEntityAt(mousePos);
+        if(entity.expired())
+         m_grid.setTile(getSelectedTile(), mousePos.x, mousePos.y);
     }else if(IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) // REMOVE TILE
     {
         m_grid.setTile(AIR, mousePos.x, mousePos.y);
@@ -223,29 +241,6 @@ void World::handleKeyboard()
         if(isPaused())
         {
             updateTick();
-        }
-    }
-
-    if(IsKeyPressed(KEY_Q)) // Selection entité
-    {
-        Vector2 mousePos = GetScreenToWorld2D(GetMousePosition(), m_camera);
-
-        // Test si une entité est cliqué
-        auto en_it = std::find_if(m_entities.begin(), m_entities.end(), [&](const auto& en) {
-            // Distance de manhattan (+ rapide que euclidien car lent pour beaucoup d'entité)
-            return (en.get()->getPos() + Vec2f(2.5f, 2.5f)).manhattan(mousePos) < 5; 
-        });
-
-        // C'est une tuile
-        if(en_it != m_entities.end()) 
-        {
-            if(!m_selected_en.expired() && m_selected_en.lock()->getId() == en_it->get()->getId())
-            {
-                m_selected_en.reset(); // Déselectionne la fourmis
-            }else
-            {
-                m_selected_en = *en_it; // Sélectionne 
-            }
         }
     }
 }
@@ -330,20 +325,30 @@ void World::drawUI()
         {
             ImGuiListClipper clipper; // Evite d'itérer sur toutes les entités
             clipper.Begin(m_entities.size());
-            static bool selected = false;
-            while(clipper.Step())
+
+            if(m_focus_en_gui && !m_selected_en.expired())
+            {
+                const Entity* entity = m_selected_en.lock().get(); 
+                clipper.IncludeItemByIndex(entity->getId());
+            }
+
+            while(clipper.Step()) 
+            {
                 for(int row_n = clipper.DisplayStart; row_n < clipper.DisplayEnd; row_n++)
                 {
                     Entity* entity = m_entities[row_n].get();
-                    char nodeId[32];
-                    sprintf(nodeId, "nodeId%ld", entity->getId());
 
-                    if(ImGui::TreeNode(nodeId, "%s Id:%ld", entity->getType(), entity->getId()))
+                    ImGuiTreeNodeFlags nodeFlag = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+                    if(!m_selected_en.expired() && (m_selected_en.lock()->getId() == entity->getId()))
                     {
-                        // if(ImGui::Selectable(nodeId, ))
-                        // {
-                        //     m_selected_en = m_entities[row_n];
-                        // } 
+                        nodeFlag |= ImGuiTreeNodeFlags_Selected;
+                    }
+
+                    if(ImGui::TreeNodeEx((void*) entity->getId(), nodeFlag, "%s Id:%ld", entity->getType(), entity->getId()))
+                    {
+                        if(ImGui::IsItemFocused()) 
+                            m_selected_en = m_entities[row_n];
+                        // if(ImGui::Selectable(nodeId)) m_selected_en = m_entities[row_n];
                         // if(ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows) && ImGui::IsMouseClicked(ImGuiPopupFlags_MouseButtonLeft))
 
                         Vec2i gridPos = m_grid.toTileCoord(entity->getPos());
@@ -354,7 +359,17 @@ void World::drawUI()
 
                         ImGui::TreePop();
                     }
+
+                    if(!m_selected_en.expired() && (m_selected_en.lock()->getId() == entity->getId()))
+                    {
+                        if(m_focus_en_gui)
+                        {
+                            m_focus_en_gui = false;
+                            ImGui::ScrollToItem(ImGuiScrollFlags_KeepVisibleCenterY);
+                        }
+                    }
                 }
+            }
             ImGui::TreePop();
         }
     }
@@ -444,4 +459,14 @@ bool World::removeEntity(unsigned long id)
     m_entities.erase(it);
 
     return it != m_entities.end();
+}
+
+std::weak_ptr<Entity> World::getEntityAt(Vec2f pos)
+{
+    auto en_it = std::find_if(m_entities.begin(), m_entities.end(), [&](const auto& en) {
+        // Distance de manhattan (+ rapide que euclidien car lent pour beaucoup d'entité)
+        return (en.get()->getPos() + Vec2f(2.5f, 2.5f)).manhattan(pos) < 5; 
+    });
+
+    return std::weak_ptr<Entity>(en_it == m_entities.end() ? nullptr : *en_it);
 }

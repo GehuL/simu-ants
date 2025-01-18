@@ -186,6 +186,8 @@ namespace simu
              */
             Tile getSelectedTile() const;
 
+            std::weak_ptr<Entity> getEntityAt(Vec2f pos);
+
         private:
             World();
 
@@ -212,6 +214,7 @@ namespace simu
             const std::array<const Tile, 3> m_cursorTiles = {GROUND, FOOD, PHEROMONE};
 
             bool m_showGenome;
+            bool m_focus_en_gui;
     };
 
     class WorldListener
