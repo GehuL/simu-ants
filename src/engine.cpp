@@ -4,6 +4,8 @@
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
 
+#include <chrono>
+
 #define MIN(a, b) a > b ? b : a
 
 using namespace simu;
@@ -24,9 +26,6 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
 
     int tickCounter = 0;
     int frameCounter = 0;
-
-    double tickSumLoad = 0;
-    int tickCounterLoad = 0;
 
     InitWindow(screenWidth, screenHeight, title.c_str());
     SetWindowState(FLAG_WINDOW_RESIZABLE);
@@ -52,16 +51,17 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
 
             while(lag >= m_tickPeriod)
             {
+                m_profiler.begin("tick");
                 updateTick();
+                m_profiler.end();
+                TraceLog(LOG_DEBUG, "%lf", m_profiler["tick"]->elapsed);
+
                 lag -= m_tickPeriod;
                 tickCounter++;
                 
                 if(m_noDelay) 
                     break;
             }
-
-           tickSumLoad += GetTime() - lastUpdateTime; // Combien de temps à pris un tick
-           tickCounterLoad++;
         }
 
         // lastDrawTime += lag;
@@ -75,6 +75,8 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
         // Draw frame OR update UI
         if(b_updateUI || b_drawAll)
         {
+            m_profiler.begin("frame");
+
             BeginDrawing();
 
             if(b_drawAll)
@@ -104,27 +106,20 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
 #ifdef SUPPORT_CUSTOM_FRAME_CONTROL
     SwapScreenBuffer();
 #endif
+            m_profiler.end();
         }
 
-        // Profiling update
-        double now2 = GetTime();
-        double profilerDelta = now2 - lastProfilerTime;
-        if(profilerDelta > 1.0)
-        {
-            lastProfilerTime = now2; // pas besoin d'être précis pour le profiling
-            
-            m_lastFrameCounter = frameCounter;
-            frameCounter = 0;
-
-            m_lastTickCounter = tickCounter;
-            tickCounter = 0;
-
-            m_averageTickLoad = tickSumLoad / tickCounterLoad; 
-            tickSumLoad = 0;
-            tickCounterLoad = 0;
-        }
-    
         double delta = GetTime() - start;
+
+        // Mise à jour profiler
+        if(GetTime() - m_lastUpdateProfiler > 1.0)
+        {
+            m_lastUpdateProfiler = GetTime();
+        
+            m_tickProfile = *m_profiler["tick"];
+            m_frameProfile = *m_profiler["frame"];
+            m_profiler.resetAll();
+        }
       
         // Différence de temps libre entre update et draw (drawDelta inclue le temps de l'affichage de l'UI)
         double waitTime = 0.0;
@@ -216,13 +211,12 @@ void Engine::updateUI()
     ClearBackground((Color){255, 255, 255, 0});
 
     drawUI();
-    
-    DrawText(TextFormat("%d FPS\n%d TPS\nTick load: %d/%d ms (%.1f%%)", 
-    m_lastFrameCounter, 
-    m_lastTickCounter, 
-    static_cast<int>(m_averageTickLoad * 1000), 
+
+    DrawText(TextFormat("%d FPS (%.2lfms)\n%d TPS\nTick load: %.2lf/%d ms (%.1f%%)", 
+    m_frameProfile.sampleCnt, std::chrono::duration_cast<std::chrono::milliseconds>(m_frameProfile.calculAverage()),
+    m_tickProfile.sampleCnt, std::chrono::duration_cast<std::chrono::milliseconds>(m_tickProfile.calculAverage()), 
     static_cast<int>(m_tickPeriod * 1000) ,
-    100 * m_averageTickLoad / m_tickPeriod), 5, 0, 20, GREEN);
+    100 * m_tickProfile.average / m_tickPeriod), 5, 0, 20, GREEN);
 
     if(m_pause)
     {
