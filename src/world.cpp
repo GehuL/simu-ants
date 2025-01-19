@@ -256,8 +256,6 @@ void World::drawFrame()
 
     if(m_listener)
         m_listener.get()->onDraw();
-
-    //drawEntityInfo();
 }
 
 void World::drawUI()
@@ -278,9 +276,7 @@ void World::drawUI()
     // Nombre d'entités
     DrawText(TextFormat("Entity: %d", m_entities.size()), 0, 100, 20, BLUE);
 
-
     ImGui::Begin("World");
-
     if(m_listener && ImGui::CollapsingHeader("Level"))
     {
         ImGui::Text("Level name: %s", typeid(m_listener.get()).name());

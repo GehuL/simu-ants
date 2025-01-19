@@ -186,6 +186,11 @@ namespace simu
              */
             Tile getSelectedTile() const;
 
+            /**
+             * @brief Cherche une entité à la position indiquée en prennant compte la largeur de l'entité.
+             * @param pos Position globale.
+             * @return Renvoie la première entité trouvée pendant l'itération.
+             */
             std::weak_ptr<Entity> getEntityAt(Vec2f pos);
 
         private:

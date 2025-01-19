@@ -219,16 +219,11 @@ void Engine::updateUI()
         m_gui_renderer = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
     }
 
+    rlImGuiBegin();
+
     BeginTextureMode(m_gui_renderer);
 
     ClearBackground((Color){255, 255, 255, 0});
-
-    DrawText(TextFormat("%d FPS\n%d TPS\nTick load: %d/%d ms (%.1f%%)", 
-    m_lastFrameCounter, 
-    m_lastTickCounter, 
-    static_cast<int>(m_averageTickLoad * 1000), 
-    static_cast<int>(m_tickPeriod * 1000) ,
-    100 * m_averageTickLoad / m_tickPeriod), 5, 0, 20, GREEN);
 
     if(m_pause)
     {
@@ -256,9 +251,18 @@ void Engine::updateUI()
         setTPS(999999999);
     }
 
-    rlImGuiBegin();
-    bool open = true;
-    ImGui::ShowDemoWindow(&open);
+    ImGui::SetNextWindowBgAlpha(0.8f);
+    ImGui::SetNextWindowPos(ImVec2(10, 10));
+    if(ImGui::Begin("Overlay performance", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav))
+    {
+        ImGui::Text("FPS: %d", m_lastFrameCounter);
+        ImGui::Text("TPS: %d | Load: %.1lf/%.1lf ms (%d%%)",
+         m_lastTickCounter, m_averageTickLoad * 1000.0, m_tickPeriod * 1000,
+         static_cast<int>(m_averageTickLoad/m_tickPeriod * 100));
+    }
+    ImGui::End();
+
+    ImGui::ShowDemoWindow();
     drawUI();
 
     rlImGuiEnd();
