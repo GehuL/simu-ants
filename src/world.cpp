@@ -454,7 +454,14 @@ bool World::removeEntity(unsigned long id)
 
     m_entities.erase(it);
 
-    return it != m_entities.end();
+    if(it != m_entities.end())
+    {
+       // if(id == (m_entity_cnt - 1)) // Source de bugs .. avoir plus tard
+       //     m_entity_cnt--; // Maintient l'ordre tout en évitant la limite atteinte (casi impossible)
+
+        return true;
+    }
+    return false;
 }
 
 std::weak_ptr<Entity> World::getEntityAt(Vec2f pos)
@@ -465,4 +472,10 @@ std::weak_ptr<Entity> World::getEntityAt(Vec2f pos)
     });
 
     return std::weak_ptr<Entity>(en_it == m_entities.end() ? nullptr : *en_it);
+}
+
+void World::clearEntities() 
+{ 
+    m_entities.clear();
+    m_entity_cnt = 0;
 }

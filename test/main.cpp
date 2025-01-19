@@ -1,8 +1,7 @@
-#include "world.h"
-#include "ant.h"
+#include "../src/world.h"
 
-#include "external/ui/imgui.h"
-#include "external/ui/rlImGui.h"
+#include "../src/external/ui/imgui.h"
+#include "../src/external/ui/rlImGui.h"
 
 using namespace simu;
 

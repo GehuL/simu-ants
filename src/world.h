@@ -146,10 +146,15 @@ namespace simu
             void removeEntities(T beg, T end)
             {
                 for(auto it = beg; it != end; it++)
-                    if(auto sp = it->lock()) removeEntity(sp->getId());
+                {
+                    if(auto sp = it->lock())
+                    {
+                        removeEntity(sp->getId());
+                    }
+                }
             }
 
-            void clearEntities() { m_entities.clear(); };
+            void clearEntities();
 
             void setListener(std::shared_ptr<WorldListener> listener)
             {
