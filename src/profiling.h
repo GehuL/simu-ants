@@ -8,28 +8,39 @@
 
 namespace simu
 {
-    struct ProfileData
+    class ProfileData
     {
+        public:
+
+        static constexpr int SAMPLE_SIZE = 30;
+        
         std::chrono::steady_clock::time_point lastTime;
-        std::chrono::duration<double> elapsed;
-        std::chrono::duration<double> cumul;
-        std::chrono::duration<double> average;
+        std::chrono::duration<double> samples[SAMPLE_SIZE];
+        int sampleIdx;
 
-        int sampleCnt;
+        void reset();
 
-        void reset() { cumul = std::chrono::duration<double>::zero(); sampleCnt = 0; };
+        std::chrono::duration<double> calculAverage();
+        std::chrono::duration<double> elapsedTime(); 
+        double getFrequency();
 
-        std::chrono::duration<double> calculAverage() { return (average = cumul / sampleCnt); };
-        std::chrono::duration<double> elapsed_time() { return lastTime - std::chrono::steady_clock::now(); };
+        bool isOpen;
     };
     
     class Profiler
     {
-        public: 
+        public:
+            static constexpr bool SCOPED = true;
+            static constexpr bool UNSCOPED = !SCOPED;
+
             Profiler();
 
+            template<bool scoped = SCOPED>
             void begin(const std::string& name);
+            
+            
             void end();
+            void end(const std::string& name);
 
             ProfileData* getProfile(const std::string& name);
             ProfileData* operator[](const std::string& name);

@@ -19,7 +19,6 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
 {
     double lastUpdateTime = 0;
     double lastDrawTime = 0;
-    double lastProfilerTime = 0;
     double lastGUITime = 0;
 
     double lag = 0.0;
@@ -51,10 +50,12 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
 
             while(lag >= m_tickPeriod)
             {
+                m_profiler.end("tps");
+                m_profiler.begin<Profiler::UNSCOPED>("tps");
+
                 m_profiler.begin("tick");
                 updateTick();
                 m_profiler.end();
-                TraceLog(LOG_DEBUG, "%lf", m_profiler["tick"]->elapsed);
 
                 lag -= m_tickPeriod;
                 tickCounter++;
@@ -81,6 +82,9 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
 
             if(b_drawAll)
             {
+                m_profiler.end("fps");
+                m_profiler.begin<Profiler::UNSCOPED>("fps");
+                
                 double now = GetTime();
                 lastDrawTime = now;
                 drawAll();
@@ -107,20 +111,11 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
     SwapScreenBuffer();
 #endif
             m_profiler.end();
+
         }
 
         double delta = GetTime() - start;
 
-        // Mise à jour profiler
-        if(GetTime() - m_lastUpdateProfiler > 1.0)
-        {
-            m_lastUpdateProfiler = GetTime();
-        
-            m_tickProfile = *m_profiler["tick"];
-            m_frameProfile = *m_profiler["frame"];
-            m_profiler.resetAll();
-        }
-      
         // Différence de temps libre entre update et draw (drawDelta inclue le temps de l'affichage de l'UI)
         double waitTime = 0.0;
         if(m_pause)
@@ -212,11 +207,11 @@ void Engine::updateUI()
 
     drawUI();
 
-    DrawText(TextFormat("%d FPS (%.2lfms)\n%d TPS\nTick load: %.2lf/%d ms (%.1f%%)", 
-    m_frameProfile.sampleCnt, std::chrono::duration_cast<std::chrono::milliseconds>(m_frameProfile.calculAverage()),
-    m_tickProfile.sampleCnt, std::chrono::duration_cast<std::chrono::milliseconds>(m_tickProfile.calculAverage()), 
-    static_cast<int>(m_tickPeriod * 1000) ,
-    100 * m_tickProfile.average / m_tickPeriod), 5, 0, 20, GREEN);
+    DrawText(TextFormat("%d FPS (%.2lfms)\n%d TPS\nTick load: %.2lf/%.2lf ms (%.1lf%%)", 
+                        (int) m_profiler["fps"]->getFrequency(), m_profiler["frame"]->calculAverage().count(),
+                        (int) m_profiler["tps"]->getFrequency(), m_profiler["tick"]->calculAverage().count() * 1000.0, m_tickPeriod * 1000.0, 
+                        100.0 * (m_profiler["tick"]->calculAverage().count() / m_tickPeriod)),
+                        5, 0, 20, GREEN);
 
     if(m_pause)
     {

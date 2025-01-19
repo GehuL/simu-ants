@@ -63,9 +63,6 @@ namespace simu
 
             RenderTexture2D m_renderer;
             RenderTexture2D m_gui_renderer;
-
-            ProfileData m_tickProfile;
-            ProfileData m_frameProfile;
     };
 }
 

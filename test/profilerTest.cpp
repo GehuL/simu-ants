@@ -8,12 +8,19 @@ int main(void)
     using namespace std::chrono_literals;
 
     simu::Profiler profiler;
-    profiler.begin("test");
 
-    std::this_thread::sleep_for(1200ms);
+    for(int i = 0; i < simu::ProfileData::SAMPLE_SIZE; i++)
+    {
+        profiler.end("test");
+        profiler.begin<simu::Profiler::UNSCOPED>("test");
+        profiler.begin("50");
+        std::this_thread::sleep_for(10ms);
+        profiler.end();
+    }
 
-    profiler.end();
+    std::cout << profiler["test"]->calculAverage().count() << std::endl;
+    std::cout << profiler["test"]->getFrequency() << std::endl;
 
-    profiler["test"]->calculAverage();
-    std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(profiler["test"]->elapsed).count() << "ms" << std::endl; 
+    std::cout << profiler["50"]->calculAverage().count() << std::endl;
+    std::cout << profiler["50"]->getFrequency() << std::endl;
 }
