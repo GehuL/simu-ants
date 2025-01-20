@@ -91,11 +91,13 @@ void Profiler::resetAll()
 
 ProfileData* Profiler::getProfile(const std::string& name)
 {
-    assert(mProfiles.find(name) != mProfiles.end() && "Aucun profiler de ce nom");
-    return &mProfiles.at(name);
+    // assert(mProfiles.find(name) != mProfiles.end() && "Aucun profiler de ce nom");
+    return operator[](name);
 }
 
 ProfileData* Profiler::operator[](const std::string& name)
 {
+    if(mProfiles.find(name) == mProfiles.end())
+        mProfiles[name] = ProfileData();
     return &mProfiles.at(name);
 }
