@@ -2,7 +2,7 @@
 #define NEATCONFIG_H
 
 struct NeatConfig {
-    int population_size = 50;        // Taille de la population
+    int population_size = 100;        // Taille de la population
     int num_inputs = 6;               // Nombre d'entrées
     int num_outputs = 4;              // Nombre de sorties
 

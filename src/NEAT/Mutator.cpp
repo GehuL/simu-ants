@@ -55,6 +55,7 @@ void Mutator::mutate_add_link(Genome &genome) {
     neat::LinkMutator link_mutator;
     neat::LinkGene new_link = link_mutator.new_value(input_id, output_id);
     genome.add_link(new_link);
+    std::cout << "Adding link from " << input_id << " to " << output_id << " to genome " << genome.get_genome_id() << std::endl;
 
 }
 
@@ -108,6 +109,7 @@ void Mutator::mutate_remove_link(Genome &genome) {
 
     auto to_remove = rng.choose_random(removable_links);
     genome.get_links().erase(std::remove(genome.get_links().begin(), genome.get_links().end(), to_remove), genome.get_links().end());
+    std::cout << "Removing link from " << to_remove.link_id.input_id << " to " << to_remove.link_id.output_id << " from genome " << genome.get_genome_id() << std::endl;
 }
 
 void Mutator::mutate_add_neuron(Genome &genome) {
@@ -135,6 +137,8 @@ void Mutator::mutate_add_neuron(Genome &genome) {
 
     genome.add_link(neat::LinkGene{{link_id.input_id, new_neuron.neuron_id}, 1.0, true});
     genome.add_link(neat::LinkGene{{new_neuron.neuron_id, link_id.output_id}, weight, true});
+
+    std::cout << "Adding neuron " << new_neuron.neuron_id << " to genome " << genome.get_genome_id() << std::endl;
 }
 
 void Mutator::mutate_remove_neuron(Genome &genome) {

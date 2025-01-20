@@ -18,7 +18,7 @@ class Scene : public WorldListener {
 
     int m_count = 0;
     const int num_generations = 1000; // Nombre total de générations
-    const int num_ants = 50;        // Nombre de fourmis par génération
+    const int num_ants = 100;        // Nombre de fourmis par génération
     int current_generation = 0;
 
     std::vector<double> avg_fitness_per_gen; // Suivi des fitness moyennes
@@ -130,7 +130,7 @@ public:
         }
     }
 
-    auto new_genomes = mPop.reproduce_from_genome_roulette(genomes, fitnesses);
+    auto new_genomes = mPop.reproduce_from_genome_roulette_negative(genomes, fitnesses);
     ants.clear();
 
     getWorld().clearEntities();

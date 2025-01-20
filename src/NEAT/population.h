@@ -82,6 +82,11 @@ public:
        const std::vector<double>& fitnesses
    );
 
+   std::vector<neat::Individual> reproduce_from_genome_roulette_negative(
+       const std::vector<std::shared_ptr<Genome>>& genomes,
+       const std::vector<double>& fitnesses
+   );
+
    /**
     * @brief Trie les individus par fitness en ordre décroissant.
     *

@@ -109,14 +109,21 @@ double ComputeFitness::evaluate_lab(const simu::Vec2i &startPos, const simu::Vec
 
     
     // Ajouter une pénalité à la fitness si trop de répétitions
-    if (repeatCount > 10) { // Par exemple, plus de 10 répétitions
-        fitness -= repeatCount * 10.0; // Réduire la fitness
+    if(ant.isIdle())
+    {
+        fitness -= 1000.0;
+    }
+
+    if(ant.isStuck())
+    {
+        fitness -= 1000.0;
     }
     
    
     // Critère d'exploration pour les premières générations
     if (current_generation < 100) { // Par exemple, encourager l'exploration pendant 50 générations
         fitness += visitedPositions.size() * 2.0;
+        //printf("Visited positions: %d\n", visitedPositions.size());
     if (directionChanges < 3) {
         fitness -= 50.0;  // Pénalité modérée
     } else if (directionChanges >= 5 && directionChanges <= 10) {
@@ -151,7 +158,7 @@ double ComputeFitness::evaluate_lab(const simu::Vec2i &startPos, const simu::Vec
     
     
     // Retourner la fitness finale, en s'assurant qu'elle n'est pas négative
-    return fitness > 0.0 ? fitness : 0.0;
+    return fitness ;
 }
 
 

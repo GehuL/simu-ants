@@ -72,7 +72,7 @@ Genome Neat::alt_crossover(const std::shared_ptr<Genome>& dominant,
                        int child_genome_id) {
     Genome offspring{child_genome_id, dominant->get_num_inputs(), dominant->get_num_outputs()};
 
-    std::cout << "Crossover with shared_ptr" << std::endl;
+    //std::cout << "Crossover with shared_ptr" << std::endl;
 
     // Crossover des neurones
     for (const auto& dominant_neuron : dominant->get_neurons()) {

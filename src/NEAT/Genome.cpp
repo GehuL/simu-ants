@@ -88,6 +88,7 @@ Genome Genome::create_genome(int id, int num_inputs, int num_outputs, int num_hi
     }
 
     // Affichage pour débogage
+    /*
     std::cout << "Genome ID: " << id << std::endl;
     std::cout << "Neurones:" << std::endl;
     for (const auto &neuron : genome.get_neurons()) {
@@ -100,6 +101,7 @@ Genome Genome::create_genome(int id, int num_inputs, int num_outputs, int num_hi
                   << " to " << link.link_id.output_id 
                   << " with weight " << link.weight << std::endl;
     }
+    */
 
     return genome;
 }
@@ -155,6 +157,7 @@ Genome Genome::create_genome_div(int id, int num_inputs, int num_outputs, int nu
     }
 
     // Affichage pour débogage
+    /*
     std::cout << "Genome ID: " << id << std::endl;
     std::cout << "Neurones:" << std::endl;
     for (const auto &neuron : genome.get_neurons()) {
@@ -167,6 +170,7 @@ Genome Genome::create_genome_div(int id, int num_inputs, int num_outputs, int nu
                   << " to " << link.link_id.output_id 
                   << " with weight " << link.weight << std::endl;
     }
+    */
 
     return genome;
 }

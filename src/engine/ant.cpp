@@ -193,7 +193,7 @@ DemoAnt& DemoAnt::operator=(const DemoAnt& ant)
 RNG gRng;
 
 AntIA::AntIA(const long id, const AntIA& ant) : Ant(id, ant), m_genome(ant.m_genome), m_network(ant.m_network) {}
-AntIA::AntIA(const long id, Vec2i position): Ant(id),  m_genome(Genome::create_genome(0, 6, 4, 3, gRng)), m_network(FeedForwardNeuralNetwork::create_from_genome(m_genome)), m_gridPos(position)
+AntIA::AntIA(const long id, Vec2i position): Ant(id),  m_genome(Genome::create_genome_div(0, 6, 4, 3, gRng)), m_network(FeedForwardNeuralNetwork::create_from_genome(m_genome)), m_gridPos(position)
 {
     m_pos = getWorld().gridToWorld(position);
 }
@@ -274,7 +274,7 @@ std::cout << std::endl;
         wallHit++;
     }
 
-    if(getTileOn().type == Type::PHEROMONE)
+    if(getTileOn().type == Type::CHECKPOINT)
     {
         numberOfCheckpoints++;
     }
@@ -302,6 +302,8 @@ std::cout << std::endl;
                           getTileRight().flags.solid + 
                           getTileBack().flags.solid;
 
+    Vec2i lastGridPos = m_gridPos;
+
 
 
     switch (direction) {
@@ -319,8 +321,33 @@ std::cout << std::endl;
 
     if (wallProximityAfter < wallProximityBefore) {
     goodWallAvoidanceMoves++;
+
+    if (m_gridPos == lastGridPos) {
+        stuckCount++;
+    } else {
+        stuckCount = 0; // Réinitialiser si la fourmi bouge
+    }
+    lastGridPos = m_gridPos;
 }
 }
+
+bool simu::AntIA::isStuck()  {
+    // Si la fourmi reste sur la même position pendant trop de ticks
+    if (stuckCount >= 10) { // Par exemple, 10 ticks
+        return true;
+    }
+    return false;
+}
+
+bool simu::AntIA::isIdle()
+{
+     // Si la fourmi répète trop souvent la même action
+    if (repeatCount >= 15) { // Par exemple, 15 répétitions
+        return true;
+    }
+    return false;
+}
+
 
 void AntIA::load(const json &json)
 {

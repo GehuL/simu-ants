@@ -194,6 +194,48 @@ std::vector<neat::Individual> Population::reproduce_from_genome_roulette(
     return new_generation;
 }
 
+std::vector<neat::Individual> Population::reproduce_from_genome_roulette_negative(
+    const std::vector<std::shared_ptr<Genome>>& genomes,
+    const std::vector<double>& fitnesses
+) {
+    if (genomes.empty() || fitnesses.empty() || genomes.size() != fitnesses.size()) {
+        throw std::runtime_error("Erreur : Liste de génomes ou de fitness invalide.");
+    }
+
+    // Étape 1 : Ajuster les fitness pour les rendre positives
+    double min_fitness = *std::min_element(fitnesses.begin(), fitnesses.end());
+    std::vector<double> adjusted_fitnesses = fitnesses;
+
+    if (min_fitness < 0) {
+        for (double& fitness : adjusted_fitnesses) {
+            fitness += std::abs(min_fitness) + 1.0; // Translation pour rendre toutes les fitness positives
+        }
+    }
+
+    // Étape 2 : Création de la nouvelle génération
+    std::vector<neat::Individual> new_generation;
+
+    while (new_generation.size() < config.population_size) {
+        // Sélection des parents par roulette biaisée sur les fitness ajustées
+        const auto& p1 = rng.roulette_selection(genomes, adjusted_fitnesses);
+        const auto& p2 = rng.roulette_selection(genomes, adjusted_fitnesses);
+
+        // Crossover
+        neat::Neat neat_instance;
+        Genome offspring_genome = neat_instance.alt_crossover(p1, p2, generate_next_genome_id());
+        std::shared_ptr<Genome> offspring = std::make_shared<Genome>(offspring_genome);
+
+        // Mutation
+        mutate(*offspring);
+
+        // Ajouter à la nouvelle génération
+        new_generation.push_back(neat::Individual(offspring));
+    }
+
+    return new_generation;
+}
+
+
 
 
 

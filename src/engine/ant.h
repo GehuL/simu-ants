@@ -112,6 +112,9 @@ namespace simu
 
             const std::unordered_set<std::pair<int, int>, pair_hash>& getVisitedPositions() { return visitedPositions; };
 
+            bool isStuck() ;
+            bool isIdle();
+
             double getFitness() { return fitness; };
             double setFitness(double fit) { fitness = fit; return fitness; };
 
@@ -138,7 +141,9 @@ namespace simu
             int wallHit = 0;
             int goodWallAvoidanceMoves = 0;
             int numberOfCheckpoints = 0;
+            int stuckCount = 0;
             bool end = false;
+            
 
             std::unordered_set<std::pair<int, int>, simu::pair_hash> visitedPositions;
 
