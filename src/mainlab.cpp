@@ -33,7 +33,7 @@ public:
     Scene() : mPop((NeatConfig){}, rng), compute_fitness(rng) {}
 
     void onInit() override {
-        getWorld().getGrid().fromImage("rsc/road.png");
+        getWorld().getGrid().fromImage("rsc/mazeCheck.png");
         Vec2i startPos(90, 150);
         Vec2i goalPos(73, 0);
         ants = getWorld().spawnEntities<AntIA>(num_ants, startPos);

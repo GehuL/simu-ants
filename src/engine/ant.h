@@ -106,6 +106,10 @@ namespace simu
             const int getDirectionChanges() { return directionChanges; };
             const int getRepeatCount() { return repeatCount; };
             const int getWallHit() { return wallHit; };
+            const int getGoodWallAvoidanceMoves() { return goodWallAvoidanceMoves; };
+            const int getNumberOfCheckpoints() { return numberOfCheckpoints; };
+            const bool isEnd() { return end; };
+
             const std::unordered_set<std::pair<int, int>, pair_hash>& getVisitedPositions() { return visitedPositions; };
 
             double getFitness() { return fitness; };
@@ -132,6 +136,10 @@ namespace simu
             int directionChanges = 0;
             int repeatCount = 0; 
             int wallHit = 0;
+            int goodWallAvoidanceMoves = 0;
+            int numberOfCheckpoints = 0;
+            bool end = false;
+
             std::unordered_set<std::pair<int, int>, simu::pair_hash> visitedPositions;
 
     };

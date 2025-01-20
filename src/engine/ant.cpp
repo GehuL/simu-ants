@@ -274,6 +274,17 @@ std::cout << std::endl;
         wallHit++;
     }
 
+    if(getTileOn().type == Type::PHEROMONE)
+    {
+        numberOfCheckpoints++;
+    }
+
+    if (getTileOn().type == Type::FOOD)
+    {
+        end = true;
+    }
+    
+
     // Vérifier les répétitions d'actions
     if (direction == lastAction) {
         repeatCount++;
@@ -286,6 +297,10 @@ std::cout << std::endl;
     // Ajouter la position actuelle à l'ensemble
     visitedPositions.insert({static_cast<int>(m_gridPos.x), static_cast<int>(m_gridPos.y)});
 
+    int wallProximityBefore = getTileFacing().flags.solid + 
+                          getTileLeft().flags.solid + 
+                          getTileRight().flags.solid + 
+                          getTileBack().flags.solid;
 
 
 
@@ -296,6 +311,15 @@ std::cout << std::endl;
         case 3: move(DOWN); break;
         default: break;
     }
+
+    int wallProximityAfter = getTileFacing().flags.solid + 
+                          getTileLeft().flags.solid + 
+                          getTileRight().flags.solid + 
+                          getTileBack().flags.solid;
+
+    if (wallProximityAfter < wallProximityBefore) {
+    goodWallAvoidanceMoves++;
+}
 }
 
 void AntIA::load(const json &json)

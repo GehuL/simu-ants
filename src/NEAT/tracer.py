@@ -5,7 +5,7 @@ import csv
 generations = []
 fitness_moyenne = []
 
-with open('C:/Users/LENOVO/Desktop/Nouveau dossier/simu-ants/fitness_moyenne_lab.csv', 'r') as file:
+with open('C:/Users/LENOVO/Desktop/simu-ants/fitness_moyenne_lab.csv', 'r') as file:
     reader = csv.reader(file)
     for row in reader:
         generations.append(int(row[0]))  # Génération

@@ -89,30 +89,34 @@ double ComputeFitness::evaluate_lab(const simu::Vec2i &startPos, const simu::Vec
     int directionChanges = ant.getDirectionChanges();
     int repeatCount = ant.getRepeatCount();
     int wallHit = ant.getWallHit();
+    int goodWallAvoidanceMoves = ant.getGoodWallAvoidanceMoves();
+    int numberOfCheckpoints = ant.getNumberOfCheckpoints();
+    
     std::unordered_set<std::pair<int, int>, simu::pair_hash> visitedPositions = ant.getVisitedPositions();
     Vec2i antPos = ant.getGridPos();
 
 
     double current_distance = static_cast<double>(grid.findPath(antPos, goalPos).size());
+    double far_from_goal = static_cast<double>(grid.findPath(startPos, antPos).size());
 
     
 
     // Calcul de la fitness
    double fitness = (initial_distance - current_distance)*2;
-
-    fitness += visitedPositions.size() * 0.5;
-
+   
+    fitness += far_from_goal;
+    
 
     
     // Ajouter une pénalité à la fitness si trop de répétitions
     if (repeatCount > 10) { // Par exemple, plus de 10 répétitions
-        fitness -= 150.0; // Réduire la fitness
+        fitness -= repeatCount * 10.0; // Réduire la fitness
     }
     
-
    
     // Critère d'exploration pour les premières générations
-    if (current_generation < 10) { // Par exemple, encourager l'exploration pendant 50 générations
+    if (current_generation < 100) { // Par exemple, encourager l'exploration pendant 50 générations
+        fitness += visitedPositions.size() * 2.0;
     if (directionChanges < 3) {
         fitness -= 50.0;  // Pénalité modérée
     } else if (directionChanges >= 5 && directionChanges <= 10) {
@@ -120,22 +124,31 @@ double ComputeFitness::evaluate_lab(const simu::Vec2i &startPos, const simu::Vec
     } else {
         fitness -= 20.0;  // Légère pénalité pour trop de changements
     }
+    fitness += visitedPositions.size() * 1.0;
 }
 
 
     // Pénaliser les collisions avec les murs
     fitness -= wallHit * 10.0;
 
+    fitness += goodWallAvoidanceMoves * 5.0;
+
+
+
+    if(ant.isEnd())
+    {
+        fitness += 12000.0;
+    }
+
+    fitness += numberOfCheckpoints * 1000.0;
 
     // Ajouter une récompense supplémentaire si la fourmi atteint l'objectif
     if (antPos == goalPos) {
         fitness += 12000.0;
     }
 
-    if(ant.getTileOn().type == Type::FOOD)
-    {
-        fitness += 12000.0;
-    }
+    
+    
     
     // Retourner la fitness finale, en s'assurant qu'elle n'est pas négative
     return fitness > 0.0 ? fitness : 0.0;
