@@ -252,15 +252,14 @@ void Engine::updateUI()
         ImGui::Separator();
 
         ImGui::Text("FPS: %d | Load: %.2lf/%.2lf ms (%.2lf%%)", 
-        static_cast<int>(m_profiler["fps"]->getFrequency()), m_profiler["frame"]->calculAverage().count() * 1000.0, m_framePeriod * 1000,
+        static_cast<int>(m_profiler["fps"]->getFrequency()), m_profiler["frame"]->calculAverage().count() * 1000.0, m_framePeriod * 1000.0,
         m_profiler["frame"]->calculAverage().count()/m_framePeriod * 100);
 
         ImGui::Text("TPS: %d | Load: %.2lf/%.2lf ms (%.2lf%%)",
-        static_cast<int>(m_profiler["tps"]->getFrequency()), m_profiler["tick"]->calculAverage().count() * 1000.0, m_tickPeriod * 1000,
+        static_cast<int>(m_profiler["tps"]->getFrequency()), m_profiler["tick"]->calculAverage().count() * 1000.0, m_tickPeriod * 1000.0,
         m_profiler["tick"]->calculAverage().count()/m_tickPeriod * 100);
 
-        ImGui::Text("Total: %.2lf ms", m_profiler["loop"]->calculAverage().count());
-        ImGui::Text("Idle: %.2lf ms", m_profiler["idle"]->calculAverage().count());
+        ImGui::Text("Total: %.2lf ms | Idle: %.2lf ms", m_profiler["loop"]->calculAverage().count() * 1000.0, m_profiler["idle"]->calculAverage().count() * 1000.0);
     }
     ImGui::End();
 
