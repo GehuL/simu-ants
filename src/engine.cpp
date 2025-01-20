@@ -134,9 +134,10 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
        
         if(waitTime >= 0.0) // Il reste du temps pour mettre en pause 
         {
-            // Désactiver le waitTime permet d'augmenter la priorité du processus 
+            // Désactiver le waitTime permet d'augmenter la priorité du processus
+            m_profiler.begin("idle");
             WaitTime(waitTime);
-            // TRACELOG(LOG_INFO, "waitTime: %lf ms", waitTime * 1000.0);
+            m_profiler.end();
         }
         m_profiler.end();
     }
@@ -259,6 +260,7 @@ void Engine::updateUI()
         m_profiler["tick"]->calculAverage().count()/m_tickPeriod * 100);
 
         ImGui::Text("Total: %.2lf ms", m_profiler["loop"]->calculAverage().count());
+        ImGui::Text("Idle: %.2lf ms", m_profiler["idle"]->calculAverage().count());
     }
     ImGui::End();
 
