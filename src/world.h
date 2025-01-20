@@ -73,10 +73,10 @@ namespace simu
                 std::vector<std::weak_ptr<T>> newlies(count);
 
                 // Itère à partir de l'ancienne fin, jusqu'à la nouvelle fin
-                for (size_t i = 0; i < m_entities.size(); ++i)
+                for (size_t i = 0; i < count; ++i)
                 {
                     auto en = std::make_shared<T>(m_entity_cnt, args...);
-                    m_entities[i + en_cnt] = en;
+                    m_entities[en_cnt + i] = en;
                     newlies[i] = en;
                     m_entity_cnt++;
                 }   
