@@ -44,6 +44,8 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
     // Main game loop
     while (!WindowShouldClose()) // Detect window close button or ESC key
     {
+        m_profiler.begin("loop");
+
         double start = GetTime();
 
         if(!m_pause)
@@ -136,6 +138,7 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
             WaitTime(waitTime);
             // TRACELOG(LOG_INFO, "waitTime: %lf ms", waitTime * 1000.0);
         }
+        m_profiler.end();
     }
     unload();
     rlImGuiShutdown();
@@ -254,6 +257,8 @@ void Engine::updateUI()
         ImGui::Text("TPS: %d | Load: %.2lf/%.2lf ms (%.2lf%%)",
         static_cast<int>(m_profiler["tps"]->getFrequency()), m_profiler["tick"]->calculAverage().count() * 1000.0, m_tickPeriod * 1000,
         m_profiler["tick"]->calculAverage().count()/m_tickPeriod * 100);
+
+        ImGui::Text("Total: %.2lf ms", m_profiler["loop"]->calculAverage().count());
     }
     ImGui::End();
 

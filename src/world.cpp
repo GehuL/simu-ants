@@ -316,6 +316,22 @@ void World::drawUI()
         ImGui::Text("Entity count: %lld", m_entities.size());
     
         if(ImGui::Button("Remove all")) clearEntities();
+        
+        static char input[6] = ""; ImGui::InputText("##", input, 6, ImGuiInputTextFlags_CharsDecimal);
+        ImGui::SameLine();
+        if(ImGui::Button("Spawn DemoAnt"))
+        {
+            try
+            {
+                int number = std::stoi(input);
+                if(number < 0 || number > 99999) throw std::runtime_error("Invalid number");
+                auto entities = spawnEntities<DemoAnt>(number, Vec2f(0, 0));
+            }
+            catch(const std::exception& e)
+            {
+                std::cerr << e.what() << '\n';
+            }
+        }
 
         if(ImGui::TreeNode("List"))
         {
