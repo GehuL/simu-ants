@@ -3,19 +3,17 @@
 
 struct NeatConfig {
     int population_size = 100;        // Taille de la population
-    int num_inputs = 11;               // Nombre d'entrées
+    int num_inputs = 12;               // Nombre d'entrées
     int num_outputs = 4;              // Nombre de sorties
 
-    // Probabilités de mutation
-    double probability_add_link = 0.05;       // Probabilité d'ajouter un lien
-    double probability_remove_link = 0.08;    // Probabilité de supprimer un lien
-    double probability_add_neuron = 0.1;     // Probabilité d'ajouter un neurone
-    double probability_remove_neuron = 0.00;  // Probabilité de supprimer un neurone
-    double probability_mutate_link_weight = 0.8;  // Probabilité de muter le poids d'un lien
-    double probability_mutate_neuron_bias = 0.7;     // Probabilité de muter le biais d'un neurone
+    double probability_add_link = 0.2;       // Favorise des connexions progressives
+    double probability_remove_link = 0.1;   // Réduit légèrement la complexité
+    double probability_add_neuron = 0.1;    // Ajout progressif de neurones
+    double probability_remove_neuron = 0.05; // Supprime les neurones inutiles
+    double probability_mutate_link_weight = 0.7;  // Explore efficacement l'espace des solutions
+    double probability_mutate_neuron_bias = 0.6;  // Ajuste le comportement des neurones
+    double survival_threshold = 0.3;       // Maintient un équilibre entre diversité et performance
 
-    // Seuil de survie pour la sélection
-    double survival_threshold = 0.3;  // Pourcentage d'individus qui survivent à chaque génération
 };
 
 #endif // NEATCONFIG_H

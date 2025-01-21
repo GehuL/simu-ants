@@ -111,6 +111,7 @@ namespace simu
             const bool isEnd() { return end; };
 
             const std::unordered_set<std::pair<int, int>, pair_hash>& getVisitedPositions() { return visitedPositions; };
+            const int getVisitedPositionsSize() { return visitedPositions.size(); };
 
             bool isStuck() ;
             bool isIdle();
@@ -120,7 +121,7 @@ namespace simu
             double getFitness() { return fitness; };
             double setFitness(double fit) { fitness = fit; return fitness; };
 
-            static constexpr int inputCount() { return 11; } ;
+            static constexpr int inputCount() { return 12; } ;
             static constexpr int outputCount() { return 4; };
 
             bool move(Vec2i vec);

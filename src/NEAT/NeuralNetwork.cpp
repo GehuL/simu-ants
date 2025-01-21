@@ -28,11 +28,14 @@ std::vector<double> FeedForwardNeuralNetwork::activate(const std::vector<double>
     {
         double value = neuron.bias;
 
-        for (const NeuronInput &input : neuron.inputs)
-        {
-            assert(values.find(input.input_id) != values.end());
+        for (const NeuronInput &input : neuron.inputs) {
+            if (values.find(input.input_id) == values.end()) {
+                std::cerr << "Error: input_id " << input.input_id << " not found in values map." << std::endl;
+                throw std::runtime_error("Invalid input_id during activation.");
+            }
             value += values[input.input_id] * input.weight;
         }
+
 
         value = std::visit([&value](auto &&fn)
                            { return fn(value); }, neuron.activation);
