@@ -122,7 +122,7 @@ double ComputeFitness::evaluate_lab(const simu::Vec2i &startPos, const simu::Vec
    
     // Critère d'exploration pour les premières générations
     if (current_generation < 200) { // Par exemple, encourager l'exploration pendant 50 générations
-        fitness += visitedPositions.size() * 3.0;
+        fitness += visitedPositions.size() * 2.0;
         //printf("Visited positions: %d\n", visitedPositions.size());
     if (directionChanges < 3) {
         fitness -= 50.0;  // Pénalité modérée

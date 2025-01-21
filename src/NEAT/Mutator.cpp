@@ -313,7 +313,7 @@ void Mutator::mutate_link_weight(Genome &genome, const NeatConfig &config, RNG &
 
     // Appliquer la mutation si la probabilité le permet
     if (rng.next_double() < config.probability_mutate_link_weight) {
-        std::cout << "Mutating link weight for genome " << genome.get_genome_id() << std::endl;
+        std::cout << "Mutating link weight for genome " << genome.get_genome_id() << "for link"<< link.link_id.input_id << "to" << link.link_id.output_id << std::endl;
         link.weight = mutate_delta(link.weight);  // Muter le poids du lien
     }
 }
@@ -377,7 +377,7 @@ void Mutator::mutate_neuron_bias(Genome &genome, const NeatConfig &config, RNG &
 
     // Appliquer la mutation si la probabilité le permet
     if (rng.next_double() < config.probability_mutate_neuron_bias) {
-        std::cout << "Mutating neuron bias for genome " << genome.get_genome_id() << std::endl;
+        std::cout << "Mutating neuron bias for genome " << genome.get_genome_id() << "for neuron"<< neuron.neuron_id << std::endl;
         neuron.bias = mutate_delta(neuron.bias);  // Muter le biais du neurone
     }
 }
