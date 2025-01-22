@@ -8,6 +8,8 @@
 
 #include "profiling.h"
 
+#define UI_FRAME_RATE 30.0
+
 namespace simu
 {
     class Engine

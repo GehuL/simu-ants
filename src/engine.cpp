@@ -80,7 +80,7 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
         double uiDelta = GetTime() - lastGUITime;
 
         bool b_drawAll = drawDelta >= m_framePeriod;
-        bool b_updateUI = uiDelta >=  1.0 / 30.0; // Keep ui at a consistant frame rate
+        bool b_updateUI = uiDelta >= 1.0 / UI_FRAME_RATE; // Keep ui at a consistant frame rate
 
         // Draw frame OR update UI
         if(b_updateUI || b_drawAll)
@@ -106,9 +106,14 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
             // Draw UI at 30 FPS
             if(b_updateUI) 
             {
+                m_profiler.end("ui");
+                m_profiler.begin<Profiler::UNSCOPED>("ui");
+                
+                m_profiler.begin("ui_period");
                 lastGUITime = GetTime();
                 updateUI();
                 PollInputEvents();
+                m_profiler.end();
             }
 
             // Draw UI            
@@ -258,6 +263,10 @@ void Engine::updateUI()
         ImGui::Text("TPS: %d | Load: %.2lf/%.2lf ms (%.2lf%%)",
         static_cast<int>(m_profiler["tps"]->getFrequency()), m_profiler["tick"]->calculAverage().count() * 1000.0, m_tickPeriod * 1000.0,
         m_profiler["tick"]->calculAverage().count()/m_tickPeriod * 100);
+
+        ImGui::Text("UI: %d | Load: %.2lf/%.2lf ms (%.2lf%%)",
+        static_cast<int>(m_profiler["ui"]->getFrequency()), m_profiler["ui_period"]->calculAverage().count() * 1000.0, 1.0 / UI_FRAME_RATE * 1000.0,
+        m_profiler["ui_period"]->calculAverage().count() *  UI_FRAME_RATE * 100);
 
         ImGui::Text("Total: %.2lf ms | Idle: %.2lf ms", m_profiler["loop"]->calculAverage().count() * 1000.0, m_profiler["idle"]->calculAverage().count() * 1000.0);
     }
