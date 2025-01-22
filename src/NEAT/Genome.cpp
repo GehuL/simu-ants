@@ -191,3 +191,25 @@ std::vector<int> Genome::make_output_ids() const {
     }
     return output_ids;
 }
+
+void to_json(json& json, const Genome& genome)
+{
+    json["genome_id"] = genome.genome_id;
+    json["num_inputs"] = genome.num_inputs;
+    json["num_outputs"] = genome.num_outputs;
+    json["neurons"] = genome.neurons;
+    json["links"] = genome.links;
+}
+
+void from_json(const json& json, Genome& genome)
+{
+    genome.neurons.clear();
+    genome.links.clear();
+
+    genome.num_inputs = json["num_inputs"];
+    genome.num_outputs = json["num_outputs"];
+    genome.genome_id = json["genome_id"];
+
+    json["neurons"].get_to(genome.neurons);
+    json["links"].get_to(genome.links);
+}

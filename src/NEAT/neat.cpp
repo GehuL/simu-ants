@@ -107,6 +107,54 @@ double clamp(double x){
 }
 
 
+void to_json(json& json, const neat::LinkGene& link)
+{
+    json["link_input_id"] = link.link_id.input_id;
+    json["link_output_id"] = link.link_id.output_id;
+    json["weight"] = link.weight;
+    json["is_enabled"] = link.is_enabled;
+}
 
+void from_json(const json& json, neat::LinkGene& link)
+{
+    json["link_input_id"].get_to(link.link_id.input_id);
+    json["link_output_id"].get_to(link.link_id.output_id);
+    json["weight"].get_to(link.weight);
+    json["is_enabled"].get_to(link.is_enabled);
+}
 
+void to_json(json& json, const neat::NeuronGene& neuron)
+{
+    json["neuron_id"] = neuron.neuron_id;
+    json["bias"] = neuron.bias;
+
+    switch(neuron.activation.get_type())
+    {
+        case Activation::Type::Sigmoid:
+            json["activation_type"] = "Sigmoid";
+            break;
+        case Activation::Type::Tanh:
+            json["activation_type"] = "Tanh";
+            break;
+        default:
+            json["activation_type"] = "Unknown";
+            break;
+    }
+}
+
+void from_json(const json& json, neat::NeuronGene& neuron)
+{
+    json["neuron_id"].get_to(neuron.neuron_id);
+    json["bias"].get_to(neuron.bias);
+
+    std::string activation_type;
+    json["activation_type"].get_to(activation_type);
+
+    if(activation_type == "Sigmoid")
+        neuron.activation = Activation(Activation::Type::Sigmoid);
+    else if(activation_type == "Tanh")
+        neuron.activation = Activation(Activation::Type::Tanh);
+    else
+        neuron.activation = Activation(Activation::Type::Sigmoid);
+}
 }

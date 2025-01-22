@@ -10,6 +10,9 @@
 #include "GenomeIndexer.h"
 #include "NeatConfig.h"
 #include <memory>
+#include "../external/json.hpp"
+
+using json = nlohmann::json;
 
 class Genome;
 
@@ -73,6 +76,12 @@ namespace neat
             return link_id.input_id == neuron.neuron_id || link_id.output_id == neuron.neuron_id;
         }
     };
+
+    void to_json(json& json, const neat::LinkGene& link);
+    void from_json(const json& json, neat::LinkGene& link);
+
+    void to_json(json& json, const neat::NeuronGene& neuron);
+    void from_json(const json& json, neat::NeuronGene& neuron);
 
     // Structure pour représenter un individu
     struct Individual
@@ -185,6 +194,7 @@ namespace neat
      * @return La valeur limitée dans la plage [config.min_value, config.max_value].
      */
     double clamp(double x);
+    
 
 } // namespace neat
 

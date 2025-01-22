@@ -210,7 +210,6 @@ bool AntIA::move(Vec2i dir)
     if(!tile.flags.solid)
     {
         m_gridPos = newPos;
-        m_pos = getWorld().gridToWorld(newPos);
         return true;
     }
     return false;
@@ -218,6 +217,8 @@ bool AntIA::move(Vec2i dir)
 
 void AntIA::update()
 {
+    m_pos = getWorld().gridToWorld(m_gridPos);
+
     // Variables de décisions
     const std::vector<double> inputs = {
     static_cast<double>(getAngle()), 

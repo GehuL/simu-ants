@@ -94,7 +94,8 @@ namespace simu
             static constexpr int inputCount() { return 3; } ;
             static constexpr int outputCount() { return 2; };
 
-            bool move(Vec2i vec);
+            bool move(Vec2i dir);
+            void setPos(Vec2i pos) { m_gridPos = pos; };
 
             void update() override;
             void save(json& json) const override;

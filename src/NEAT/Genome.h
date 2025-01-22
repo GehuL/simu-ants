@@ -6,6 +6,9 @@
 #include "rng.h"
 #include <vector>
 #include <optional>
+#include "../external/json.hpp"
+
+using json = nlohmann::json;
 
 class Genome
 {
@@ -136,6 +139,9 @@ public:
      */
     neat::NeuronGene create_neuron(int neuron_id);
 
+    friend void to_json(json& json, const Genome& genome);
+    friend void from_json(const json& json, Genome& genome);
+
 private:
     int genome_id;
     int num_inputs;
@@ -145,5 +151,10 @@ private:
     std::vector<neat::NeuronGene> neurons;
     std::vector<neat::LinkGene> links;
 };
+
+void to_json(json& json, const Genome& genome);
+void from_json(const json& json, Genome& genome);
+
+
 
 #endif // GENOME_H
