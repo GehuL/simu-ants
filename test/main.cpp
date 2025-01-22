@@ -1,5 +1,4 @@
-#include "world.h"
-#include "ant.h"
+#include "../src/world.h"
 
 using namespace simu;
 
