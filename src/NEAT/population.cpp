@@ -13,7 +13,7 @@ Population::Population(NeatConfig config, RNG &rng)
     : config{config}, rng{rng}, next_genome_id{0} {
     for (int i = 0; i < config.population_size; ++i) {
         int num_hidden_neurons = rng.next_int(1, 4);  // Random hidden neurons
-std::shared_ptr<Genome> genome = std::make_shared<Genome>(Genome::create_genome(generate_next_genome_id(), config.num_inputs, config.num_outputs, num_hidden_neurons, rng));
+std::shared_ptr<Genome> genome = std::make_shared<Genome>(Genome::create_genome_div(generate_next_genome_id(), config.num_inputs, config.num_outputs, num_hidden_neurons, rng));
 individuals.emplace_back(genome);
 
     }
@@ -234,7 +234,42 @@ std::vector<neat::Individual> Population::reproduce_from_genome_roulette_negativ
 
     return new_generation;
 }
+/*
+std::vector<neat::Individual> Population::reproduce_with_speciation(
+    const std::vector<Species>& species_list
+) {
+    std::vector<neat::Individual> new_generation;
 
+    for (const auto &species : species_list) {
+        // Ajuster les fitness de l'espèce
+        std::vector<double> adjusted_fitnesses;
+        for (const auto &genome : species.members) {
+            double adjusted_fitness = genome->getFitness() / species.members.size();
+            adjusted_fitnesses.push_back(adjusted_fitness);
+        }
+
+        // Reproduire au sein de l'espèce
+        while (new_generation.size() < config.population_size) {
+            const auto &p1 = rng.roulette_selection(species.members, adjusted_fitnesses);
+            const auto &p2 = rng.roulette_selection(species.members, adjusted_fitnesses);
+
+            // Crossover
+            neat::Neat neat_instance;
+            Genome offspring_genome = neat_instance.alt_crossover(p1, p2, generate_next_genome_id());
+            std::shared_ptr<Genome> offspring = std::make_shared<Genome>(offspring_genome);
+
+            // Mutation
+            mutate(*offspring);
+
+            // Ajouter à la nouvelle génération
+            new_generation.push_back(neat::Individual(offspring));
+        }
+    }
+
+    return new_generation;
+}
+
+*/
 
 
 
@@ -272,7 +307,21 @@ void Population::replace_population(std::vector<neat::Individual> new_generation
     std::cout << "Population remplacée. Taille actuelle : " << individuals.size() << std::endl;
 }
 
+void Population::clear_species() {
+        for (auto &species : species_list) {
+            species.clear_members();
+        }
+    }
 
 
 
+    // Créer une nouvelle espèce
+void Population::create_new_species(std::shared_ptr<Genome> representative) {
+    int new_id = species_list.size() + 1;
+    Species new_species(new_id, *representative); 
+    species_list.push_back(std::move(new_species));
+}
 
+std::vector<Species> &Population::get_species_list()
+{return species_list;
+}

@@ -11,7 +11,8 @@ public:
     enum class Type
     {
         Sigmoid,
-        Tanh
+        Tanh,
+        ReLU
     };
 
     /**
@@ -45,6 +46,8 @@ public:
             return sigmoid(x);
         case Type::Tanh:
             return tanh(x);
+        case Type::ReLU:
+            return std::max(0.0, x);    
         default:
             throw std::invalid_argument("Unknown activation type");
         }
@@ -66,6 +69,11 @@ private:
     static double tanh(double x)
     {
         return std::tanh(x);
+    }
+
+    static double relu(double x)
+    {
+        return std::max(0.0, x);
     }
 };
 ;

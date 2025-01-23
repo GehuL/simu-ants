@@ -10,26 +10,45 @@
 
 
 void Mutator::mutate(Genome &genome, const NeatConfig &config, RNG &rng) {
-    if (rng.next_double() < config.probability_add_link) {
-        mutate_add_link_fix(genome);
-    }
-    if (rng.next_double() < config.probability_remove_link) {
-        mutate_remove_link_fix(genome);
-    }
-    if (rng.next_double() < config.probability_add_neuron) {
-        mutate_add_neuron_fix(genome);
-    }
-    if (rng.next_double() < config.probability_remove_neuron) {
-        mutate_remove_neuron_fix(genome);
+    // Probabilité d'une mutation structurelle
+    if (rng.next_double() < config.probability_structure_mutation) {
+        // Liste des mutations structurelles possibles et de leurs probabilités relatives
+        std::vector<std::pair<std::function<void(Genome&)>, double>> structure_mutations = {
+            {mutate_add_link_fix, config.probability_add_link},
+            {mutate_remove_link_fix, config.probability_remove_link},
+            {mutate_add_neuron_fix, config.probability_add_neuron},
+            {mutate_remove_neuron_fix, config.probability_remove_neuron}
+        };
+
+        // Normaliser les probabilités pour éviter des erreurs de cumul
+        double total_probability = 0.0;
+        for (const auto& mutation : structure_mutations) {
+            total_probability += mutation.second;
+        }
+
+        double mutation_choice = rng.next_double() * total_probability;
+
+        // Sélectionner et appliquer une mutation structurelle
+        double cumulative_probability = 0.0;
+        for (const auto& mutation : structure_mutations) {
+            cumulative_probability += mutation.second;
+            if (mutation_choice < cumulative_probability) {
+                mutation.first(genome); // Appliquer la mutation structurelle
+                break;
+            }
+        }
     }
 
-    // Mutate weights and biases
+    if (rng.next_double() < config.probability_weight_or_bias_mutation) {
     if (rng.next_bool()) {
         mutate_link_weight(genome, config, rng);
     } else {
         mutate_neuron_bias(genome, config, rng);
     }
 }
+
+}
+
 
 void Mutator::mutate_add_link(Genome &genome) { 
     int input_id = choose_random_input_or_hidden_neuron(genome.get_neurons());  

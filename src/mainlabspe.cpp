@@ -3,13 +3,15 @@
 #include "NEAT/population.h"
 #include "NEAT/ComputeFitness.h"
 #include "NEAT/Utils.h"
+#include "NEAT/NeatConfig.h"
 #include <fstream>
 #include <iostream>
 
-
+/*
 using namespace simu;
 
 RNG rng;
+NeatConfig config;
 
 class Scene : public WorldListener {
     std::vector<std::weak_ptr<AntIA>> ants;
@@ -93,6 +95,37 @@ public:
         current_tick++;
     }
 
+    void speciate() {
+    // Effacer les membres des espèces existantes
+    mPop.clear_species();
+
+    // Parcourir chaque fourmi et son génome
+    for (const auto &ant : ants) {
+        if (ant.expired()) continue;
+
+        auto locked_ant = ant.lock();
+        std::shared_ptr<Genome> genome = std::make_shared<Genome>(locked_ant->getGenome());
+        bool assigned = false;
+
+        // Comparer avec les représentants des espèces existantes
+        for (auto &species : mPop.get_species_list()) {
+            double distance = genome->compute_distance(species.representative, config);
+            if (distance < config.compatibility_threshold) {
+                species.add_member(genome); // Ajouter le génome à l'espèce
+                assigned = true;
+                break;
+            }
+        }
+
+        // Si aucune espèce n'est compatible, créer une nouvelle espèce
+        if (!assigned) {
+            mPop.create_new_species(genome);
+        }
+    }
+}
+
+
+
     void finalizeGeneration() {
     double total_fitness = 0.0;
     double max_fitness = std::numeric_limits<double>::lowest();
@@ -103,7 +136,7 @@ public:
 
         auto locked_ant = ant.lock();
         Vec2i antPos = getWorld().getGrid().toTileCoord((Vec2f)(locked_ant->getPos()));
-        
+
         // Calculer la fitness individuelle
         double fitness = compute_fitness.evaluate_lab(
             antPos, Vec2i(73, 0), getWorld().getGrid(), *locked_ant, initial_distance, current_generation
@@ -133,49 +166,53 @@ public:
               << " - Fitness max: " << max_fitness
               << " - Fitness min: " << min_fitness << std::endl;
 
+    // Appeler la spéciation
+    speciate();
+
     // Réinitialiser pour la prochaine génération
     nextGeneration();
 }
 
 
+
     void nextGeneration() {
-        std::vector<std::shared_ptr<Genome>> genomes;
-        std::vector<double> fitnesses;
-        for (const auto &ant : ants) {
-            if (!ant.expired()) {
-                genomes.push_back(std::make_shared<Genome>(ant.lock()->getGenome()));
-                fitnesses.push_back(ant.lock()->getFitness());
+    // Étape 1 : Réinitialiser les espèces
+    for (auto &species : species_list) {
+        species.clear_members();
+    }
+
+    // Étape 2 : Réassigner les génomes aux espèces existantes
+    for (const auto &genome : new_genomes) {
+        bool assigned = false;
+        for (auto &species : species_list) {
+            if (compute_compatibility(species.representative, *genome) < config.compatibility_threshold) {
+                species.add_member(genome);
+                assigned = true;
+                break;
             }
         }
 
-        auto new_genomes = mPop.reproduce_from_genome_roulette_negative(genomes, fitnesses);
-        ants.clear();
-
-        getWorld().clearEntities();
-
-        for (auto &genome : new_genomes) {
-            ants.push_back(getWorld().spawnEntity<AntIA>(*genome.genome, Vec2i(90, 150)));
+        // Si aucune espèce existante n'est compatible, créer une nouvelle espèce
+        if (!assigned) {
+            species_list.emplace_back(generate_next_species_id(), *genome);
         }
-
-        // Réinitialiser le compteur global et les positions
-        current_tick = 0;
-        current_generation++;
     }
 
-    void export_fitness_data() {
-    std::ofstream file("fitness_moyenne_lab.csv");
-    if (file.is_open()) {
-        file << "Generation,Fitness_Moyenne,Fitness_Max,Fitness_Min\n";
-        for (size_t i = 0; i < avg_fitness_per_gen.size(); ++i) {
-            file << i + 1 << ","
-                 << avg_fitness_per_gen[i] << ","
-                 << max_fitness_per_gen[i] << ","
-                 << min_fitness_per_gen[i] << "\n";
+    // Étape 3 : Générer les fourmis pour la nouvelle génération
+    ants.clear();
+    getWorld().clearEntities();
+
+    for (const auto &species : species_list) {
+        for (const auto &genome : species.members) {
+            ants.push_back(getWorld().spawnEntity<AntIA>(*genome, Vec2i(90, 150)));
         }
-        file.close();
-        std::cout << "Données exportées dans 'fitness_moyenne_lab.csv'.\n";
     }
+
+    // Réinitialiser le compteur global
+    current_tick = 0;
+    current_generation++;
 }
+
 
 };
 
@@ -193,3 +230,4 @@ int main(void) {
 
     return result;
 }
+*/

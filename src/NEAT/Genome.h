@@ -36,6 +36,10 @@ public:
 
     static Genome create_genome_div(int id, int num_inputs, int num_outputs, int num_hidden_neurons, RNG &rng);
 
+    static Genome create_diverse_genome(int id, int num_inputs, int num_outputs, int max_hidden_neurons, RNG &rng);
+
+    double compute_distance(const Genome &other, const NeatConfig &config) const;
+
     /**
      * @brief Obtenir le nombre d’entrées dans le génome.
      *

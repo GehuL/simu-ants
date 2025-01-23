@@ -6,6 +6,7 @@
 #include "ComputeFitness.h"
 #include "Genome.h"
 #include "NeatConfig.h"
+#include "species.h"
 #include <vector>
 #include <algorithm>
 #include <cmath>
@@ -87,6 +88,10 @@ public:
        const std::vector<double>& fitnesses
    );
 
+   std::vector<neat::Individual> reproduce_with_speciation(
+    const std::vector<Species>& species_list
+);
+
    /**
     * @brief Trie les individus par fitness en ordre décroissant.
     *
@@ -119,6 +124,21 @@ public:
  */
    void replace_population(std::vector<neat::Individual> new_generation);
 
+    /**
+     * @brief Efface toutes les espèces de la population.
+     *
+     * Cette méthode efface toutes les espèces de la population en vidant la liste des espèces.
+     * Elle est appelée à la fin de chaque génération pour nettoyer les données de la génération précédente.
+     */
+
+    void clear_species();
+
+    void create_new_species(std::shared_ptr<Genome> representative);
+
+    std::vector<Species> &get_species_list();
+
+    
+
    
 private:
    NeatConfig config;
@@ -126,6 +146,7 @@ private:
    int next_genome_id;
    std::vector<neat::Individual> individuals;
    neat::Individual best_individual;
+   std::vector<Species> species_list;
 };
 
 #endif // POPULATION_H

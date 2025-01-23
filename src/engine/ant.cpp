@@ -193,7 +193,7 @@ DemoAnt& DemoAnt::operator=(const DemoAnt& ant)
 RNG gRng;
 
 AntIA::AntIA(const long id, const AntIA& ant) : Ant(id, ant), m_genome(ant.m_genome), m_network(ant.m_network) {}
-AntIA::AntIA(const long id, Vec2i position): Ant(id),  m_genome(Genome::create_genome_div(0, 12, 4, 3, gRng)), m_network(FeedForwardNeuralNetwork::create_from_genome(m_genome)), m_gridPos(position)
+AntIA::AntIA(const long id, Vec2i position): Ant(id),  m_genome(Genome::create_diverse_genome(0, 14, 4, 3, gRng)), m_network(FeedForwardNeuralNetwork::create_from_genome(m_genome)), m_gridPos(position)
 {
     m_pos = getWorld().gridToWorld(position);
 }
@@ -244,6 +244,8 @@ void AntIA::update()
     //static_cast<double>(getDistanceToWall(RIGHT))
     static_cast<double>(getLastAction()),
     static_cast<double>(getDirectionChanges()),
+    static_cast<double>(getRepeatCount()),
+    static_cast<double>(getWallHit()),
     };
 /*
     std::cout << "Inputs: ";
@@ -253,8 +255,19 @@ for (double input : inputs) {
 std::cout << std::endl;
 */
 
+    std::vector<double> actions;
+    try
+    {
+       actions = m_network.activate(inputs);
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+      //  save(m_genome);
+   //     exit(-1);
+    }
+    
     // Activation des sorties
-    auto actions = m_network.activate(inputs);
 
     // Ajouter du bruit aléatoire aux actions
     std::random_device rd;  // Générateur aléatoire
@@ -279,7 +292,7 @@ std::cout << std::endl;
 
     //std::cout << "Ant " << getId() << " action: " << direction << std::endl;
 
-    if(getTileFacing().flags.solid || getTileLeft().flags.solid|| getTileRight().flags.solid || getTileBack().flags.solid)
+    if(getTileFacing().flags.solid || getTileLeft().flags.solid|| getTileRight().flags.solid|| getTileBack().flags.solid)
     {
         wallHit++;
     }
@@ -307,10 +320,7 @@ std::cout << std::endl;
     // Ajouter la position actuelle à l'ensemble
     visitedPositions.insert({static_cast<int>(m_gridPos.x), static_cast<int>(m_gridPos.y)});
 
-    int wallProximityBefore = getTileFacing().flags.solid + 
-                          getTileLeft().flags.solid + 
-                          getTileRight().flags.solid + 
-                          getTileBack().flags.solid;
+    int wallProximityBefore = getWallProximityBeforeMove();
 
     Vec2i lastGridPos = m_gridPos;
 
@@ -324,10 +334,7 @@ std::cout << std::endl;
         default: break;
     }
 
-    int wallProximityAfter = getTileFacing().flags.solid + 
-                          getTileLeft().flags.solid + 
-                          getTileRight().flags.solid + 
-                          getTileBack().flags.solid;
+    int wallProximityAfter = getWallProximityBeforeMove();
 
     if (wallProximityAfter < wallProximityBefore) {
     goodWallAvoidanceMoves++;
@@ -364,6 +371,14 @@ bool simu::AntIA::isCurrentPositionVisited()
         return true;
     }
     return false;
+}
+
+int simu::AntIA::getWallProximityBeforeMove()
+{
+    return getTileFacing().flags.solid + 
+                          getTileLeft().flags.solid + 
+                          getTileRight().flags.solid+ 
+                          getTileBack().flags.solid;
 }
 /*
 double simu::AntIA::getDistanceToWall(Direction dir)

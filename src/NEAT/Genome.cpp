@@ -156,25 +156,123 @@ Genome Genome::create_genome_div(int id, int num_inputs, int num_outputs, int nu
         }
     }
 
-    // Affichage pour débogage
-    /*
-    std::cout << "Genome ID: " << id << std::endl;
-    std::cout << "Neurones:" << std::endl;
-    for (const auto &neuron : genome.get_neurons()) {
-        std::cout << "  Neuron ID: " << neuron.neuron_id 
-                  << ", Bias: " << neuron.bias << std::endl;
-    }
-    std::cout << "Liens:" << std::endl;
-    for (const auto &link : genome.get_links()) {
-        std::cout << "  Link from " << link.link_id.input_id 
-                  << " to " << link.link_id.output_id 
-                  << " with weight " << link.weight << std::endl;
-    }
-    */
 
     return genome;
 }
 
+Genome Genome::create_diverse_genome(int id, int num_inputs, int num_outputs, int max_hidden_neurons, RNG &rng) {
+    Genome genome(id, num_inputs, num_outputs);
+
+    // Ajoute neurones d'entrée
+    for (int i = 0; i < num_inputs; ++i) {
+        genome.add_neuron(neat::NeuronGene{i, 0.0, Activation(Activation::Type::Sigmoid)});
+    }
+
+    // Ajoute neurones de sortie avec des biais aléatoires
+    for (int i = 0; i < num_outputs; ++i) {
+        int output_id = num_inputs + i;
+        double bias = rng.uniform(-1.0, 1.0);
+        genome.add_neuron(neat::NeuronGene{output_id, bias, Activation(Activation::Type::Sigmoid)});
+    }
+
+    // Nombre aléatoire de neurones cachés (jusqu'à max_hidden_neurons)
+    int num_hidden_neurons = rng.uniform(0, max_hidden_neurons);
+    for (int i = 0; i < num_hidden_neurons; ++i) {
+        int hidden_id = num_inputs + num_outputs + i;
+        double bias = rng.gaussian(0.0, 1.0);
+        
+        // Fonction d'activation aléatoire
+        Activation::Type activation_type = rng.uniform(0, 2) == 0 
+            ? Activation::Type::Sigmoid 
+            : Activation::Type::ReLU;
+        
+        genome.add_neuron(neat::NeuronGene{hidden_id, bias, Activation(activation_type)});
+    }
+
+    // Ajoute connexions aléatoires (entrée -> caché, caché -> caché, caché -> sortie)
+    auto add_random_connection = [&](int from, int to) {
+        if (!genome.would_create_cycle(from, to)) {
+            genome.add_link(genome.create_link_div(from, to, rng));
+        }
+    };
+
+    // Probabilités pour les connexions
+    double prob_input_to_hidden = 0.5;
+    double prob_hidden_to_hidden = 0.3;
+    double prob_hidden_to_output = 0.7;
+
+    // Connexions : entrée -> cachés
+    for (int input_id = 0; input_id < num_inputs; ++input_id) {
+        for (int hidden_id = num_inputs + num_outputs; hidden_id < num_inputs + num_outputs + num_hidden_neurons; ++hidden_id) {
+            if (rng.uniform(0.0, 1.0) < prob_input_to_hidden) {
+                add_random_connection(input_id, hidden_id);
+            }
+        }
+    }
+
+    // Connexions : cachés -> cachés
+    for (int hidden_id = num_inputs + num_outputs; hidden_id < num_inputs + num_outputs + num_hidden_neurons; ++hidden_id) {
+        for (int target_hidden_id = hidden_id + 1; target_hidden_id < num_inputs + num_outputs + num_hidden_neurons; ++target_hidden_id) {
+            if (rng.uniform(0.0, 1.0) < prob_hidden_to_hidden) {
+                add_random_connection(hidden_id, target_hidden_id);
+            }
+        }
+    }
+
+    // Connexions : cachés -> sorties
+    for (int hidden_id = num_inputs + num_outputs; hidden_id < num_inputs + num_outputs + num_hidden_neurons; ++hidden_id) {
+        for (int output_id = num_inputs; output_id < num_inputs + num_outputs; ++output_id) {
+            if (rng.uniform(0.0, 1.0) < prob_hidden_to_output) {
+                add_random_connection(hidden_id, output_id);
+            }
+        }
+    }
+
+    return genome;
+}
+
+/*
+double Genome::compute_distance(const Genome &other, const NeatConfig &config) const {
+    int num_disjoint = 0;
+    int num_excess = 0;
+    double weight_diff = 0.0;
+    int matching_genes = 0;
+
+    auto it1 = links.begin();
+    auto it2 = other.links.begin();
+
+    while (it1 != links.end() || it2 != other.links.end()) {
+        if (it1 == links.end()) {
+            ++num_excess;
+            ++it2;
+        } else if (it2 == other.links.end()) {
+            ++num_excess;
+            ++it1;
+        } else if (it1->innovation_number < it2->innovation_number) {
+            ++num_disjoint;
+            ++it1;
+        } else if (it1->innovation_number > it2->innovation_number) {
+            ++num_disjoint;
+            ++it2;
+        } else {
+            // Matching genes
+            weight_diff += std::abs(it1->weight - it2->weight);
+            ++matching_genes;
+            ++it1;
+            ++it2;
+        }
+    }
+
+    int max_genes = std::max(links.size(), other.links.size());
+    double avg_weight_diff = (matching_genes > 0) ? (weight_diff / matching_genes) : 0.0;
+
+    return (config.compatibility_coefficient_excess * num_excess) / max_genes +
+           (config.compatibility_coefficient_disjoint * num_disjoint) / max_genes +
+           (config.compatibility_coefficient_weights * avg_weight_diff);
+}
+
+
+*/
 
 
 
