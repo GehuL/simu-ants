@@ -20,6 +20,8 @@ public:
      */
     Activation() : activation_type(Type::Sigmoid) {}
 
+    
+
     /**
      * @brief Construit un objet Activation avec le type d'activation spécifié.
      *

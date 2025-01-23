@@ -120,6 +120,8 @@ ActivationFn convert_activation(const Activation &activation)
         return Sigmoid{};
     case Activation::Type::Tanh:
         return Tanh{};
+    case Activation::Type::ReLU:
+        return ReLU{};
     default:
         throw std::invalid_argument("Unknown activation type");
     }

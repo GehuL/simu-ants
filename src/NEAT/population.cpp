@@ -13,7 +13,7 @@ Population::Population(NeatConfig config, RNG &rng)
     : config{config}, rng{rng}, next_genome_id{0} {
     for (int i = 0; i < config.population_size; ++i) {
         int num_hidden_neurons = rng.next_int(1, 4);  // Random hidden neurons
-std::shared_ptr<Genome> genome = std::make_shared<Genome>(Genome::create_genome_div(generate_next_genome_id(), config.num_inputs, config.num_outputs, num_hidden_neurons, rng));
+std::shared_ptr<Genome> genome = std::make_shared<Genome>(Genome::create_genome(generate_next_genome_id(), config.num_inputs, config.num_outputs, num_hidden_neurons, rng));
 individuals.emplace_back(genome);
 
     }
