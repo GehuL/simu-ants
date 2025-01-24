@@ -229,6 +229,7 @@ void AntIA::update()
 void AntIA::load(const json &json)
 {
     Ant::load(json);
+    m_gridPos = getWorld().getGrid().toTileCoord(m_pos);
     // TODO: Load genome
 }
 

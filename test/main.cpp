@@ -1,5 +1,8 @@
 #include "../src/world.h"
 
+#include "../src/external/ui/imgui.h"
+#include "../src/external/ui/rlImGui.h"
+
 using namespace simu;
 
 class Scene: public WorldListener
@@ -11,62 +14,19 @@ class Scene: public WorldListener
         {
             Grid& grid = getWorld().getGrid();
             grid.fromImage("maze.png");
-            getWorld().centerCamera();
-            
-            TraceLog(LOG_DEBUG, "Size of Type: %d  Size of Tiles: %d", sizeof(Type), sizeof(Tile));
-            
-           /* double startTime = GetTime();
-            auto path = grid.findPath(Vec2i{89, 161}, Vec2i{6, 10});
-
-            double deltaTime = (GetTime() - startTime) * 1000.f;
-            TraceLog(LOG_DEBUG, "A*: %.1lf ms", deltaTime);
-        
-            for(Vec2i tile : path)
-                grid.setTile(FOOD, tile.x, tile.y);*/
-
+                        
             ants = getWorld().spawnEntities<AntIA>(1000, Vec2i{89, 161});
             getWorld().spawnEntity<DemoAnt>(getWorld().gridToWorld(Vec2i{89, 161}));
         };
 
-        void onDraw() override
+        void onDrawUI() override 
         {
-            if(IsKeyPressed(KEY_G))
-            {
-                Grid& grid = getWorld().getGrid();
+            ImGui::Begin("World");
+            ImGui::End();
+        };
 
-                for(const auto& ant: ants)
-                {
-                    if(ant.expired())
-                        continue;
-
-                    Vec2i antPos = grid.toTileCoord((Vec2f)(ant.lock()->getPos()));
-
-                    auto path = grid.findPath(antPos, getWorld().mouseToGridCoord());
-
-                    const int tileSize = grid.getTileSize();
-
-                    for(Vec2i tile : path)
-                    {
-                        DrawRectangle(tile.x * tileSize, tile.y * tileSize, tileSize, tileSize, RED);
-                    }
-                }
-            }
-
-            if(IsKeyPressed(KEY_SPACE))
-            {
-                // getWorld().clearEntities();
-                //  for(auto& en : getWorld().getEntities())
-                // {
-                //     getWorld().removeEntity(en.lock()->getId());
-                // }
-                getWorld().removeEntities(ants.begin(), ants.end());
-                // getWorld().clearEntities();
-            }
-
-        }
-
+        void onDraw() override {};
         void onUnload() override {};
-        
         void onUpdate() override {};
 };
 
@@ -76,5 +36,5 @@ int main(void)
 
     simu::World& world = simu::getWorld(); 
     world.setListener(std::make_shared<Scene>());
-    return world.run(800, 800, "ants-simulation");
+    return world.run(1600, 800, "ants-simulation");
 }

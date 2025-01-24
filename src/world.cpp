@@ -7,6 +7,11 @@
 
 #include "raygui.h"
 
+#include "external/ui/imgui.h"
+#include "external/ui/rlImGui.h"
+#include "external/ui/imgui_internal.h"
+
+
 using namespace simu;
 using json = nlohmann::json;
 
@@ -150,12 +155,32 @@ void World::load(const std::string& filename)
 
 void World::handleMouse()
 {
+    if(ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow))
+        return;
+
     // TODO: Interpoler les points pour tracer des lignes
     Vector2 mousePos = GetScreenToWorld2D(GetMousePosition(), m_camera);
 
-    if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)) 
+    if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
     {
-        m_grid.setTile(getSelectedTile(), mousePos.x, mousePos.y);
+        auto entity = getEntityAt(mousePos);
+
+        if(!entity.expired()) 
+        {
+            if(!m_selected_en.expired() && m_selected_en.lock()->getId() == entity.lock()->getId())
+            {
+                m_selected_en.reset(); // Déselectionne la fourmis
+            }else
+            {
+                m_selected_en = entity; // Sélectionne 
+                m_focus_en_gui = true;
+            }
+        }
+    }else if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)) 
+    {
+        auto entity = getEntityAt(mousePos);
+        if(entity.expired())
+         m_grid.setTile(getSelectedTile(), mousePos.x, mousePos.y);
     }else if(IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) // REMOVE TILE
     {
         m_grid.setTile(AIR, mousePos.x, mousePos.y);
@@ -191,6 +216,9 @@ void World::handleMouse()
 
 void World::handleKeyboard()
 {
+    if(ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow))
+        return;
+
     constexpr float camera_speed = 5.0f; 
 
     if (IsKeyDown(KEY_DOWN)) m_camera.offset.y -= camera_speed;
@@ -215,29 +243,6 @@ void World::handleKeyboard()
             updateTick();
         }
     }
-
-    if(IsKeyPressed(KEY_Q)) // Selection entité
-    {
-        Vector2 mousePos = GetScreenToWorld2D(GetMousePosition(), m_camera);
-
-        // Test si une entité est cliqué
-        auto en_it = std::find_if(m_entities.begin(), m_entities.end(), [&](const auto& en) {
-            // Distance de manhattan (+ rapide que euclidien car lent pour beaucoup d'entité)
-            return (en.get()->getPos() + Vec2f(2.5f, 2.5f)).manhattan(mousePos) < 5; 
-        });
-
-        // C'est une tuile
-        if(en_it != m_entities.end()) 
-        {
-            if(!m_selected_en.expired() && m_selected_en.lock()->getId() == en_it->get()->getId())
-            {
-                m_selected_en.reset(); // Déselectionne la fourmis
-            }else
-            {
-                m_selected_en = *en_it; // Sélectionne 
-            }
-        }
-    }
 }
 
 void World::drawFrame()
@@ -251,8 +256,6 @@ void World::drawFrame()
 
     if(m_listener)
         m_listener.get()->onDraw();
-
-    //drawEntityInfo();
 }
 
 void World::drawUI()
@@ -272,6 +275,135 @@ void World::drawUI()
 
     // Nombre d'entités
     DrawText(TextFormat("Entity: %d", m_entities.size()), 0, 100, 20, BLUE);
+
+    ImGui::Begin("World");
+    ImGui::Text("Seed: 0x%X", m_seed);
+    
+    // Sauvegarde et chargement
+    static char saveFileName[128] = "simu-save.json";
+    ImGui::InputText("##input_file", saveFileName, IM_ARRAYSIZE(saveFileName));
+    ImGui::SameLine();
+    if(ImGui::Button("Save")) save(saveFileName);
+
+    static char loadFileName[128] = "simu-save.json";
+    ImGui::InputText("##output_file", loadFileName, IM_ARRAYSIZE(loadFileName));
+    ImGui::SameLine();
+    if(ImGui::Button("Load")) load(loadFileName);
+
+
+    if(m_listener && ImGui::CollapsingHeader("Level"))
+    {
+        ImGui::Text("Level name: %s", typeid(m_listener.get()).name());
+        if(ImGui::Button("Restart Level")) init();
+    }
+
+    if(ImGui::CollapsingHeader("Grid"))
+    {
+        ImGui::Text("Size: %dx%d", m_grid.getGridWidth(), m_grid.getGridWidth());
+        static char filename[128] = "maze.png";
+        ImGui::InputText("File name", filename, IM_ARRAYSIZE(filename));
+        ImGui::SameLine();
+        static std::runtime_error last_error("");
+        if(ImGui::Button("Load grid"))
+        {
+            try
+            {
+                m_grid.fromImage(std::string(filename));
+            }catch(std::runtime_error& error)
+            {
+                last_error = error;
+                ImGui::OpenPopup("Error");
+            }
+        }
+        
+        if (ImGui::BeginPopupModal("Error", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+        {
+            ImGui::Text(last_error.what());
+            if (ImGui::Button("Close"))
+                ImGui::CloseCurrentPopup();
+            ImGui::EndPopup();
+        }
+    }
+
+    if(ImGui::CollapsingHeader("Entity"))
+    {
+        ImGui::Text("Entity count: %lld", m_entities.size());
+    
+        if(ImGui::Button("Remove all")) clearEntities();
+        
+        static char input[6] = ""; ImGui::InputText("##", input, 6, ImGuiInputTextFlags_CharsDecimal);
+        ImGui::SameLine();
+        if(ImGui::Button("Spawn DemoAnt"))
+        {
+            try
+            {
+                int number = std::stoi(input);
+                if(number < 0 || number > 99999) throw std::runtime_error("Invalid number");
+                auto entities = spawnEntities<DemoAnt>(number, Vec2f(0, 0));
+            }
+            catch(const std::exception& e)
+            {
+                std::cerr << e.what() << '\n';
+            }
+        }
+
+        if(ImGui::TreeNode("List"))
+        {
+            ImGuiListClipper clipper; // Evite d'itérer sur toutes les entités
+            clipper.Begin(m_entities.size());
+
+            if(m_focus_en_gui && !m_selected_en.expired())
+            {
+                const Entity* entity = m_selected_en.lock().get(); 
+                clipper.IncludeItemByIndex(entity->getId());
+            }
+
+            while(clipper.Step()) 
+            {
+                for(int row_n = clipper.DisplayStart; row_n < clipper.DisplayEnd; row_n++)
+                {
+                    Entity* entity = m_entities[row_n].get();
+
+                    ImGuiTreeNodeFlags nodeFlag = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+                    if(!m_selected_en.expired() && (m_selected_en.lock()->getId() == entity->getId()))
+                    {
+                        nodeFlag |= ImGuiTreeNodeFlags_Selected;
+                    }
+
+                    if(ImGui::TreeNodeEx((void*) entity->getId(), nodeFlag, "%s Id:%ld", entity->getType(), entity->getId()))
+                    {
+                        if(ImGui::IsItemFocused()) 
+                            m_selected_en = m_entities[row_n];
+                        // if(ImGui::Selectable(nodeId)) m_selected_en = m_entities[row_n];
+                        // if(ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows) && ImGui::IsMouseClicked(ImGuiPopupFlags_MouseButtonLeft))
+
+                        Vec2i gridPos = m_grid.toTileCoord(entity->getPos());
+                        Vec2f globalPos = entity->getPos();
+
+                        ImGui::Text("Grid pos: (%d, %d)", gridPos.x, gridPos.y);
+                        ImGui::Text("Global pos: (%.1f, %.1f)", globalPos.x, globalPos.y);
+
+                        ImGui::TreePop();
+                    }
+
+                    if(!m_selected_en.expired() && (m_selected_en.lock()->getId() == entity->getId()))
+                    {
+                        if(m_focus_en_gui)
+                        {
+                            m_focus_en_gui = false;
+                            ImGui::ScrollToItem(ImGuiScrollFlags_KeepVisibleCenterY);
+                        }
+                    }
+                }
+            }
+            ImGui::TreePop();
+        }
+    }
+
+    ImGui::End();
+
+    if(m_listener)
+        m_listener.get()->onDrawUI();
 }
 
 void World::drawEntityInfo()
@@ -362,9 +494,18 @@ bool World::removeEntity(unsigned long id)
     return false;
 }
 
+std::weak_ptr<Entity> World::getEntityAt(Vec2f pos)
+{
+    auto en_it = std::find_if(m_entities.begin(), m_entities.end(), [&](const auto& en) {
+        // Distance de manhattan (+ rapide que euclidien car lent pour beaucoup d'entité)
+        return (en.get()->getPos() + Vec2f(2.5f, 2.5f)).manhattan(pos) < 5; 
+    });
+
+    return std::weak_ptr<Entity>(en_it == m_entities.end() ? nullptr : *en_it);
+}
 
 void World::clearEntities() 
 { 
     m_entities.clear();
     m_entity_cnt = 0;
-};
+}

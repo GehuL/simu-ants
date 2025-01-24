@@ -4,6 +4,10 @@
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
 
+#include "external/ui/imgui.h"
+#include "external/ui/rlImGui.h"
+
+#include "external/ui/imgui_spectrum.h"
 #include <chrono>
 
 #define MIN(a, b) a > b ? b : a
@@ -32,11 +36,16 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
     m_renderer = LoadRenderTexture(screenWidth, screenHeight);
     m_gui_renderer = LoadRenderTexture(screenWidth, screenHeight);
 
+    rlImGuiSetup(false);
+    // ImGui::Spectrum::LoadStyleSynth();
+
     init();
 
     // Main game loop
     while (!WindowShouldClose()) // Detect window close button or ESC key
     {
+        m_profiler.begin("loop");
+
         double start = GetTime();
 
         if(!m_pause)
@@ -71,7 +80,7 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
         double uiDelta = GetTime() - lastGUITime;
 
         bool b_drawAll = drawDelta >= m_framePeriod;
-        bool b_updateUI = uiDelta >=  1.0 / 30.0; // Keep ui at a consistant frame rate
+        bool b_updateUI = uiDelta >= 1.0 / UI_FRAME_RATE; // Keep ui at a consistant frame rate
 
         // Draw frame OR update UI
         if(b_updateUI || b_drawAll)
@@ -97,9 +106,14 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
             // Draw UI at 30 FPS
             if(b_updateUI) 
             {
+                m_profiler.end("ui");
+                m_profiler.begin<Profiler::UNSCOPED>("ui");
+                
+                m_profiler.begin("ui_period");
                 lastGUITime = GetTime();
                 updateUI();
                 PollInputEvents();
+                m_profiler.end();
             }
 
             // Draw UI            
@@ -125,12 +139,15 @@ int Engine::run(int screenWidth, int screenHeight, std::string title)
        
         if(waitTime >= 0.0) // Il reste du temps pour mettre en pause 
         {
-            // Désactiver le waitTime permet d'augmenter la priorité du processus 
+            // Désactiver le waitTime permet d'augmenter la priorité du processus
+            m_profiler.begin("idle");
             WaitTime(waitTime);
-            // TRACELOG(LOG_INFO, "waitTime: %lf ms", waitTime * 1000.0);
+            m_profiler.end();
         }
+        m_profiler.end();
     }
     unload();
+    rlImGuiShutdown();
 
     CloseWindow();
     return 0;
@@ -187,7 +204,6 @@ void Engine::drawFrame()
 
 void Engine::drawUI()
 {
-    
 }
 
 void Engine::updateUI()
@@ -201,17 +217,11 @@ void Engine::updateUI()
         m_gui_renderer = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
     }
 
+    rlImGuiBegin();
+
     BeginTextureMode(m_gui_renderer);
 
     ClearBackground((Color){255, 255, 255, 0});
-
-    drawUI();
-
-    DrawText(TextFormat("%d FPS (%.2lfms)\n%d TPS\nTick load: %.2lf/%.2lf ms (%.1lf%%)", 
-                        (int) m_profiler["fps"]->getFrequency(), m_profiler["frame"]->calculAverage().count(),
-                        (int) m_profiler["tps"]->getFrequency(), m_profiler["tick"]->calculAverage().count() * 1000.0, m_tickPeriod * 1000.0, 
-                        100.0 * (m_profiler["tick"]->calculAverage().count() / m_tickPeriod)),
-                        5, 0, 20, GREEN);
 
     if(m_pause)
     {
@@ -238,6 +248,35 @@ void Engine::updateUI()
     if(m_noDelay && !lastStateNoDelay) {
         setTPS(999999999);
     }
+
+    ImGui::SetNextWindowBgAlpha(0.8f);
+    ImGui::SetNextWindowPos(ImVec2(10, 10));
+    if(ImGui::Begin("Overlay performance", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav))
+    {
+        ImGui::Text("Profiler");
+        ImGui::Separator();
+
+        ImGui::Text("FPS: %d | Load: %.2lf/%.2lf ms (%.2lf%%)", 
+        static_cast<int>(m_profiler["fps"]->getFrequency()), m_profiler["frame"]->calculAverage().count() * 1000.0, m_framePeriod * 1000.0,
+        m_profiler["frame"]->calculAverage().count()/m_framePeriod * 100);
+
+        ImGui::Text("TPS: %d | Load: %.2lf/%.2lf ms (%.2lf%%)",
+        static_cast<int>(m_profiler["tps"]->getFrequency()), m_profiler["tick"]->calculAverage().count() * 1000.0, m_tickPeriod * 1000.0,
+        m_profiler["tick"]->calculAverage().count()/m_tickPeriod * 100);
+
+        ImGui::Text("UI: %d | Load: %.2lf/%.2lf ms (%.2lf%%)",
+        static_cast<int>(m_profiler["ui"]->getFrequency()), m_profiler["ui_period"]->calculAverage().count() * 1000.0, 1.0 / UI_FRAME_RATE * 1000.0,
+        m_profiler["ui_period"]->calculAverage().count() *  UI_FRAME_RATE * 100);
+
+        ImGui::Text("Total: %.2lf ms | Idle: %.2lf ms", m_profiler["loop"]->calculAverage().count() * 1000.0, m_profiler["idle"]->calculAverage().count() * 1000.0);
+    }
+    ImGui::End();
+
+    ImGui::ShowDemoWindow();
+    drawUI();
+
+    rlImGuiEnd();
+
 
     EndTextureMode();
 }
