@@ -1,5 +1,6 @@
 #include "Genome.h"
 #include "neat.h"
+#include "InnovationTracker.h"
 #include <optional>
 #include <iostream>
 #include <vector>
@@ -133,7 +134,7 @@ Genome Genome::create_genome_div(int id, int num_inputs, int num_outputs, int nu
     for (int input_id = 0; input_id < num_inputs; ++input_id) {
         for (int hidden_id = num_inputs + num_outputs; hidden_id < num_inputs + num_outputs + num_hidden_neurons; ++hidden_id) {
             if (!genome.would_create_cycle(input_id, hidden_id)) {
-                genome.add_link(genome.create_link_div(input_id, hidden_id, rng));
+                genome.add_link(genome.create_link_div_with_inov(input_id, hidden_id, rng));
             }
         }
     }
@@ -142,7 +143,7 @@ Genome Genome::create_genome_div(int id, int num_inputs, int num_outputs, int nu
     for (int hidden_id = num_inputs + num_outputs; hidden_id < num_inputs + num_outputs + num_hidden_neurons; ++hidden_id) {
         for (int target_hidden_id = hidden_id + 1; target_hidden_id < num_inputs + num_outputs + num_hidden_neurons; ++target_hidden_id) {
             if (!genome.would_create_cycle(hidden_id, target_hidden_id)) {
-                genome.add_link(genome.create_link_div(hidden_id, target_hidden_id, rng));
+                genome.add_link(genome.create_link_div_with_inov(hidden_id, target_hidden_id, rng));
             }
         }
     }
@@ -151,7 +152,7 @@ Genome Genome::create_genome_div(int id, int num_inputs, int num_outputs, int nu
     for (int hidden_id = num_inputs + num_outputs; hidden_id < num_inputs + num_outputs + num_hidden_neurons; ++hidden_id) {
         for (int output_id = num_inputs; output_id < num_inputs + num_outputs; ++output_id) {
             if (!genome.would_create_cycle(hidden_id, output_id)) {
-                genome.add_link(genome.create_link_div(hidden_id, output_id, rng));
+                genome.add_link(genome.create_link_div_with_inov(hidden_id, output_id, rng));
             }
         }
     }
@@ -192,7 +193,7 @@ Genome Genome::create_diverse_genome(int id, int num_inputs, int num_outputs, in
     // Ajoute connexions aléatoires (entrée -> caché, caché -> caché, caché -> sortie)
     auto add_random_connection = [&](int from, int to) {
         if (!genome.would_create_cycle(from, to)) {
-            genome.add_link(genome.create_link_div(from, to, rng));
+            genome.add_link(genome.create_link_div_with_inov(from, to, rng));
         }
     };
 
@@ -203,10 +204,18 @@ Genome Genome::create_diverse_genome(int id, int num_inputs, int num_outputs, in
 
     // Connexions : entrée -> cachés
     for (int input_id = 0; input_id < num_inputs; ++input_id) {
+        bool connected_to_hidden = false;
         for (int hidden_id = num_inputs + num_outputs; hidden_id < num_inputs + num_outputs + num_hidden_neurons; ++hidden_id) {
             if (rng.uniform(0.0, 1.0) < prob_input_to_hidden) {
                 add_random_connection(input_id, hidden_id);
+                connected_to_hidden = true;
             }
+        }
+
+        // Si l'entrée n'est pas connectée à un neurone caché, la connecter directement à une sortie
+        if (!connected_to_hidden) {
+            int output_id = rng.uniform(num_inputs, num_inputs + num_outputs); // Connexion à une sortie aléatoire
+            add_random_connection(input_id, output_id);
         }
     }
 
@@ -231,7 +240,8 @@ Genome Genome::create_diverse_genome(int id, int num_inputs, int num_outputs, in
     return genome;
 }
 
-/*
+
+
 double Genome::compute_distance(const Genome &other, const NeatConfig &config) const {
     int num_disjoint = 0;
     int num_excess = 0;
@@ -272,7 +282,7 @@ double Genome::compute_distance(const Genome &other, const NeatConfig &config) c
 }
 
 
-*/
+
 
 
 
@@ -288,6 +298,17 @@ neat::LinkGene Genome::create_link_div(int input_id, int output_id, RNG &rng) {
         : rng.next_gaussian(0.0, 2.0);  // Poids gaussiens
     return neat::LinkGene{{input_id, output_id}, weight, true};
 }
+
+neat::LinkGene Genome::create_link_div_with_inov(int input_id, int output_id, RNG &rng) {
+    double weight = (rng.next_bool()) 
+        ? rng.uniform(-3.0, 3.0)  // Poids uniformes
+        : rng.next_gaussian(0.0, 2.0);  // Poids gaussiens
+
+    int innovation_number = InnovationTracker::get_new_innovation();
+
+    return neat::LinkGene{{input_id, output_id}, weight, true, innovation_number};
+}
+
 
 neat::NeuronGene Genome::create_neuron(int neuron_id) {
     return neat::NeuronGene{neuron_id, 0.0, Activation(Activation::Type::Sigmoid)};

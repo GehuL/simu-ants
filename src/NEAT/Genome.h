@@ -133,6 +133,8 @@ public:
 
     neat::LinkGene create_link_div(int input_id, int output_id, RNG &rng);
 
+    neat::LinkGene create_link_div_with_inov(int input_id, int output_id, RNG &rng);
+
     /**
      * @brief Crée un nouveau neurone avec l'identifiant de neurone spécifié.
      *

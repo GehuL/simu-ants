@@ -7,7 +7,7 @@
 #include <fstream>
 #include <iostream>
 
-/*
+
 using namespace simu;
 
 RNG rng;
@@ -37,6 +37,13 @@ std::vector<double> min_fitness_per_gen; // Fitness minimum par génération
 
 public:
     Scene() : mPop((NeatConfig){}, rng), compute_fitness(rng) {}
+
+/*
+    int generate_next_species_id() {
+        static int species_id = 0;
+        return species_id++;
+    }
+    */
 
     void onInit() override {
         getWorld().getGrid().fromImage("rsc/mazeCheck.png");
@@ -111,7 +118,7 @@ public:
         for (auto &species : mPop.get_species_list()) {
             double distance = genome->compute_distance(species.representative, config);
             if (distance < config.compatibility_threshold) {
-                species.add_member(genome); // Ajouter le génome à l'espèce
+                species.add_member(*genome); // Ajouter le génome à l'espèce
                 assigned = true;
                 break;
             }
@@ -176,17 +183,32 @@ public:
 
 
     void nextGeneration() {
+    std::vector<std::shared_ptr<Genome>> genomes;
+    std::unordered_map<std::shared_ptr<Genome>, double> fitness_map;
+
+    // Collecter les génomes et leurs fitness
+    for (const auto &ant : ants) {
+        if (!ant.expired()) {
+            auto locked_ant = ant.lock();
+            std::shared_ptr<Genome> genome = std::make_shared<Genome>(locked_ant->getGenome());
+            genomes.push_back(genome);
+            fitness_map[genome] = locked_ant->getFitness();
+        }
+    }
+
+    auto species_list = mPop.get_species_list();
+
     // Étape 1 : Réinitialiser les espèces
     for (auto &species : species_list) {
         species.clear_members();
     }
 
     // Étape 2 : Réassigner les génomes aux espèces existantes
-    for (const auto &genome : new_genomes) {
+    for (const auto &genome : genomes) {
         bool assigned = false;
         for (auto &species : species_list) {
-            if (compute_compatibility(species.representative, *genome) < config.compatibility_threshold) {
-                species.add_member(genome);
+            if (species.representative.compute_distance(*genome, config) < config.compatibility_threshold) {
+                species.add_member(*genome);
                 assigned = true;
                 break;
             }
@@ -198,20 +220,35 @@ public:
         }
     }
 
-    // Étape 3 : Générer les fourmis pour la nouvelle génération
+    // Étape 3 : Générer la nouvelle génération en fonction des espèces
+    auto new_generation = mPop.reproduce_with_speciation(species_list, fitness_map);
     ants.clear();
     getWorld().clearEntities();
 
-    for (const auto &species : species_list) {
-        for (const auto &genome : species.members) {
-            ants.push_back(getWorld().spawnEntity<AntIA>(*genome, Vec2i(90, 150)));
-        }
+    for (auto &individual : new_generation) {
+        ants.push_back(getWorld().spawnEntity<AntIA>(*individual.genome, Vec2i(90, 150)));
     }
 
     // Réinitialiser le compteur global
     current_tick = 0;
     current_generation++;
 }
+
+void export_fitness_data() {
+    std::ofstream file("fitness_moyenne_lab.csv");
+    if (file.is_open()) {
+        file << "Generation,Fitness_Moyenne,Fitness_Max,Fitness_Min\n";
+        for (size_t i = 0; i < avg_fitness_per_gen.size(); ++i) {
+            file << i + 1 << ","
+                 << avg_fitness_per_gen[i] << ","
+                 << max_fitness_per_gen[i] << ","
+                 << min_fitness_per_gen[i] << "\n";
+        }
+        file.close();
+        std::cout << "Données exportées dans 'fitness_moyenne_lab.csv'.\n";
+    }
+}
+
 
 
 };
@@ -230,4 +267,3 @@ int main(void) {
 
     return result;
 }
-*/

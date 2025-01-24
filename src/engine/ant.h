@@ -122,7 +122,7 @@ namespace simu
             double getFitness() { return fitness; };
             double setFitness(double fit) { fitness = fit; return fitness; };
 
-            static constexpr int inputCount() { return 14; } ;
+            static constexpr int inputCount() { return 15; } ;
             static constexpr int outputCount() { return 4; };
 
             bool move(Vec2i vec);

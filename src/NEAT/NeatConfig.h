@@ -3,7 +3,7 @@
 
 struct NeatConfig {
     int population_size = 200;        // Taille de la population
-    int num_inputs = 14;               // Nombre d'entrées
+    int num_inputs = 15;               // Nombre d'entrées
     int num_outputs = 4;              // Nombre de sorties
 
 
@@ -11,9 +11,9 @@ struct NeatConfig {
     double probability_weight_or_bias_mutation = 0.3; // Probabilité d'une mutation de poids ou de biais
 
     double probability_add_link = 0.2;       // Favorise des connexions progressives
-    double probability_remove_link = 0.02;   // Réduit légèrement la complexité (Combinaison avec add-neuron fait planter)
+    double probability_remove_link = 0.00;   // Réduit légèrement la complexité (Combinaison avec add-neuron fait planter)
     double probability_add_neuron = 0.2;    // Ajout progressif de neurones
-    double probability_remove_neuron = 0.02; // Supprime les neurones inutiles
+    double probability_remove_neuron = 0.00; // Supprime les neurones inutiles
     double probability_mutate_link_weight = 0.7;  // Explore efficacement l'espace des solutions
     double probability_mutate_neuron_bias = 0.6;  // Ajuste le comportement des neurones
 

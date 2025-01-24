@@ -88,9 +88,11 @@ public:
        const std::vector<double>& fitnesses
    );
 
-   std::vector<neat::Individual> reproduce_with_speciation(
-    const std::vector<Species>& species_list
+ std::vector<neat::Individual> reproduce_with_speciation(
+    const std::vector<Species>& species_list,
+    const std::unordered_map<std::shared_ptr<Genome>, double>& fitness_map
 );
+
 
    /**
     * @brief Trie les individus par fitness en ordre décroissant.

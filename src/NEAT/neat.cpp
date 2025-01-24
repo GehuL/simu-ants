@@ -34,6 +34,7 @@ LinkGene Neat::crossover_link(const LinkGene &a, const LinkGene &b) {
     LinkId link_id = a.link_id;
     double weight = rng.choose(0.5, a.weight, b.weight);  // Choix aléatoire du poids
     bool is_enabled = rng.choose(0.5, a.is_enabled, b.is_enabled);  // Choix aléatoire de l'activation
+    int innovation_number = rng.choose(0.5, a.innovation_number, b.innovation_number);
 
     return LinkGene{link_id, weight, is_enabled};
 }

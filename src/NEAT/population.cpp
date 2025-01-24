@@ -234,18 +234,33 @@ std::vector<neat::Individual> Population::reproduce_from_genome_roulette_negativ
 
     return new_generation;
 }
-/*
+
 std::vector<neat::Individual> Population::reproduce_with_speciation(
-    const std::vector<Species>& species_list
+    const std::vector<Species>& species_list,
+    const std::unordered_map<std::shared_ptr<Genome>, double>& fitness_map
 ) {
     std::vector<neat::Individual> new_generation;
 
     for (const auto &species : species_list) {
         // Ajuster les fitness de l'espèce
         std::vector<double> adjusted_fitnesses;
+        double min_fitness = std::numeric_limits<double>::max();  
+
         for (const auto &genome : species.members) {
-            double adjusted_fitness = genome->getFitness() / species.members.size();
+            double adjusted_fitness = fitness_map.at(genome) / species.members.size();
             adjusted_fitnesses.push_back(adjusted_fitness);
+
+            // Trouver la fitness minimale
+            if (adjusted_fitness < min_fitness) {
+                min_fitness = adjusted_fitness;
+            }
+        }
+
+        // Appliquer une translation si nécessaire
+        if (min_fitness < 0) {
+            for (double& fitness : adjusted_fitnesses) {
+                fitness += std::abs(min_fitness) + 1.0; // Translation pour rendre toutes les fitness positives
+            }
         }
 
         // Reproduire au sein de l'espèce
@@ -269,7 +284,7 @@ std::vector<neat::Individual> Population::reproduce_with_speciation(
     return new_generation;
 }
 
-*/
+
 
 
 
