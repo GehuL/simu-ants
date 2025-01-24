@@ -21,6 +21,23 @@ public:
         return dist(gen);
     }
 
+    // Génère un nombre réel aléatoire entre min et max
+    double uniform(double min, double max) {
+        std::uniform_real_distribution<double> dist(min, max);
+        return dist(gen);
+    }
+
+    // Génère un nombre selon une distribution gaussienne
+    double gaussian(double mean, double stddev) {
+        std::normal_distribution<double> dist(mean, stddev);
+        return dist(gen);
+    }
+
+    // Génère un nombre réel aléatoire entre 0 et 1
+    double next_double() {
+        return uniform(0.0, 1.0);
+    }
+
     // Méthode pour choisir entre deux valeurs avec une probabilité
     template <typename T>
     T choose(double probability, const T& a, const T& b) {
@@ -60,10 +77,7 @@ public:
     return dist(gen);  // Utilise le générateur de nombres aléatoires défini dans RNG
 }
 
-    double next_double() {
-        std::uniform_real_distribution<> dis(0, 1);  // Distribution pour les nombres réels entre 0 et 1
-        return dis(gen);  // Retourne un nombre aléatoire entre 0 et 1
-    }
+    
 
 template <typename T>
 T& choose_random(const std::vector<T>& vec, int limit) {
@@ -75,6 +89,28 @@ T& choose_random(const std::vector<T>& vec, int limit) {
     }
     std::uniform_int_distribution<> dis(0, limit - 1);  // Distribution pour choisir un indice aléatoire entre 0 et limit-1
     return const_cast<T&>(vec[dis(gen)]);  // Retourner l'élément choisi aléatoirement
+}
+
+
+template <typename T>
+T& roulette_selection(const std::vector<T>& items, const std::vector<double>& fitnesses) {
+    if (items.size() != fitnesses.size() || items.empty()) {
+        throw std::invalid_argument("Items and fitnesses must have the same non-zero size.");
+    }
+
+    double total_fitness = std::accumulate(fitnesses.begin(), fitnesses.end(), 0.0);
+    std::uniform_real_distribution<double> dist(0.0, total_fitness);
+    double random_value = dist(gen);
+
+    double cumulative_fitness = 0.0;
+    for (size_t i = 0; i < items.size(); ++i) {
+        cumulative_fitness += fitnesses[i];
+        if (random_value <= cumulative_fitness) {
+            return const_cast<T&>(items[i]);
+        }
+    }
+
+    return const_cast<T&>(items.back());  // Retourne le dernier par sécurité
 }
 
 

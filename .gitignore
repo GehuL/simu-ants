@@ -2,8 +2,5 @@
 main.code-workspace
 *.exe
 *.json
-<<<<<<< HEAD
 simu-ants
-=======
-simu-ants
->>>>>>> engine
+imgui.ini

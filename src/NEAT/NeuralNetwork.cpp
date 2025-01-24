@@ -7,27 +7,44 @@
  */
 std::vector<double> FeedForwardNeuralNetwork::activate(const std::vector<double> &inputs)
 {
+    // Assurer que le nombre d'entrées correspond
     assert(inputs.size() == m_input_ids.size());
+
+    // Map pour stocker les valeurs des neurones
     std::unordered_map<int, double> values;
 
+    // Initialisation des valeurs d'entrée
     for (size_t i = 0; i < inputs.size(); i++)
     {
         int input_id = m_input_ids[i];
         values[input_id] = inputs[i];
     }
 
+    // Initialiser les neurones cachés et leurs valeurs dans la map values
+    for (const auto& neuron : m_neurons)
+    {
+        if (values.find(neuron.neuron_id) == values.end()) {
+            // Initialiser la valeur du neurone avec son biais si elle n'est pas présente
+            values[neuron.neuron_id] = neuron.bias;
+        }
+    }
+
+    // Initialiser les valeurs des neurones de sortie à 0 (ou une autre valeur de départ si nécessaire)
     for (int output_id : m_output_ids)
     {
         values[output_id] = 0.0;
     }
 
+    // Calculer les valeurs des neurones
     for (const auto &neuron : m_neurons)
     {
         double value = neuron.bias;
 
-        for (const NeuronInput &input : neuron.inputs)
-        {
-            assert(values.find(input.input_id) != values.end());
+        for (const NeuronInput &input : neuron.inputs) {
+            if (values.find(input.input_id) == values.end()) {
+                std::cerr << "Error: input_id " << input.input_id << " not found in values map." << std::endl;
+                throw std::runtime_error("Invalid input_id during activation.");
+            }
             value += values[input.input_id] * input.weight;
         }
 
@@ -36,6 +53,7 @@ std::vector<double> FeedForwardNeuralNetwork::activate(const std::vector<double>
         values[neuron.neuron_id] = value;
     }
 
+    // Collecter les sorties du réseau
     std::vector<double> outputs;
     for (int output_id : m_output_ids)
     {
@@ -44,6 +62,7 @@ std::vector<double> FeedForwardNeuralNetwork::activate(const std::vector<double>
     }
     return outputs;
 }
+
 
 /**
  * @brief Crée un réseau neuronal à partir d'un génome.
@@ -101,6 +120,8 @@ ActivationFn convert_activation(const Activation &activation)
         return Sigmoid{};
     case Activation::Type::Tanh:
         return Tanh{};
+    case Activation::Type::ReLU:
+        return ReLU{};
     default:
         throw std::invalid_argument("Unknown activation type");
     }

@@ -3,23 +3,33 @@
 
 #include <map>
 #include <string>
+#include <unordered_set>
 
 #include "types.h"
 #include "entity.h"
 #include "tiles.h"
+#include "../NEAT/Utils.h"
 
 #include "../NEAT/Genome.h"
 #include "../NEAT/NeuralNetwork.h"
 
 namespace simu
 {
+
+    struct pair_hash {
+    template <class T1, class T2>
+    std::size_t operator()(const std::pair<T1, T2>& pair) const {
+        return std::hash<T1>()(pair.first) ^ std::hash<T2>()(pair.second);
+    }
+};
+
     class Ant : public Entity
     {
         public:
 
             Ant(const long id = -1);
             Ant(const long id, const Ant& ant);
-            Ant(const long id, Vector2f position);
+            Ant(const long id, Vec2f position);
 
             virtual ~Ant() {};
 
@@ -81,18 +91,39 @@ namespace simu
     class AntIA: public Ant
     {
         public:
-            AntIA(const long id = -1);
             AntIA(const long id, const AntIA& ant);
-            AntIA(const long id, const Genome ant);
-            AntIA(const long id, Vec2i position);
+            AntIA(const long id, const Genome ant, Vec2i pos = Vec2i(0, 0));
+            AntIA(const long id = -1, Vec2i position = Vec2i(0, 0));
 
             virtual ~AntIA() {};
 
             const char* getType() const override { return "antIA"; };
             const Genome& getGenome() { return m_genome; };
+            const FeedForwardNeuralNetwork& getNetwork() { return m_network; };
 
-            static constexpr int inputCount() { return 3; } ;
-            static constexpr int outputCount() { return 2; };
+            const Vec2i getGridPos() { return m_gridPos; };
+            const int getLastAction() { return lastAction; };
+            const int getDirectionChanges() { return directionChanges; };
+            const int getRepeatCount() { return repeatCount; };
+            const int getWallHit() { return wallHit; };
+            const int getGoodWallAvoidanceMoves() { return goodWallAvoidanceMoves; };
+            const int getNumberOfCheckpoints() { return numberOfCheckpoints; };
+            const bool isEnd() { return end; };
+
+            const std::unordered_set<std::pair<int, int>, pair_hash>& getVisitedPositions() { return visitedPositions; };
+            const int getVisitedPositionsSize() { return visitedPositions.size(); };
+
+            bool isStuck() ;
+            bool isIdle();
+            bool isCurrentPositionVisited();
+            int getWallProximityBeforeMove();
+            //double getDistanceToWall(Direction dir);
+
+            double getFitness() { return fitness; };
+            double setFitness(double fit) { fitness = fit; return fitness; };
+
+            static constexpr int inputCount() { return 15; } ;
+            static constexpr int outputCount() { return 4; };
 
             bool move(Vec2i dir);
             void setPos(Vec2i pos) { m_gridPos = pos; };
@@ -106,9 +137,53 @@ namespace simu
         private:
             Genome m_genome;
             FeedForwardNeuralNetwork m_network;
+            double fitness = 0.0;
             Vec2i m_dir;
             Vec2i m_gridPos;
+            int lastAction = -1; 
+            int directionChanges = 0;
+            int repeatCount = 0; 
+            int wallHit = 0;
+            int goodWallAvoidanceMoves = 0;
+            int numberOfCheckpoints = 0;
+            int stuckCount = 0;
+            bool end = false;
+            
+
+            std::unordered_set<std::pair<int, int>, simu::pair_hash> visitedPositions;
+
     };
+
+/*
+    class AntIALab : public AntIA {
+    int steps_count;  // Compteur d'étapes
+    int max_steps;    // Nombre maximal d'étapes autorisées
+    simu::Vec2i goalPos;
+
+public:
+    AntIALab(const Genome &genome, simu::Vec2i goal, int max_steps)
+        : simu::AntIA(genome), goalPos(goal), max_steps(max_steps), steps_count(0) {}
+
+    bool canAct() const {
+        return steps_count < max_steps;
+    }
+
+    void update() override
+    {
+    
+    
+    }
+
+    void act(simu::Grid &grid) {
+        if (canAct()) {
+            auto inputs = simu::get_game_state_lab(getPos(), goalPos, grid);
+            auto outputs = getNetwork().activate(inputs);
+            simu::perform_action_lab(outputs, *this);
+            steps_count++;
+        }
+    }
+};
+*/
 
     class Test: public Entity
     {
@@ -133,6 +208,8 @@ namespace simu
         private:
             std::string m_test = "this is a test";
     };
+
+    
 }
 
 #endif

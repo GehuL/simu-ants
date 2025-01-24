@@ -1,4 +1,4 @@
-// Neat.h
+// neat.h
 #ifndef NEAT_H
 #define NEAT_H
 
@@ -64,6 +64,7 @@ namespace neat
         LinkId link_id;  // Connexion entre les neurones
         double weight;   // Poids de la connexion
         bool is_enabled; // Si la connexion est active
+        int innovation_number;
 
         // Définir l'opérateur == pour comparer deux LinkGene
         bool operator==(const LinkGene &other) const

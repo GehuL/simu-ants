@@ -3,7 +3,7 @@
 
 #include "Neat.h"
 #include "Genome.h"
-#include "rng.h"
+#include "RNG.h"
 #include "NeatConfig.h"
 
 class Mutator
@@ -72,6 +72,8 @@ public:
      */
     static void mutate_add_link(Genome &genome);
 
+    static void mutate_add_link_fix(Genome &genome);
+
     /**
      * @brief Modifie le génome donné en supprimant un lien non essentiel.
      *
@@ -83,6 +85,8 @@ public:
      * @param genome Le génome à muter.
      */
     static void mutate_remove_link(Genome &genome);
+
+    static void mutate_remove_link_fix(Genome &genome);
 
     /**
      * @brief Modifie le génome donné en ajoutant un nouveau neurone.
@@ -101,6 +105,8 @@ public:
      */
     static void mutate_add_neuron(Genome &genome);
 
+    static void mutate_add_neuron_fix(Genome &genome);
+
     /**
      * @brief Modifie le génome donné en supprimant un neurone caché.
      *
@@ -111,6 +117,10 @@ public:
      * @param genome Le génome à muter.
      */
     static void mutate_remove_neuron(Genome &genome);
+
+    static void mutate_remove_neuron_fix(Genome &genome);
+
+    static void validate_connectivity(const Genome &genome);
 };
 
 // Méthodes utilitaires pour choisir des neurones aléatoires
@@ -126,7 +136,7 @@ public:
  * @return L’identifiant d’un neurone caché ou d’une entrée choisie au hasard. Si aucun neurone valide n’est trouvé,
  *   renvoie -1.
  */
-static int choose_random_input_or_hidden_neuron(const std::vector<neat::NeuronGene> &neurons);
+ int choose_random_input_or_hidden_neuron(const std::vector<neat::NeuronGene> &neurons);
 
 /**
  * @brief Sélectionne une sortie aléatoire ou un neurone caché dans une liste de neurones.
@@ -138,7 +148,7 @@ static int choose_random_input_or_hidden_neuron(const std::vector<neat::NeuronGe
  * @param neurons Un vecteur d’objets NeuronGene représentant les neurones à choisir.
  * @return L’identifiant d’un neurone valide choisi au hasard, ou -1 si aucun neurone valide n’est trouvé.
  */
-static int choose_random_output_or_hidden_neuron(const std::vector<neat::NeuronGene> &neurons);
+ int choose_random_output_or_hidden_neuron(const std::vector<neat::NeuronGene> &neurons);
 
 // Méthodes pour choisir des neurones cachés aléatoires
 

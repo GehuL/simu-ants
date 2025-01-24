@@ -34,6 +34,7 @@ LinkGene Neat::crossover_link(const LinkGene &a, const LinkGene &b) {
     LinkId link_id = a.link_id;
     double weight = rng.choose(0.5, a.weight, b.weight);  // Choix aléatoire du poids
     bool is_enabled = rng.choose(0.5, a.is_enabled, b.is_enabled);  // Choix aléatoire de l'activation
+    int innovation_number = rng.choose(0.5, a.innovation_number, b.innovation_number);
 
     return LinkGene{link_id, weight, is_enabled};
 }
@@ -53,7 +54,6 @@ Genome Neat::crossover(const Individual &dominant, const Individual &recessive, 
         }
     }
 
-    std::cout << "Crossover2 " << std::endl;
 
     for (const auto &dominant_link : dominant.genome->get_links()) {
         LinkId link_id = dominant_link.link_id;
@@ -73,7 +73,7 @@ Genome Neat::alt_crossover(const std::shared_ptr<Genome>& dominant,
                        int child_genome_id) {
     Genome offspring{child_genome_id, dominant->get_num_inputs(), dominant->get_num_outputs()};
 
-    std::cout << "Crossover with shared_ptr" << std::endl;
+    //std::cout << "Crossover with shared_ptr" << std::endl;
 
     // Crossover des neurones
     for (const auto& dominant_neuron : dominant->get_neurons()) {

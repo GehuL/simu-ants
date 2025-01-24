@@ -1,5 +1,5 @@
-#ifndef __OTHERS_H__
-#define __OTHERS_H__
+#ifndef __TYPES_H__
+#define __TYPES_H__
 
 #include "raylib.h"
 
@@ -7,6 +7,7 @@
 #include <iterator>
 #include <functional>
 #include <ostream>
+#include <math.h>
 
 namespace simu
 {
@@ -25,12 +26,14 @@ namespace simu
         
         T mag() const { return x*x + y*y; };
 
-        T distance(const Vec2<T>& vec) const { return std::abs(vec.x - x) + std::abs(vec.y - y); };  // Distance de Manhattan
+        T euclide(const Vec2<T>& vec) const { return std::sqrt((vec.x - x)*(vec.x - x) + (vec.y - y)*(vec.y - y)); };
+        T manhattan(const Vec2<T>& vec) const { return std::abs(vec.x - x) + std::abs(vec.y - y); };  // Distance de Manhattan
 
         bool operator==(const Vec2<T>& vec) const { return x == vec.x && y == vec.y; };
         bool operator!=(const Vec2<T>& vec) const { return !operator==(vec); };
 
         Vec2<T> operator+(const Vec2<T>& vec) const { return Vec2<T>{x + vec.x, y + vec.y}; };
+        
         
         Vec2<T> operator*(const float scalar) const { return Vec2<T>{static_cast<T>(x * scalar), static_cast<T>(y * scalar)}; };
         Vec2<T> operator/(const float scalar) const { return Vec2<T>{static_cast<T>(x / scalar), static_cast<T>(y / scalar)}; };

@@ -3,8 +3,8 @@
 
 #include "raylib.h"
 #include "engine.h"
-#include "../external/json.hpp"
 #include "types.h"
+#include "../external/json.hpp"
 
 namespace simu
 {
@@ -16,7 +16,8 @@ namespace simu
         GROUND,
         FOOD,
         PHEROMONE,
-        BORDER,  
+        BORDER,
+        CHECKPOINT,  
     }; 
  
     struct TileFlags
@@ -48,6 +49,8 @@ namespace simu
     const Tile FOOD = (Tile) {.color=GREEN, .type=Type::FOOD, .flags=0x10};
     const Tile PHEROMONE = (Tile) {.color=PINK, .type=Type::PHEROMONE, .flags=0x4};
     const Tile BORDER = (Tile) {.color=WHITE, .type=Type::BORDER, .flags=0x1};
+    
+    const Tile CHECKPOINT = (Tile) {.color=GOLD, .type=Type::CHECKPOINT, .flags=0x10};
 
     Tile fromColor(const Color& color);
     bool operator==(const Color &c1, const Color &c2);

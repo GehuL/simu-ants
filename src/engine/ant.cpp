@@ -5,6 +5,8 @@
 
 #include "world.h"
 
+#include <random> 
+
 using namespace simu;
 
 Ant::Ant(const long id) : Entity(id) {}
@@ -12,7 +14,7 @@ Ant::Ant(const long id, const Ant& ant) : Entity(id, ant), m_life(ant.m_life),
 m_carried_object(ant.m_carried_object)
 {
 }
-Ant::Ant(const long id, Vector2f pos) : Entity(id, pos) {}
+Ant::Ant(const long id, Vec2f pos) : Entity(id, pos) {}
 
 void Ant::update() {}
 
@@ -59,8 +61,10 @@ bool Ant::moveForward()
     if(!tile.flags.solid)
     {
         m_pos = newPos;
+        //std::cout << "Nouvelle position : (" << m_pos.x << ", " << m_pos.y << ")" << std::endl;
         return true;
     }
+    //std::cout << "Déplacement bloqué à : (" << newPos.x << ", " << newPos.y << ")" << std::endl;
     return false;
 }
 
@@ -188,12 +192,15 @@ DemoAnt& DemoAnt::operator=(const DemoAnt& ant)
 // ==================[ANT IA]==================
 RNG gRng;
 
-AntIA::AntIA(const long id) : Ant(id), m_genome(Genome::create_genome(0, 3, 2, 3, gRng)), m_network(FeedForwardNeuralNetwork::create_from_genome(m_genome)) {}
-AntIA::AntIA(const long id, const Genome genome) : Ant(id), m_genome(genome), m_network(FeedForwardNeuralNetwork::create_from_genome(genome)) {}
 AntIA::AntIA(const long id, const AntIA& ant) : Ant(id, ant), m_genome(ant.m_genome), m_network(ant.m_network) {}
-AntIA::AntIA(const long id, Vec2i position): Ant(id),  m_genome(Genome::create_genome(0, 3, 2, 3, gRng)), m_network(FeedForwardNeuralNetwork::create_from_genome(m_genome))
+AntIA::AntIA(const long id, Vec2i position): Ant(id),  m_genome(Genome::create_diverse_genome(0, 15, 4, 3, gRng)), m_network(FeedForwardNeuralNetwork::create_from_genome(m_genome)), m_gridPos(position)
 {
     m_pos = getWorld().gridToWorld(position);
+}
+
+AntIA::AntIA(const long id, const Genome genome, Vec2i pos) : Ant(id), m_genome(genome), m_network(FeedForwardNeuralNetwork::create_from_genome(genome)), m_gridPos(pos) 
+{
+    m_pos = getWorld().gridToWorld(pos);
 }
 
 void AntIA::save(json &json) const
@@ -221,17 +228,176 @@ void AntIA::update()
 
     // Variables de décisions
     const std::vector<double> inputs = {
-    static_cast<double>(getAngle()), 
-    static_cast<double>(getTileOn().type), 
-    static_cast<double>(getTileFacing().type)};
-
-    // Activation des sorties
-    auto outputs = m_network.activate(inputs);
-
-    // Décisions
-    rotate(outputs[0]);
-    moveForward();
+    //static_cast<double>(getAngle()), 
+    static_cast<double>(getTileFacing().flags.solid),
+    static_cast<double>(getTileLeft().flags.solid),
+    static_cast<double>(getTileRight().flags.solid),
+    static_cast<double>(getTileBack().flags.solid),
+    static_cast<double>(m_gridPos.x),
+    static_cast<double>(m_gridPos.y),
+    static_cast<double>(isStuck()),
+    static_cast<double>(isIdle()),
+    static_cast<double>(isCurrentPositionVisited()),
+    static_cast<double>(getVisitedPositionsSize()),
+    //static_cast<double>(getDistanceToWall(UP)),
+    //static_cast<double>(getDistanceToWall(DOWN)),
+    //static_cast<double>(getDistanceToWall(LEFT)),
+    //static_cast<double>(getDistanceToWall(RIGHT))
+    static_cast<double>(getLastAction()),
+    static_cast<double>(getDirectionChanges()),
+    static_cast<double>(getRepeatCount()),
+    static_cast<double>(getWallHit()),
+    static_cast<double>(getGoodWallAvoidanceMoves()),
+    };
+/*
+    std::cout << "Inputs: ";
+for (double input : inputs) {
+    std::cout << input << " ";
 }
+std::cout << std::endl;
+*/
+
+    std::vector<double> actions;
+    try
+    {
+       actions = m_network.activate(inputs);
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+      //  save(m_genome);
+   //     exit(-1);
+    }
+    
+    // Activation des sorties
+
+    // Ajouter du bruit aléatoire aux actions
+    std::random_device rd;  // Générateur aléatoire
+    std::mt19937 gen(rd()); // Mersenne Twister
+    std::uniform_real_distribution<> dis(-0.1, 0.1); // Bruit entre -0.1 et 0.1
+
+    for (double &action : actions)
+    {
+        action += dis(gen); // Ajouter un bruit aléatoire
+    }
+
+
+/*
+    std::cout << "Outputs: ";
+for (double action : actions) {
+    std::cout << action << " ";
+}
+std::cout << std::endl;
+*/
+    // Décisions
+    int direction = std::distance(actions.begin(), std::max_element(actions.begin(), actions.end()));
+
+    //std::cout << "Ant " << getId() << " action: " << direction << std::endl;
+
+    if(getTileFacing().flags.solid || getTileLeft().flags.solid|| getTileRight().flags.solid|| getTileBack().flags.solid)
+    {
+        wallHit++;
+    }
+
+    if(getTileOn().type == Type::CHECKPOINT)
+    {
+        numberOfCheckpoints++;
+    }
+
+    if (getTileOn().type == Type::FOOD)
+    {
+        end = true;
+    }
+    
+
+    // Vérifier les répétitions d'actions
+    if (direction == lastAction) {
+        repeatCount++;
+    } else {
+        directionChanges++;
+        repeatCount = 0; // Réinitialiser si la direction change
+    }
+    lastAction = direction;
+
+    // Ajouter la position actuelle à l'ensemble
+    visitedPositions.insert({static_cast<int>(m_gridPos.x), static_cast<int>(m_gridPos.y)});
+
+    int wallProximityBefore = getWallProximityBeforeMove();
+
+    Vec2i lastGridPos = m_gridPos;
+
+
+
+    switch (direction) {
+        case 0: move(RIGHT);  break;
+        case 1: move(LEFT);  break;
+        case 2: move(UP); break;
+        case 3: move(DOWN); break;
+        default: break;
+    }
+
+    int wallProximityAfter = getWallProximityBeforeMove();
+
+    if (wallProximityAfter < wallProximityBefore) {
+    goodWallAvoidanceMoves++;
+
+    if (m_gridPos == lastGridPos) {
+        stuckCount++;
+    } else {
+        stuckCount = 0; // Réinitialiser si la fourmi bouge
+    }
+    lastGridPos = m_gridPos;
+}
+}
+
+bool simu::AntIA::isStuck()  {
+    // Si la fourmi reste sur la même position pendant trop de ticks
+    if (stuckCount >= 10) { // Par exemple, 10 ticks
+        return true;
+    }
+    return false;
+}
+
+bool simu::AntIA::isIdle()
+{
+     // Si la fourmi répète trop souvent la même action
+    if (repeatCount >= 15) { // Par exemple, 15 répétitions
+        return true;
+    }
+    return false;
+}
+
+bool simu::AntIA::isCurrentPositionVisited()
+{
+    if (visitedPositions.find({static_cast<int>(m_gridPos.x), static_cast<int>(m_gridPos.y)}) != visitedPositions.end()) {
+        return true;
+    }
+    return false;
+}
+
+int simu::AntIA::getWallProximityBeforeMove()
+{
+    return getTileFacing().flags.solid + 
+                          getTileLeft().flags.solid + 
+                          getTileRight().flags.solid+ 
+                          getTileBack().flags.solid;
+}
+/*
+double simu::AntIA::getDistanceToWall(Direction dir)
+{
+    int distance = 0;
+    Vec2i pos = m_gridPos;
+
+    while (!getWorld().getGrid().getTile(pos).flags.solid) {
+        distance++;
+        pos += dir;
+    }
+
+    return distance;
+}
+*/
+
+
 
 void AntIA::load(const json &json)
 {

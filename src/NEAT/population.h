@@ -2,10 +2,11 @@
 #define POPULATION_H
 
 #include "Mutator.h"
-#include "rng.h"
+#include "RNG.h"
 #include "ComputeFitness.h"
 #include "Genome.h"
 #include "NeatConfig.h"
+#include "species.h"
 #include <vector>
 #include <algorithm>
 #include <cmath>
@@ -13,6 +14,8 @@
 class Population
 {
 public:
+
+   
    /**
     * @brief Constructeur de la classe Population.
     *
@@ -70,6 +73,27 @@ public:
 
    std::vector<neat::Individual> reproduce_from_genomes(const std::vector<std::shared_ptr<Genome>>& genomes);
 
+   std::vector<neat::Individual> reproduce_from_genomes_with_fitness(
+       const std::vector<std::shared_ptr<Genome>>& genomes,
+       const std::vector<double>& fitnesses
+   );
+
+   std::vector<neat::Individual> reproduce_from_genome_roulette(
+       const std::vector<std::shared_ptr<Genome>>& genomes,
+       const std::vector<double>& fitnesses
+   );
+
+   std::vector<neat::Individual> reproduce_from_genome_roulette_negative(
+       const std::vector<std::shared_ptr<Genome>>& genomes,
+       const std::vector<double>& fitnesses
+   );
+
+ std::vector<neat::Individual> reproduce_with_speciation(
+    const std::vector<Species>& species_list,
+    const std::unordered_map<std::shared_ptr<Genome>, double>& fitness_map
+);
+
+
    /**
     * @brief Trie les individus par fitness en ordre décroissant.
     *
@@ -102,6 +126,21 @@ public:
  */
    void replace_population(std::vector<neat::Individual> new_generation);
 
+    /**
+     * @brief Efface toutes les espèces de la population.
+     *
+     * Cette méthode efface toutes les espèces de la population en vidant la liste des espèces.
+     * Elle est appelée à la fin de chaque génération pour nettoyer les données de la génération précédente.
+     */
+
+    void clear_species();
+
+    void create_new_species(std::shared_ptr<Genome> representative);
+
+    std::vector<Species> &get_species_list();
+
+    
+
    
 private:
    NeatConfig config;
@@ -109,6 +148,7 @@ private:
    int next_genome_id;
    std::vector<neat::Individual> individuals;
    neat::Individual best_individual;
+   std::vector<Species> species_list;
 };
 
 #endif // POPULATION_H
