@@ -46,7 +46,7 @@ std::vector<Vec2i> Grid::findPath(Vec2i start, Vec2i dest)
             {
                 paths[newEdge] = current;
                 reached[newEdge] = cost;
-                int totalCost = cost + newEdge.distance(dest);
+                int totalCost = cost + newEdge.manhattan(dest);
                 edges.push(element(totalCost, newEdge));
             }
         }

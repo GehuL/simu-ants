@@ -59,7 +59,7 @@ namespace simu
              * @return La position du premier élément ajouté. Renvoie end() si il y a une erreur (count <= 0)
              */
             template<class T, typename... Args, class = TEMPLATE_CONDITION(T)>
-            std::vector<std::weak_ptr<T>> spawnEntities(size_t count, Args... args)
+            std::vector<std::weak_ptr<T>> spawnEntities(size_t count, const Args&... args)
             {
                 CHECK_TEMPLATE_ST(T)
 
@@ -73,15 +73,15 @@ namespace simu
                 std::vector<std::weak_ptr<T>> newlies(count);
 
                 // Itère à partir de l'ancienne fin, jusqu'à la nouvelle fin
-                for (size_t i = 0; i < m_entities.size(); ++i)
+                for (size_t i = 0; i < count; ++i)
                 {
                     auto en = std::make_shared<T>(m_entity_cnt, args...);
-                    m_entities[i + en_cnt] = en;
+                    m_entities[en_cnt + i] = en;
                     newlies[i] = en;
                     m_entity_cnt++;
                 }   
 
-                // Retourne l'itérateur correspondant à l'ancienne fin (avant ajout des nouveaux éléments)
+                // Retourne un vecteur de weak_ptr vers les nouvelles entités ajoutées
                 return newlies;
             };
             
@@ -146,10 +146,15 @@ namespace simu
             void removeEntities(T beg, T end)
             {
                 for(auto it = beg; it != end; it++)
-                    if(auto sp = it->lock()) removeEntity(sp->getId());
+                {
+                    if(auto sp = it->lock())
+                    {
+                        removeEntity(sp->getId());
+                    }
+                }
             }
 
-            void clearEntities() { m_entities.clear(); };
+            void clearEntities();
 
             void setListener(std::shared_ptr<WorldListener> listener)
             {
@@ -186,6 +191,13 @@ namespace simu
              */
             Tile getSelectedTile() const;
 
+            /**
+             * @brief Cherche une entité à la position indiquée en prennant compte la largeur de l'entité.
+             * @param pos Position globale.
+             * @return Renvoie la première entité trouvée pendant l'itération.
+             */
+            std::weak_ptr<Entity> getEntityAt(Vec2f pos);
+
         private:
             World();
 
@@ -195,6 +207,10 @@ namespace simu
             void drawFrame() override;
             void drawUI() override;
             void updateTick() override;
+
+            void drawEntityInfo();
+
+            void drawInputWithError(const char* label, char* buf, size_t buf_size, const char* error);
         
             unsigned long m_entity_cnt;
             unsigned int m_seed;
@@ -202,10 +218,15 @@ namespace simu
             std::shared_ptr<WorldListener> m_listener;
             std::vector<std::shared_ptr<Entity>> m_entities;
 
+            std::weak_ptr<Entity> m_selected_en;
+
             Grid m_grid;
 
             int m_cursorTileIndex;
-            const std::array<const Tile, 3> m_cursorTiles = {GROUND, FOOD, PHEROMONE};  
+            const std::array<const Tile, 3> m_cursorTiles = {GROUND, FOOD, PHEROMONE};
+
+            bool m_showGenome;
+            bool m_focus_en_gui;
     };
 
     class WorldListener
@@ -222,8 +243,11 @@ namespace simu
             // executé à la fréquence de rafraichissement de l'écran
             virtual void onDraw() = 0;
 
-                // executé à la frequence de mise à jour de la logique de la simulation
+            // executé à la frequence de mise à jour de la logique de la simulation
             virtual void onUpdate() = 0;
+
+            // executé à la fréquence de l'UI (30 FPS)
+            virtual void onDrawUI() = 0;
     };
 
     inline World& getWorld() { return simu::World::world; };

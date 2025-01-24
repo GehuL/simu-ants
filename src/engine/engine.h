@@ -1,11 +1,14 @@
 #ifndef __ENGINE_H__
 #define __ENGINE_H__
 
-#define RAYGUI_IMPLEMENTATION
-
 #include "config.h"
+
 #include "raylib.h"
 #include <string>
+
+#include "profiling.h"
+
+#define UI_FRAME_RATE 30.0
 
 namespace simu
 {
@@ -45,6 +48,7 @@ namespace simu
 
         protected:
             Camera2D m_camera;
+            Profiler m_profiler;
         private:
 
 
@@ -54,10 +58,7 @@ namespace simu
             double m_tickPeriod;
             double m_framePeriod;
 
-            int m_lastFrameCounter;
-            int m_lastTickCounter;
-
-            double m_averageTickLoad;
+            double m_lastUpdateProfiler;
 
             bool m_noDelay;
 
