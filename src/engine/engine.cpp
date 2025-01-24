@@ -4,10 +4,10 @@
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
 
-#include "external/ui/imgui.h"
-#include "external/ui/rlImGui.h"
+#include "../external/ui/imgui.h"
+#include "../external/ui/rlImGui.h"
 
-#include "external/ui/imgui_spectrum.h"
+#include "../external/ui/imgui_spectrum.h"
 #include <chrono>
 
 #define MIN(a, b) a > b ? b : a

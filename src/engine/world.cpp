@@ -9,9 +9,9 @@
 
 #include "raygui.h"
 
-#include "external/ui/imgui.h"
-#include "external/ui/rlImGui.h"
-#include "external/ui/imgui_internal.h"
+#include "../external/ui/imgui.h"
+#include "../external/ui/rlImGui.h"
+#include "../external/ui/imgui_internal.h"
 
 
 using namespace simu;
