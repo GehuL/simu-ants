@@ -11,13 +11,16 @@ public:
     enum class Type
     {
         Sigmoid,
-        Tanh
+        Tanh,
+        ReLU
     };
 
     /**
      * @brief Construit un objet Activation avec le type d'activation par défaut défini sur Sigmoid.
      */
     Activation() : activation_type(Type::Sigmoid) {}
+
+    
 
     /**
      * @brief Construit un objet Activation avec le type d'activation spécifié.
@@ -45,6 +48,8 @@ public:
             return sigmoid(x);
         case Type::Tanh:
             return tanh(x);
+        case Type::ReLU:
+            return std::max(0.0, x);    
         default:
             throw std::invalid_argument("Unknown activation type");
         }
@@ -66,6 +71,11 @@ private:
     static double tanh(double x)
     {
         return std::tanh(x);
+    }
+
+    static double relu(double x)
+    {
+        return std::max(0.0, x);
     }
 };
 ;

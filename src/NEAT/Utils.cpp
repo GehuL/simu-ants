@@ -5,6 +5,8 @@
 #include <random>
 #include <algorithm>
 
+using namespace simu;
+
 /**
  * @brief Sauvegarde un génome dans un fichier.
  * 
@@ -150,3 +152,45 @@ void default_perform_action(const std::vector<double> &actions, int ant_id) {
 
     std::cout << "Selected Action for Ant ID " << ant_id << ": " << action << std::endl;
 }
+
+std::vector<double> get_game_state_rpc(int ant_id, RNG &rng) {
+    // Exemple simplifié : représenter uniquement le coup précédent de l'adversaire
+    int last_opponent_move = rng.next_int(0, 2);  // 0: Rock, 1: Paper, 2: Scissors
+    return { double(last_opponent_move) };
+}
+
+void perform_action_rpc(const std::vector<double> &actions, int ant_id) {
+    int choice = std::distance(actions.begin(), std::max_element(actions.begin(), actions.end()));
+    std::cout << "Ant ID " << ant_id << " chooses: " 
+              << (choice == 0 ? "Rock" : (choice == 1 ? "Paper" : "Scissors")) 
+              << std::endl;
+}
+
+std::vector<double> get_game_state_lab(const Vec2i &antPos,   Grid &grid) {
+    std::vector<double> state;
+
+    // Position actuelle de la fourmi
+    state.push_back(static_cast<double>(antPos.x));
+    state.push_back(static_cast<double>(antPos.y));
+
+/*
+    // Distance via A* entre la fourmi et l'obj final
+    auto path = grid.findPath(antPos, goalPos);  //Je crois que c'est ça la syntaxe
+    double path_length = static_cast<double>(path.size()); // Taille du chemin trouvé normalement ?
+    state.push_back(path_length);
+
+*/
+
+
+/*
+    // Obstacles environnants (haut, bas, gauche, droite) qu'on peut rajouter en entrée genre la fourmi voit que devant elle y'a un mur ce qui peut peut être retirer une option de mouvemet à force ?
+    state.push_back(grid.isWalkable(antPos.x + 1, antPos.y) ? 1.0 : 0.0); // Est
+    state.push_back(grid.isWalkable(antPos.x - 1, antPos.y) ? 1.0 : 0.0); // Ouest
+    state.push_back(grid.isWalkable(antPos.x, antPos.y + 1) ? 1.0 : 0.0); // Nord
+    state.push_back(grid.isWalkable(antPos.x, antPos.y - 1) ? 1.0 : 0.0); // Sud
+*/
+    
+    return state;
+}
+
+

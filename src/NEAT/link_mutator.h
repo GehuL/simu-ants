@@ -1,7 +1,7 @@
 #ifndef LINK_MUTATOR_H
 #define LINK_MUTATOR_H
 
-#include "Neat.h"
+#include "neat.h"
 #include "rng.h"
 
 namespace neat

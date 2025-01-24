@@ -228,7 +228,7 @@ void Grid::fromImage(const std::string& file)
 
 Tile simu::fromColor(const Color& color)
 {
-    std::array<Tile, 4> tiles {AIR, GROUND, FOOD, WALL};
+    std::array<Tile, 5> tiles {AIR, GROUND, FOOD, WALL,CHECKPOINT};
     return *std::find_if(tiles.begin(), tiles.end(), [color](auto t) { return t.color == color;});
 }
 

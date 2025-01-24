@@ -1,7 +1,7 @@
 #ifndef GENOME_H
 #define GENOME_H
 
-#include "Neat.h"
+#include "neat.h"
 #include "Activation.h"
 #include "rng.h"
 #include <vector>
@@ -36,6 +36,12 @@ public:
 
     // Méthodes statiques pour créer un génome
     static Genome create_genome(int id, int num_inputs, int num_outputs, int num_hidden_neurons, RNG &rng);
+
+    static Genome create_genome_div(int id, int num_inputs, int num_outputs, int num_hidden_neurons, RNG &rng);
+
+    static Genome create_diverse_genome(int id, int num_inputs, int num_outputs, int max_hidden_neurons, RNG &rng);
+
+    double compute_distance(const Genome &other, const NeatConfig &config) const;
 
     /**
      * @brief Obtenir le nombre d’entrées dans le génome.
@@ -127,6 +133,10 @@ public:
      * @return neat::LinkGene Une structure LinkGene représentant le lien nouvellement créé.
      */
     neat::LinkGene create_link(int input_id, int output_id, RNG &rng);
+
+    neat::LinkGene create_link_div(int input_id, int output_id, RNG &rng);
+
+    neat::LinkGene create_link_div_with_inov(int input_id, int output_id, RNG &rng);
 
     /**
      * @brief Crée un nouveau neurone avec l'identifiant de neurone spécifié.

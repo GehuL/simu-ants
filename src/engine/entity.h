@@ -42,8 +42,15 @@ namespace simu
 
             Tile getTileOn() const;
             Tile getTileFacing() const;
+            Tile getTileLeft() const;
+            Tile getTileRight() const;
+            Tile getTileBack() const;
 
             Vector2i getTileFacingPos() const;
+            Vector2i getTileLeftPos() const;
+            Vector2i getTileRightPos() const;
+            Vector2i getTileBackPos() const;
+
             Vector2i getTilePosOn() const;
 
             const unsigned long getId() const { return m_id; };

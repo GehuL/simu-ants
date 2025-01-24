@@ -1,8 +1,17 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include "../engine/tiles.h"
+#include "../engine/ant.h"
 #include <string>
 #include "Genome.h"  // Inclure la définition de Genome
+
+using namespace simu;
+namespace simu {
+    class AntIA;
+}
+
+
 
 /**
  * @brief Sauvegarde un génome dans un fichier.
@@ -32,6 +41,8 @@ void perform_actions(const std::vector<double>& actions, int ant_id);
  */
 std::vector<double> default_get_game_state(int ant_id, RNG &rng);
 
+std::vector<double> get_game_state_rpc(int ant_id, RNG &rng);
+
 /**
  * @brief Imprime les actions sélectionnées en fonction des sorties du réseau neuronal.
  * 
@@ -39,5 +50,11 @@ std::vector<double> default_get_game_state(int ant_id, RNG &rng);
  * @param ant_id L'identifiant de la fourmi.
  */
 void default_perform_action(const std::vector<double> &actions, int ant_id);
+
+void perform_action_rpc(const std::vector<double> &actions, int ant_id);
+
+std::vector<double> get_game_state_lab(const simu::Vec2i &antPos,   simu::Grid &grid);
+
+void perform_action_lab(const std::vector<double> &actions, simu::AntIA &ant);
 
 #endif // UTILS_H

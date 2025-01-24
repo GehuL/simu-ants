@@ -1,8 +1,10 @@
 #include "world.h"
 #include <exception>
 
+
 #include "utils.h"
 #include "ant.h"
+
 #include "../external/json.hpp"
 
 using namespace simu;
@@ -22,7 +24,7 @@ void World::init()
     m_seed = GetRandomValue(0, std::numeric_limits<int>::max());
     SetRandomSeed(m_seed);
 
-    TRACELOG(LOG_INFO, "seed: %d", m_seed);
+    //TRACELOG(LOG_INFO, "seed: %d", m_seed);
     m_entities.clear();
 
     if(m_listener)
@@ -60,7 +62,7 @@ Tile World::getSelectedTile() const
 
 void World::save(const std::string& filename)
 {
-    TRACELOG(LOG_INFO, "Saving simulation..");
+    //TRACELOG(LOG_INFO, "Saving simulation..");
  
     try
     {
@@ -81,16 +83,16 @@ void World::save(const std::string& filename)
         file << j;
         file.close();
 
-        TRACELOG(LOG_INFO, "File saved to %s", filename.c_str());
+        //TRACELOG(LOG_INFO, "File saved to %s", filename.c_str());
     }catch(const json::exception& e)
     {
-        TRACELOG(LOG_ERROR, "Erreur de chargement du fichier %s: %s", filename, e.what());
+        //TRACELOG(LOG_ERROR, "Erreur de chargement du fichier %s: %s", filename, e.what());
     } 
 }
 
 void World::load(const std::string& filename)
 {
-    TRACELOG(LOG_INFO, "Loading file %s", filename.c_str());
+    //TRACELOG(LOG_INFO, "Loading file %s", filename.c_str());
     
     try
     {
@@ -136,13 +138,13 @@ void World::load(const std::string& filename)
        
         file.close();
 
-        TRACELOG(LOG_INFO, "Loaded !");
+        //TRACELOG(LOG_INFO, "Loaded !");
     } catch(const json::exception& e)
     {
-        TRACELOG(LOG_ERROR, "Erreur de chargement du fichier %s: %s", filename, e.what());
+        //TRACELOG(LOG_ERROR, "Erreur de chargement du fichier %s: %s", filename, e.what());
     } catch(const std::runtime_error& e)
     {
-        TRACELOG(LOG_ERROR, "Erreur de chargement du fichier %s: %s", filename, e.what());
+        //TRACELOG(LOG_ERROR, "Erreur de chargement du fichier %s: %s", filename, e.what());
     }
 }
 

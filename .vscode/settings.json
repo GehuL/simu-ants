@@ -60,7 +60,10 @@
         "span": "cpp",
         "sstream": "cpp",
         "cinttypes": "cpp",
-        "valarray": "cpp"
+        "valarray": "cpp",
+        "charconv": "cpp",
+        "format": "cpp",
+        "text_encoding": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
