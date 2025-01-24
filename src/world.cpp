@@ -277,6 +277,20 @@ void World::drawUI()
     DrawText(TextFormat("Entity: %d", m_entities.size()), 0, 100, 20, BLUE);
 
     ImGui::Begin("World");
+    ImGui::Text("Seed: 0x%X", m_seed);
+    
+    // Sauvegarde et chargement
+    static char saveFileName[128] = "simu-save.json";
+    ImGui::InputText("##input_file", saveFileName, IM_ARRAYSIZE(saveFileName));
+    ImGui::SameLine();
+    if(ImGui::Button("Save")) save(saveFileName);
+
+    static char loadFileName[128] = "simu-save.json";
+    ImGui::InputText("##output_file", loadFileName, IM_ARRAYSIZE(loadFileName));
+    ImGui::SameLine();
+    if(ImGui::Button("Load")) load(loadFileName);
+
+
     if(m_listener && ImGui::CollapsingHeader("Level"))
     {
         ImGui::Text("Level name: %s", typeid(m_listener.get()).name());
@@ -302,7 +316,7 @@ void World::drawUI()
             }
         }
         
-        if (ImGui::BeginPopupModal("Error"))
+        if (ImGui::BeginPopupModal("Error", NULL, ImGuiWindowFlags_AlwaysAutoResize))
         {
             ImGui::Text(last_error.what());
             if (ImGui::Button("Close"))
