@@ -235,19 +235,19 @@ namespace simu
             virtual ~WorldListener() {};
 
             // executé lors du chargement de la scene
-            virtual void onInit() = 0;
+            virtual void onInit() {};
 
             // executé lors de la fermeture de la scene
-            virtual void onUnload() = 0;
+            virtual void onUnload() {};
 
             // executé à la fréquence de rafraichissement de l'écran
-            virtual void onDraw() = 0;
+            virtual void onDraw() {};
 
             // executé à la frequence de mise à jour de la logique de la simulation
-            virtual void onUpdate() = 0;
+            virtual void onUpdate() {};
 
             // executé à la fréquence de l'UI (30 FPS)
-            virtual void onDrawUI() = 0;
+            virtual void onDrawUI() {};
     };
 
     inline World& getWorld() { return simu::World::world; };
