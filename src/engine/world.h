@@ -9,6 +9,8 @@
 #include <array>
 #include <fstream>
 #include <variant>
+#include <unordered_map>
+#include <functional>
 
 #include "engine.h"
 #include "entity.h"
@@ -17,11 +19,14 @@
 
 // #define TEMPLATE_CONDITION(T) std::enable_if_t<std::is_base_of<Entity, T>::value && !std::is_same<Entity, T>::value>
 #define TEMPLATE_CONDITION(T) std::enable_if_t<std::is_base_of<Entity, T>::value>
-#define CHECK_TEMPLATE_ST(T) static_assert(std::is_base_of<Entity, T>::value);// && !std::is_same<Entity, T>::value, "T doit etre une class fille de Entity");
+
+#define CHECK_TEMPLATE(T, baseClass) static_assert(std::is_base_of<baseClass, T>::value) // && !std::is_same<Entity, T>::value, "T doit etre une class fille de Entity");
+#define CHECK_TEMPLATE_ST(T) CHECK_TEMPLATE(T, Entity)// && !std::is_same<Entity, T>::value, "T doit etre une class fille de Entity");
 
 namespace simu
 {
     class WorldListener;
+    class Level;
 
 
     // Liste des entités enregistrés 
@@ -61,7 +66,7 @@ namespace simu
             template<class T, typename... Args, class = TEMPLATE_CONDITION(T)>
             std::vector<std::weak_ptr<T>> spawnEntities(size_t count, const Args&... args)
             {
-                CHECK_TEMPLATE_ST(T)
+                CHECK_TEMPLATE_ST(T);
 
                 if(count <= 0)
                     return std::vector<std::weak_ptr<T>>();
@@ -93,7 +98,7 @@ namespace simu
             template<class T, typename... Args, class = TEMPLATE_CONDITION(T)>
             std::weak_ptr<T> spawnEntity(Args... args)
             {
-                CHECK_TEMPLATE_ST(T)
+                CHECK_TEMPLATE_ST(T);
 
                 std::shared_ptr<T> en = std::make_shared<T>(m_entity_cnt, args...);
 
@@ -106,7 +111,7 @@ namespace simu
             template<class T, class = TEMPLATE_CONDITION(T)>
             std::weak_ptr<T> getEntity(unsigned long id)
             {
-                CHECK_TEMPLATE_ST(T)
+                CHECK_TEMPLATE_ST(T);
 
                 auto it = std::find_if(m_entities.begin(), m_entities.end(), [id](std::shared_ptr<Entity> en)
                 {
@@ -154,12 +159,41 @@ namespace simu
                 }
             }
 
-            void clearEntities();
-
-            void setListener(std::shared_ptr<WorldListener> listener)
+            /**
+             * @brief Enregistre un niveau dans la simulation. Il est préférable de l'appeler avec world.run()
+             * @parma name Nom du niveau, doit être unique
+             * @throw std::runtime_error si le nom est vide ou déjà enregistré 
+             */
+            template<class T>
+            void registerLevel(const std::string& name)
             {
-                m_listener = listener;
-            };
+                CHECK_TEMPLATE(T, Level);
+                
+                if(name.empty())
+                    throw std::runtime_error("Le nom du niveau ne peut pas être vide");
+
+                if(m_levels.find(name) != m_levels.end())
+                    throw std::runtime_error("Le niveau " + name + " est déjà enregistré");
+                
+                m_levels[name] = [name, this]() -> void {
+                    this->setListener(std::make_shared<T>());
+                    this->init();
+                };
+            }
+
+            /**
+             * @brief Charge un niveau dans la simulation
+             * @param name Nom du niveau, doit être enregistré
+             * @throw std::runtime_error si le niveau n'existe pas
+             */
+            void loadLevel(const std::string& name)
+            {
+                if(m_levels.find(name) == m_levels.end())
+                    throw std::runtime_error("Le niveau " + name + " n'existe pas");
+                m_levels[name]();
+            }
+
+            void clearEntities();
 
             Grid& getGrid() { return m_grid; };
             
@@ -201,6 +235,11 @@ namespace simu
         private:
             World();
 
+            void setListener(std::shared_ptr<WorldListener> listener)
+            {
+                m_listener = listener;
+            };
+
             void handleKeyboard();
             void handleMouse();
 
@@ -220,6 +259,8 @@ namespace simu
 
             std::weak_ptr<Entity> m_selected_en;
 
+            std::unordered_map<std::string, std::function<void()>> m_levels;
+
             Grid m_grid;
 
             int m_cursorTileIndex;
@@ -229,13 +270,14 @@ namespace simu
             bool m_focus_en_gui;
     };
 
+    // Interface pour écouter les événements de la simulation
     class WorldListener
     {
         public:
             virtual ~WorldListener() {};
 
             // executé lors du chargement de la scene
-            virtual void onInit() {};
+            virtual void onInit() = 0;
 
             // executé lors de la fermeture de la scene
             virtual void onUnload() {};
@@ -248,11 +290,30 @@ namespace simu
 
             // executé à la fréquence de l'UI (30 FPS)
             virtual void onDrawUI() {};
+
+            // executé lors du chargement de la sauvegarde
+            virtual void onLoad(json json) {};
+
+            // executé lors de l'enregistrement de la sauvegarde
+            virtual void onSave(json json) {};
     };
 
-    inline World& getWorld() { return simu::World::world; };
+    // Représente un environnement pour une simulation spécifique.
+    class Level: public WorldListener
+    {
+        public:
+            Level() {};
+            virtual ~Level() override {};
 
+            virtual void onInit() override {};
+     
+            virtual const std::string getName() const { return ""; };
+            virtual const std::string getDescription() const { return ""; };
 
+        private:
+    };
+
+    inline World& getWorld() { return simu::World::world; }
 }
 
 #endif

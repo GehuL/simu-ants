@@ -3,13 +3,13 @@
 
 #include "utils.h"
 #include "ant.h"
-#include "external/json.hpp"
 
 #include "raygui.h"
 
-#include "external/ui/imgui.h"
-#include "external/ui/rlImGui.h"
-#include "external/ui/imgui_internal.h"
+#include "../external/json.hpp"
+#include "../external/ui/imgui.h"
+#include "../external/ui/rlImGui.h"
+#include "../external/ui/imgui_internal.h"
 
 
 using namespace simu;
@@ -29,8 +29,7 @@ void World::init()
     m_seed = GetRandomValue(0, std::numeric_limits<int>::max());
     SetRandomSeed(m_seed);
 
-    TRACELOG(LOG_INFO, "seed: %d", m_seed);
-    m_entities.clear();
+    clearEntities();
 
     if(m_listener)
         m_listener.get()->onInit();
@@ -83,6 +82,9 @@ void World::save(const std::string& filename)
 
         j["grid"] = m_grid;
         j["seed"] = m_seed;
+
+        if(m_listener)
+            m_listener.get()->onSave(j);
 
         auto file = std::ofstream(filename, std::ios_base::out);
         file << j;
@@ -141,6 +143,9 @@ void World::load(const std::string& filename)
         m_entities.clear();
         m_entities = std::move(entities_tmp); // On peut altérer la partie
        
+        if(m_listener)
+            m_listener.get()->onLoad(j);
+
         file.close();
 
         TRACELOG(LOG_INFO, "Loaded !");
@@ -291,10 +296,32 @@ void World::drawUI()
     if(ImGui::Button("Load")) load(loadFileName);
 
 
-    if(m_listener && ImGui::CollapsingHeader("Level"))
+    if(ImGui::CollapsingHeader("Level"))
     {
-        ImGui::Text("Level name: %s", typeid(m_listener.get()).name());
+        // Affichage de la liste des niveaux disponibles
+        static std::string selectedLevel = "";
+        if(ImGui::BeginCombo("Levels", selectedLevel.c_str()))
+        {
+            for(auto& [name, level] : m_levels)
+            {
+                if(ImGui::Selectable(name.c_str(), selectedLevel == name))
+                {
+                    selectedLevel = name;
+                    loadLevel(name);
+                    break;
+                }
+            }
+            ImGui::EndCombo();
+        }
+        ImGui::SameLine();
         if(ImGui::Button("Restart Level")) init();
+
+        if(std::dynamic_pointer_cast<Level>(m_listener) != nullptr)
+        {
+            Level* level = dynamic_cast<Level*>(m_listener.get());
+            ImGui::SeparatorText("Description");
+            ImGui::Text("%s", level->getDescription().substr(0, 256).c_str());
+        }
     }
 
     if(ImGui::CollapsingHeader("Grid"))
