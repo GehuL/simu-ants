@@ -59,6 +59,7 @@ namespace simu
 
             /**
              * @brief Ajoute des entités dans la simulation
+             * @tparam T Type de l'entité (class fille de Entity)
              * @param count Quantité d'entitée à ajouter
              * @param args Les paramètres du constructeur de l'entité
              * @return La position du premier élément ajouté. Renvoie end() si il y a une erreur (count <= 0)
@@ -92,6 +93,7 @@ namespace simu
             
             /**
              * @brief Ajoute une entité dans la simulation
+             * @tparam T Type de l'entité (class fille de Entity)
              * @param args Les paramètres du constructeur de l'entité
              * @return Un pointeur vers la fourmis nouvellement crée
              */
@@ -133,6 +135,25 @@ namespace simu
                 return std::vector<std::weak_ptr<Entity>>(m_entities.begin(), m_entities.end());
             }
 
+            /**
+             * @brief Renvoie une liste d'entités en fonction du type fournis en paramètre
+             * @tparam T Type de l'entité
+             */
+            template<class T, class = TEMPLATE_CONDITION(T)>
+            std::vector<std::weak_ptr<Entity>> getEntities()
+            {
+                std::vector<std::weak_ptr<T>> entities;
+                for(auto en: m_entities)
+                {
+                    if(auto sp = std::dynamic_pointer_cast<T>(en))
+                    {
+                        entities.push_back(sp);
+                    }
+                }
+                return entities;
+            }
+
+
             /** @brief Supprime une entitié en utilisant l'algo binary search. 
              *  @param id L'ID de l'entité.
              *  @return Renvoie vrai si l'entité à été supprimé et que l'ID existe.
@@ -142,6 +163,7 @@ namespace simu
             bool removeEntity(unsigned long id);
 
             /** @brief Supprime toutes les entités fournis en paramètres.
+             *  @tparam T Type d'itérateur
              *  @param beg Début de la liste
              *  @param end Fin de la lite
              *  @example std::vector<std::weak_ptr<Ant>> en; \
