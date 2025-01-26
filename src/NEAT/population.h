@@ -139,6 +139,8 @@ public:
 
     std::vector<Species> &get_species_list();
 
+    int generate_next_species_id();
+
     
 
    
@@ -146,6 +148,7 @@ private:
    NeatConfig config;
    RNG &rng;
    int next_genome_id;
+   static int species_id_counter;
    std::vector<neat::Individual> individuals;
    neat::Individual best_individual;
    std::vector<Species> species_list;

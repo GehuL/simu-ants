@@ -193,7 +193,7 @@ DemoAnt& DemoAnt::operator=(const DemoAnt& ant)
 RNG gRng;
 
 AntIA::AntIA(const long id, const AntIA& ant) : Ant(id, ant), m_genome(ant.m_genome), m_network(ant.m_network) {}
-AntIA::AntIA(const long id, Vec2i position): Ant(id),  m_genome(Genome::create_diverse_genome(0, 15, 4, 3, gRng)), m_network(FeedForwardNeuralNetwork::create_from_genome(m_genome)), m_gridPos(position)
+AntIA::AntIA(const long id, Vec2i position): Ant(id),  m_genome(Genome::create_diverse_genome(0, 19, 4, 3, gRng)), m_network(FeedForwardNeuralNetwork::create_from_genome(m_genome)), m_gridPos(position)
 {
     m_pos = getWorld().gridToWorld(position);
 }
@@ -239,10 +239,10 @@ void AntIA::update()
     static_cast<double>(isIdle()),
     static_cast<double>(isCurrentPositionVisited()),
     static_cast<double>(getVisitedPositionsSize()),
-    //static_cast<double>(getDistanceToWall(UP)),
-    //static_cast<double>(getDistanceToWall(DOWN)),
-    //static_cast<double>(getDistanceToWall(LEFT)),
-    //static_cast<double>(getDistanceToWall(RIGHT))
+    static_cast<double>(getDistanceToWall(UP)),
+    static_cast<double>(getDistanceToWall(DOWN)),
+    static_cast<double>(getDistanceToWall(LEFT)),
+    static_cast<double>(getDistanceToWall(RIGHT)),
     static_cast<double>(getLastAction()),
     static_cast<double>(getDirectionChanges()),
     static_cast<double>(getRepeatCount()),
@@ -382,20 +382,19 @@ int simu::AntIA::getWallProximityBeforeMove()
                           getTileRight().flags.solid+ 
                           getTileBack().flags.solid;
 }
-/*
-double simu::AntIA::getDistanceToWall(Direction dir)
+
+double simu::AntIA::getDistanceToWall(Vec2i dir)
 {
     int distance = 0;
     Vec2i pos = m_gridPos;
 
     while (!getWorld().getGrid().getTile(pos).flags.solid) {
-        distance++;
+       
         pos += dir;
     }
 
-    return distance;
+    return pos.manhattan(pos);
 }
-*/
 
 
 

@@ -216,7 +216,7 @@ public:
 
         // Si aucune espèce existante n'est compatible, créer une nouvelle espèce
         if (!assigned) {
-            species_list.emplace_back(generate_next_species_id(), *genome);
+            species_list.emplace_back(mPop.generate_next_species_id(), *genome);
         }
     }
 

@@ -27,6 +27,8 @@ int Population::generate_next_genome_id() {
     return next_genome_id++;
 }
 
+
+
 void Population::mutate(Genome &genome) {
     Mutator::mutate(genome, config, rng);
 }
@@ -247,14 +249,22 @@ std::vector<neat::Individual> Population::reproduce_with_speciation(
         double min_fitness = std::numeric_limits<double>::max();  
 
         for (const auto &genome : species.members) {
-            double adjusted_fitness = fitness_map.at(genome) / species.members.size();
-            adjusted_fitnesses.push_back(adjusted_fitness);
+            if (fitness_map.find(genome) != fitness_map.end()) {
+    double adjusted_fitness = fitness_map.at(genome) / species.members.size();
+    
+    adjusted_fitnesses.push_back(adjusted_fitness);
 
             // Trouver la fitness minimale
             if (adjusted_fitness < min_fitness) {
                 min_fitness = adjusted_fitness;
             }
         }
+ else {
+    std::cerr << "Erreur: Génome introuvable dans fitness_map !" << std::endl;
+    continue; // Passer au prochain génome
+}
+
+            
 
         // Appliquer une translation si nécessaire
         if (min_fitness < 0) {
@@ -282,6 +292,7 @@ std::vector<neat::Individual> Population::reproduce_with_speciation(
     }
 
     return new_generation;
+}
 }
 
 
@@ -339,4 +350,11 @@ void Population::create_new_species(std::shared_ptr<Genome> representative) {
 
 std::vector<Species> &Population::get_species_list()
 {return species_list;
+}
+
+int Population::species_id_counter = 0;
+
+
+int Population::generate_next_species_id() {
+    return species_id_counter ++;
 }

@@ -3,7 +3,7 @@
 
 struct NeatConfig {
     int population_size = 200;        // Taille de la population
-    int num_inputs = 15;               // Nombre d'entrées
+    int num_inputs = 19;               // Nombre d'entrées
     int num_outputs = 4;              // Nombre de sorties
 
 
