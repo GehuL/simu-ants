@@ -1,40 +1,23 @@
-#include "../src/world.h"
+#include "../engine/world.h"
 
-#include "../src/external/ui/imgui.h"
-#include "../src/external/ui/rlImGui.h"
+#include "../external/ui/imgui.h"
+#include "../external/ui/rlImGui.h"
+#include "../external/json.hpp"
 
-using namespace simu;
+#include "../simulation/demo.h"
+#include "../simulation/labyrinth.h"
 
-class Scene: public WorldListener
-{
-    std::vector<std::weak_ptr<AntIA>> ants;
+#include "utils.h"
 
-    public:
-        void onInit() override
-        {
-            Grid& grid = getWorld().getGrid();
-            grid.fromImage("maze.png");
-                        
-            ants = getWorld().spawnEntities<AntIA>(1000, Vec2i{89, 161});
-            getWorld().spawnEntity<DemoAnt>(getWorld().gridToWorld(Vec2i{89, 161}));
-        };
 
-        void onDrawUI() override 
-        {
-            ImGui::Begin("World");
-            ImGui::End();
-        };
-
-        void onDraw() override {};
-        void onUnload() override {};
-        void onUpdate() override {};
-};
 
 int main(void)
 {   
     SetTraceLogLevel(LOG_DEBUG);
-
+    
     simu::World& world = simu::getWorld(); 
-    world.setListener(std::make_shared<Scene>());
+    world.registerLevel<simu::Demo>("Démonstration 1");
+    world.registerLevel<simu::Demo2>("Démonstration 2");
+    world.registerLevel<simu::Labyrinth>("Labyrinthe");
     return world.run(1600, 800, "ants-simulation");
 }

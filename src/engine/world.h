@@ -9,6 +9,8 @@
 #include <array>
 #include <fstream>
 #include <variant>
+#include <unordered_map>
+#include <functional>
 
 #include "engine.h"
 #include "entity.h"
@@ -17,11 +19,14 @@
 
 // #define TEMPLATE_CONDITION(T) std::enable_if_t<std::is_base_of<Entity, T>::value && !std::is_same<Entity, T>::value>
 #define TEMPLATE_CONDITION(T) std::enable_if_t<std::is_base_of<Entity, T>::value>
-#define CHECK_TEMPLATE_ST(T) static_assert(std::is_base_of<Entity, T>::value);// && !std::is_same<Entity, T>::value, "T doit etre une class fille de Entity");
+
+#define CHECK_TEMPLATE(T, baseClass) static_assert(std::is_base_of<baseClass, T>::value) // && !std::is_same<Entity, T>::value, "T doit etre une class fille de Entity");
+#define CHECK_TEMPLATE_ST(T) CHECK_TEMPLATE(T, Entity)// && !std::is_same<Entity, T>::value, "T doit etre une class fille de Entity");
 
 namespace simu
 {
     class WorldListener;
+    class Level;
 
 
     // Liste des entités enregistrés 
@@ -54,6 +59,7 @@ namespace simu
 
             /**
              * @brief Ajoute des entités dans la simulation
+             * @tparam T Type de l'entité (class fille de Entity)
              * @param count Quantité d'entitée à ajouter
              * @param args Les paramètres du constructeur de l'entité
              * @return La position du premier élément ajouté. Renvoie end() si il y a une erreur (count <= 0)
@@ -61,7 +67,7 @@ namespace simu
             template<class T, typename... Args, class = TEMPLATE_CONDITION(T)>
             std::vector<std::weak_ptr<T>> spawnEntities(size_t count, const Args&... args)
             {
-                CHECK_TEMPLATE_ST(T)
+                CHECK_TEMPLATE_ST(T);
 
                 if(count <= 0)
                     return std::vector<std::weak_ptr<T>>();
@@ -87,13 +93,14 @@ namespace simu
             
             /**
              * @brief Ajoute une entité dans la simulation
+             * @tparam T Type de l'entité (class fille de Entity)
              * @param args Les paramètres du constructeur de l'entité
              * @return Un pointeur vers la fourmis nouvellement crée
              */
             template<class T, typename... Args, class = TEMPLATE_CONDITION(T)>
             std::weak_ptr<T> spawnEntity(Args... args)
             {
-                CHECK_TEMPLATE_ST(T)
+                CHECK_TEMPLATE_ST(T);
 
                 std::shared_ptr<T> en = std::make_shared<T>(m_entity_cnt, args...);
 
@@ -106,7 +113,7 @@ namespace simu
             template<class T, class = TEMPLATE_CONDITION(T)>
             std::weak_ptr<T> getEntity(unsigned long id)
             {
-                CHECK_TEMPLATE_ST(T)
+                CHECK_TEMPLATE_ST(T);
 
                 auto it = std::find_if(m_entities.begin(), m_entities.end(), [id](std::shared_ptr<Entity> en)
                 {
@@ -128,6 +135,25 @@ namespace simu
                 return std::vector<std::weak_ptr<Entity>>(m_entities.begin(), m_entities.end());
             }
 
+            /**
+             * @brief Renvoie une liste d'entités en fonction du type fournis en paramètre
+             * @tparam T Type de l'entité
+             */
+            template<class T, class = TEMPLATE_CONDITION(T)>
+            std::vector<std::weak_ptr<Entity>> getEntities()
+            {
+                std::vector<std::weak_ptr<T>> entities;
+                for(auto en: m_entities)
+                {
+                    if(auto sp = std::dynamic_pointer_cast<T>(en))
+                    {
+                        entities.push_back(sp);
+                    }
+                }
+                return entities;
+            }
+
+
             /** @brief Supprime une entitié en utilisant l'algo binary search. 
              *  @param id L'ID de l'entité.
              *  @return Renvoie vrai si l'entité à été supprimé et que l'ID existe.
@@ -137,6 +163,7 @@ namespace simu
             bool removeEntity(unsigned long id);
 
             /** @brief Supprime toutes les entités fournis en paramètres.
+             *  @tparam T Type d'itérateur
              *  @param beg Début de la liste
              *  @param end Fin de la lite
              *  @example std::vector<std::weak_ptr<Ant>> en; \
@@ -154,12 +181,43 @@ namespace simu
                 }
             }
 
-            void clearEntities();
-
-            void setListener(std::shared_ptr<WorldListener> listener)
+            /**
+             * @brief Enregistre un niveau dans la simulation. Il est préférable de l'appeler avec world.run()
+             * @parma name Nom du niveau, doit être unique
+             * @throw std::runtime_error si le nom est vide ou déjà enregistré 
+             */
+            template<class T>
+            void registerLevel(const std::string& name)
             {
-                m_listener = listener;
-            };
+                CHECK_TEMPLATE(T, Level);
+                
+                if(name.empty())
+                    throw std::runtime_error("Le nom du niveau ne peut pas être vide");
+
+                if(m_levels.find(name) != m_levels.end())
+                    throw std::runtime_error("Le niveau " + name + " est déjà enregistré");
+                
+                TraceLog(LOG_INFO, "Enregistrement du niveau %s", name.c_str());
+
+                m_levels[name] = [name, this]() -> void {
+                    this->m_level = std::make_shared<T>(name);
+                    this->init();
+                };
+            }
+
+            std::weak_ptr<Level> getCurrentLevel() const
+            {
+                return m_level;
+            }
+
+            /**
+             * @brief Charge un niveau dans la simulation
+             * @param name Nom du niveau, doit être enregistré
+             * @throw std::runtime_error si le niveau n'existe pas
+             */
+            void loadLevel(const std::string& name);
+
+            void clearEntities();
 
             Grid& getGrid() { return m_grid; };
             
@@ -215,10 +273,12 @@ namespace simu
             unsigned long m_entity_cnt;
             unsigned int m_seed;
 
-            std::shared_ptr<WorldListener> m_listener;
+            std::shared_ptr<Level> m_level;
             std::vector<std::shared_ptr<Entity>> m_entities;
 
             std::weak_ptr<Entity> m_selected_en;
+
+            std::unordered_map<std::string, std::function<void()>> m_levels;
 
             Grid m_grid;
 
@@ -229,13 +289,14 @@ namespace simu
             bool m_focus_en_gui;
     };
 
+    // Interface pour écouter les événements de la simulation
     class WorldListener
     {
         public:
             virtual ~WorldListener() {};
 
             // executé lors du chargement de la scene
-            virtual void onInit() {};
+            virtual void onInit() = 0;
 
             // executé lors de la fermeture de la scene
             virtual void onUnload() {};
@@ -248,11 +309,31 @@ namespace simu
 
             // executé à la fréquence de l'UI (30 FPS)
             virtual void onDrawUI() {};
+
+            // executé lors du chargement de la sauvegarde
+            virtual void onLoad(json json) {};
+
+            // executé lors de l'enregistrement de la sauvegarde
+            virtual void onSave(json json) {};
     };
 
-    inline World& getWorld() { return simu::World::world; };
+    // Représente un environnement pour une simulation spécifique.
+    class Level: public WorldListener
+    {
+        public:
+            Level(const std::string& name): m_name(name) {};
+            virtual ~Level() override {};
 
+            virtual void onInit() override {};
+     
+            const std::string getName() const { return m_name; };
+            virtual const std::string getDescription() const { return ""; };
 
+        private:
+            const std::string m_name;
+    };
+
+    inline World& getWorld() { return simu::World::world; }
 }
 
 #endif

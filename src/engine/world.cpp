@@ -4,11 +4,18 @@
 
 #include "utils.h"
 #include "ant.h"
+<<<<<<< HEAD
 
 #include "../external/json.hpp"
 
 #include "raygui.h"
 
+=======
+
+#include "raygui.h"
+
+#include "../external/json.hpp"
+>>>>>>> engine
 #include "../external/ui/imgui.h"
 #include "../external/ui/rlImGui.h"
 #include "../external/ui/imgui_internal.h"
@@ -31,17 +38,21 @@ void World::init()
     m_seed = GetRandomValue(0, std::numeric_limits<int>::max());
     SetRandomSeed(m_seed);
 
+<<<<<<< HEAD
     //TRACELOG(LOG_INFO, "seed: %d", m_seed);
     m_entities.clear();
+=======
+    clearEntities();
+>>>>>>> engine
 
-    if(m_listener)
-        m_listener.get()->onInit();
+    if(m_level)
+        m_level.get()->onInit();
 }
 
 void World::unload()
 {
-    if(m_listener)
-        m_listener.get()->onUnload();
+    if(m_level)
+        m_level.get()->onUnload();
     m_grid.unload();
 }
 
@@ -85,6 +96,9 @@ void World::save(const std::string& filename)
 
         j["grid"] = m_grid;
         j["seed"] = m_seed;
+
+        if(m_level)
+            m_level.get()->onSave(j);
 
         auto file = std::ofstream(filename, std::ios_base::out);
         file << j;
@@ -143,6 +157,9 @@ void World::load(const std::string& filename)
         m_entities.clear();
         m_entities = std::move(entities_tmp); // On peut altérer la partie
        
+        if(m_level)
+            m_level.get()->onLoad(j);
+
         file.close();
 
         //TRACELOG(LOG_INFO, "Loaded !");
@@ -256,8 +273,8 @@ void World::drawFrame()
         en->draw();
     }
 
-    if(m_listener)
-        m_listener.get()->onDraw();
+    if(m_level)
+        m_level.get()->onDraw();
 }
 
 void World::drawUI()
@@ -293,10 +310,31 @@ void World::drawUI()
     if(ImGui::Button("Load")) load(loadFileName);
 
 
-    if(m_listener && ImGui::CollapsingHeader("Level"))
+    if(ImGui::CollapsingHeader("Level"))
     {
-        ImGui::Text("Level name: %s", typeid(m_listener.get()).name());
+        // Affichage de la liste des niveaux disponibles
+        std::string selectedLevel = m_level ? m_level->getName() : "None";
+        if(ImGui::BeginCombo("Levels", selectedLevel.c_str()))
+        {
+            for(auto& [name, level] : m_levels)
+            {
+                if(ImGui::Selectable(name.c_str(), selectedLevel == name))
+                {
+                    loadLevel(name);
+                    break;
+                }
+            }
+            ImGui::EndCombo();
+        }
+        ImGui::SameLine();
         if(ImGui::Button("Restart Level")) init();
+
+        if(m_level != nullptr)
+        {
+            // Level* level = dynamic_cast<Level*>(m_level.get());
+            ImGui::SeparatorText("Description");
+            ImGui::Text("%s", m_level->getDescription().substr(0, 256).c_str());
+        }
     }
 
     if(ImGui::CollapsingHeader("Grid"))
@@ -404,8 +442,8 @@ void World::drawUI()
 
     ImGui::End();
 
-    if(m_listener)
-        m_listener.get()->onDrawUI();
+    if(m_level)
+        m_level.get()->onDrawUI();
 }
 
 void World::drawEntityInfo()
@@ -460,8 +498,8 @@ void World::updateTick()
         }
     }
 
-    if(m_listener)
-        m_listener.get()->onUpdate();
+    if(m_level)
+        m_level.get()->onUpdate();
 }
 
 bool World::exist(unsigned long id) const
@@ -510,4 +548,12 @@ void World::clearEntities()
 { 
     m_entities.clear();
     m_entity_cnt = 0;
+}
+
+void World::loadLevel(const std::string& name)
+{
+    if(m_levels.find(name) == m_levels.end())
+        throw std::runtime_error("Le niveau " + name + " n'existe pas");
+    m_levels[name]();
+    TraceLog(LOG_DEBUG, "Niveau %s chargé", name.c_str());
 }

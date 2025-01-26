@@ -5,8 +5,6 @@
 
 #include "world.h"
 
-#include <random> 
-
 using namespace simu;
 
 Ant::Ant(const long id) : Entity(id) {}
@@ -20,7 +18,7 @@ void Ant::update() {}
 
 void Ant::draw() 
 {
-    DrawRectangle(this->m_pos.x, this->m_pos.y, 5, 5, DARKBROWN);
+    DrawRectangle(this->m_pos.x, this->m_pos.y, 5, 5, DARKPURPLE);
 
     if(m_carried_object.type != Type::AIR)
     {
@@ -402,6 +400,7 @@ double simu::AntIA::getDistanceToWall(Direction dir)
 void AntIA::load(const json &json)
 {
     Ant::load(json);
+    m_gridPos = getWorld().getGrid().toTileCoord(m_pos);
     // TODO: Load genome
 }
 
