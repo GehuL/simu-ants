@@ -89,12 +89,14 @@ FeedForwardNeuralNetwork FeedForwardNeuralNetwork::create_from_genome(const Geno
             std::vector<NeuronInput> neuron_inputs;
 
             for (const auto &link : genome.get_links())
-            {
-                if (neuron_id == link.link_id.output_id)
-                {
-                    neuron_inputs.emplace_back(NeuronInput{link.link_id.input_id, link.weight});
-                }
-            }
+{
+    if (!link.is_enabled) continue; // Ignorer les liens désactivés
+    if (neuron_id == link.link_id.output_id)
+    {
+        neuron_inputs.emplace_back(NeuronInput{link.link_id.input_id, link.weight});
+    }
+}
+
 
             auto neuron_gene_opt = genome.find_neuron(neuron_id);
             // Vérification : assure qu'un neurone est trouvé dans le génome

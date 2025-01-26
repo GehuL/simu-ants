@@ -80,32 +80,40 @@ void Mutator::mutate_add_link(Genome &genome) {
 }
 
 void Mutator::mutate_add_link_fix(Genome &genome) {
-    int input_id = choose_random_input_or_hidden_neuron(genome.get_neurons());
-    int output_id = choose_random_output_or_hidden_neuron(genome.get_neurons());
+    constexpr int MAX_ATTEMPTS = 10; // Évite de boucler indéfiniment si peu d'options
+    for (int attempt = 0; attempt < MAX_ATTEMPTS; ++attempt) {
+        int input_id = choose_random_input_or_hidden_neuron(genome.get_neurons());
+        int output_id = choose_random_output_or_hidden_neuron(genome.get_neurons());
 
-    if (input_id == -1 || output_id == -1 || input_id == output_id) {
-        return; // Identifiants invalides ou identiques
-    }
-
-    neat::LinkId link_id{input_id, output_id};
-
-    auto existing_link = genome.find_link(link_id);
-    if (existing_link) {
-        if (!existing_link->is_enabled) {
-            existing_link->is_enabled = true; // Réactive le lien désactivé
+        if (input_id == -1 || output_id == -1 || input_id == output_id) {
+            continue; // Recommence avec un autre choix
         }
-        return;
+
+        neat::LinkId link_id{input_id, output_id};
+
+        // Vérifie si la connexion existe déjà
+        auto existing_link = genome.find_link(link_id);
+        if (existing_link) {
+            if (!existing_link->is_enabled) {
+                existing_link->is_enabled = true; // Réactive le lien désactivé
+                std::cout << "Re-enabling existing link from " << input_id << " to " << output_id << std::endl;
+            }
+            return;
+        }
+
+        // Vérifie si cela crée un cycle **seulement si la connexion est nouvelle**
+        if (would_create_cycle(genome.get_links(), input_id, output_id)) {
+            continue; // Essaie un autre lien
+        }
+
+        // Création d'une nouvelle connexion
+        neat::LinkMutator link_mutator;
+        neat::LinkGene new_link = link_mutator.new_value(input_id, output_id);
+        genome.add_link(new_link);
+
+        std::cout << "Adding link from " << input_id << " to " << output_id << " in genome " << genome.get_genome_id() << std::endl;
+        return; // Succès, on sort de la boucle
     }
-
-    if (would_create_cycle(genome.get_links(), input_id, output_id)) {
-        return; // Évite la création de cycles
-    }
-
-    neat::LinkMutator link_mutator;
-    neat::LinkGene new_link = link_mutator.new_value(input_id, output_id);
-    genome.add_link(new_link);
-
-    std::cout << "Adding link from " << input_id << " to " << output_id << " to genome " << genome.get_genome_id() << std::endl;
 }
 
 
@@ -266,26 +274,22 @@ void Mutator::mutate_add_neuron_fix(Genome &genome) {
         return;
     }
 
+    // Sélectionne un lien actif aléatoire
     neat::LinkGene link_to_split = rng.choose_random(genome.get_links());
     if (!link_to_split.is_enabled) {
-        return; // Éviter de splitter un lien déjà désactivé
+        return; // Évite de splitter un lien déjà désactivé
     }
+
+    // Désactive le lien immédiatement sans rechercher à nouveau
     link_to_split.is_enabled = false;
 
-    // Désactive le lien en le marquant (au lieu de l'effacer immédiatement)
-    for (auto &link : genome.get_links()) {
-        if (link.link_id == link_to_split.link_id) {
-            link.is_enabled = false;
-        }
-    }
-
-    // Crée un nouveau neurone
+    // Création d'un nouveau neurone unique
     neat::NeuronMutator neuron_mutator;
     neat::NeuronGene new_neuron = neuron_mutator.new_neuron();
     new_neuron.neuron_id = genome.generate_next_neuron_id();
     genome.add_neuron(new_neuron);
 
-    // Ajoute deux nouveaux liens
+    // Ajoute deux nouvelles connexions respectant la règle NEAT
     neat::LinkGene link1{{link_to_split.link_id.input_id, new_neuron.neuron_id}, 1.0, true};
     neat::LinkGene link2{{new_neuron.neuron_id, link_to_split.link_id.output_id}, link_to_split.weight, true};
     genome.add_link(link1);
@@ -293,6 +297,7 @@ void Mutator::mutate_add_neuron_fix(Genome &genome) {
 
     std::cout << "Adding neuron " << new_neuron.neuron_id << " to genome " << genome.get_genome_id() << std::endl;
 }
+
 
 
 void Mutator::mutate_remove_neuron(Genome &genome) {
