@@ -4,3 +4,4 @@ main.code-workspace
 *.json
 simu-ants
 imgui.ini
+docs
