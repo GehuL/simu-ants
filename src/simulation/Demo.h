@@ -11,6 +11,8 @@ namespace simu
     class Demo: public Level
     {
         public:
+            Demo(std::string name): Level(name) {};
+
             void onInit() override
             {
                 Grid& grid = getWorld().getGrid();
@@ -39,13 +41,16 @@ namespace simu
 
     class Demo2: public Level
     {
-        void onInit() override
-        {
-            Grid& grid = getWorld().getGrid();
-            grid.fromImage("maze.png");
-                        
-            getWorld().spawnEntities<AntIA>(1000, Vec2i{89, 161});
-        };
+        public:
+            Demo2(std::string name): Level(name) {};
+
+            void onInit() override
+            {
+                Grid& grid = getWorld().getGrid();
+                grid.fromImage("maze.png");
+                            
+                getWorld().spawnEntities<AntIA>(1000, Vec2i{89, 161});
+            };
 
         const std::string getDescription() const override { return "Scene de démonstration du moteur. Pas de script d'apprentissage."; };
     };

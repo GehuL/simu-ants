@@ -11,6 +11,8 @@ namespace simu
     class Labyrinth: public Level
     {
         public:
+            Labyrinth(std::string name): Level(name) {};
+
             void onInit() override
             {
                 Grid& grid = getWorld().getGrid();
@@ -18,7 +20,7 @@ namespace simu
                 getWorld().spawnEntities<AntIA>(1000, Vec2i{89, 161});
             };
 
-            const std::string getDescription() const override { return "Simulation d'apprendissage de résolution de labyrinthe."; };
+            const std::string getDescription() const override { return "Simulation d'apprentissage de résolution de labyrinthe."; };
     };
 
 }

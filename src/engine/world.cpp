@@ -31,14 +31,14 @@ void World::init()
 
     clearEntities();
 
-    if(m_listener)
-        m_listener.get()->onInit();
+    if(m_level)
+        m_level.get()->onInit();
 }
 
 void World::unload()
 {
-    if(m_listener)
-        m_listener.get()->onUnload();
+    if(m_level)
+        m_level.get()->onUnload();
     m_grid.unload();
 }
 
@@ -83,8 +83,8 @@ void World::save(const std::string& filename)
         j["grid"] = m_grid;
         j["seed"] = m_seed;
 
-        if(m_listener)
-            m_listener.get()->onSave(j);
+        if(m_level)
+            m_level.get()->onSave(j);
 
         auto file = std::ofstream(filename, std::ios_base::out);
         file << j;
@@ -143,8 +143,8 @@ void World::load(const std::string& filename)
         m_entities.clear();
         m_entities = std::move(entities_tmp); // On peut altérer la partie
        
-        if(m_listener)
-            m_listener.get()->onLoad(j);
+        if(m_level)
+            m_level.get()->onLoad(j);
 
         file.close();
 
@@ -259,8 +259,8 @@ void World::drawFrame()
         en->draw();
     }
 
-    if(m_listener)
-        m_listener.get()->onDraw();
+    if(m_level)
+        m_level.get()->onDraw();
 }
 
 void World::drawUI()
@@ -299,14 +299,13 @@ void World::drawUI()
     if(ImGui::CollapsingHeader("Level"))
     {
         // Affichage de la liste des niveaux disponibles
-        static std::string selectedLevel = "";
+        std::string selectedLevel = m_level ? m_level->getName() : "None";
         if(ImGui::BeginCombo("Levels", selectedLevel.c_str()))
         {
             for(auto& [name, level] : m_levels)
             {
                 if(ImGui::Selectable(name.c_str(), selectedLevel == name))
                 {
-                    selectedLevel = name;
                     loadLevel(name);
                     break;
                 }
@@ -316,11 +315,11 @@ void World::drawUI()
         ImGui::SameLine();
         if(ImGui::Button("Restart Level")) init();
 
-        if(std::dynamic_pointer_cast<Level>(m_listener) != nullptr)
+        if(m_level != nullptr)
         {
-            Level* level = dynamic_cast<Level*>(m_listener.get());
+            // Level* level = dynamic_cast<Level*>(m_level.get());
             ImGui::SeparatorText("Description");
-            ImGui::Text("%s", level->getDescription().substr(0, 256).c_str());
+            ImGui::Text("%s", m_level->getDescription().substr(0, 256).c_str());
         }
     }
 
@@ -429,8 +428,8 @@ void World::drawUI()
 
     ImGui::End();
 
-    if(m_listener)
-        m_listener.get()->onDrawUI();
+    if(m_level)
+        m_level.get()->onDrawUI();
 }
 
 void World::drawEntityInfo()
@@ -485,8 +484,8 @@ void World::updateTick()
         }
     }
 
-    if(m_listener)
-        m_listener.get()->onUpdate();
+    if(m_level)
+        m_level.get()->onUpdate();
 }
 
 bool World::exist(unsigned long id) const

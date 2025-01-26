@@ -197,10 +197,17 @@ namespace simu
                 if(m_levels.find(name) != m_levels.end())
                     throw std::runtime_error("Le niveau " + name + " est déjà enregistré");
                 
+                TraceLog(LOG_INFO, "Enregistrement du niveau %s", name.c_str());
+
                 m_levels[name] = [name, this]() -> void {
-                    this->setListener(std::make_shared<T>());
+                    this->m_level = std::make_shared<T>(name);
                     this->init();
                 };
+            }
+
+            std::weak_ptr<Level> getCurrentLevel() const
+            {
+                return m_level;
             }
 
             /**
@@ -252,11 +259,6 @@ namespace simu
         private:
             World();
 
-            void setListener(std::shared_ptr<WorldListener> listener)
-            {
-                m_listener = listener;
-            };
-
             void handleKeyboard();
             void handleMouse();
 
@@ -271,7 +273,7 @@ namespace simu
             unsigned long m_entity_cnt;
             unsigned int m_seed;
 
-            std::shared_ptr<WorldListener> m_listener;
+            std::shared_ptr<Level> m_level;
             std::vector<std::shared_ptr<Entity>> m_entities;
 
             std::weak_ptr<Entity> m_selected_en;
@@ -319,15 +321,16 @@ namespace simu
     class Level: public WorldListener
     {
         public:
-            Level() {};
+            Level(const std::string& name): m_name(name) {};
             virtual ~Level() override {};
 
             virtual void onInit() override {};
      
-            virtual const std::string getName() const { return ""; };
+            const std::string getName() const { return m_name; };
             virtual const std::string getDescription() const { return ""; };
 
         private:
+            const std::string m_name;
     };
 
     inline World& getWorld() { return simu::World::world; }
