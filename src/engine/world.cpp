@@ -536,3 +536,11 @@ void World::clearEntities()
     m_entities.clear();
     m_entity_cnt = 0;
 }
+
+void World::loadLevel(const std::string& name)
+{
+    if(m_levels.find(name) == m_levels.end())
+        throw std::runtime_error("Le niveau " + name + " n'existe pas");
+    m_levels[name]();
+    TraceLog(LOG_DEBUG, "Niveau %s chargé", name.c_str());
+}

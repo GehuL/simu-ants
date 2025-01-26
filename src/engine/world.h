@@ -208,12 +208,7 @@ namespace simu
              * @param name Nom du niveau, doit être enregistré
              * @throw std::runtime_error si le niveau n'existe pas
              */
-            void loadLevel(const std::string& name)
-            {
-                if(m_levels.find(name) == m_levels.end())
-                    throw std::runtime_error("Le niveau " + name + " n'existe pas");
-                m_levels[name]();
-            }
+            void loadLevel(const std::string& name);
 
             void clearEntities();
 
