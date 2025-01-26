@@ -4,6 +4,6 @@ main.code-workspace
 *.json
 simu-ants
 imgui.ini
-docs
 
-!docs/Doxfile
+docs/*
+!docs/Doxyfile
