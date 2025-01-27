@@ -14,7 +14,7 @@ namespace simu
     class LaborerIA: public Ant
     {
         public:
-            LaborerIA(const long id = -1, Vec2i spawnPos = Vec2i(0, 0)) : Ant(id, getWorld().gridToWorld(spawnPos)), m_genome(Genome::create_diverse_genome(0, 4, 4, 1, gRng))
+            LaborerIA(const long id = -1, Vec2i spawnPos = Vec2i(0, 0)) : Ant(id, getWorld().gridToWorld(spawnPos)), m_genome(Genome::create_diverse_genome(0, 5, 1, 1, gRng))
                                                                                 ,m_network(FeedForwardNeuralNetwork::create_from_genome(m_genome)), m_spawnPos(spawnPos) {};
 
             LaborerIA(const long id, const Genome& genome, Vec2i spawnPos = Vec2i(0, 0)) : Ant(id, getWorld().gridToWorld(spawnPos)), m_genome(genome)
@@ -27,26 +27,25 @@ namespace simu
 
             void update() override
             {
-                std::vector<double> inputs = {m_angle, m_pos.x, m_pos.y, static_cast<double>(Ant::getCarriedObject().type == Type::FOOD)};
+                std::vector<double> inputs = {m_angle, m_pos.x, m_pos.y, static_cast<double>(m_spawnPos.x), static_cast<double>(m_spawnPos.y)};
                 
                 auto outputs = m_network.activate(inputs);
                
-                int direction = std::distance(outputs.begin(), std::max_element(outputs.begin(), outputs.end()));
+              /*int direction = std::distance(outputs.begin(), std::max_element(outputs.begin(), outputs.end()));
                 switch(direction)
                 {
                     case 0: m_angle = EAST; break;
                     case 1: m_angle = NORTH; break;
                     case 2: m_angle = WEST; break;
                     case 3: m_angle = SOUTH; break;
-                }
+                }*/
 
+                m_angle = outputs[0] * 2 * PI - PI;
                 move(m_angle);
 
-                Ant::take();
-
-                if(getWorld().getGrid().toTileCoord(m_pos) == m_spawnPos)
+                if(getTileOn().type == Type::FOOD)
                 {
-                    put();
+                    eat();
                     m_harvestedFood++;
                 }
             };

@@ -46,7 +46,7 @@ namespace simu
     const Tile AIR = (Tile) {.color=WHITE, .type=Type::AIR, .flags=0x2};
     const Tile GROUND = (Tile) {.color=BROWN, .type=Type::GROUND, .flags=0x3};
     const Tile WALL = (Tile) {.color=BLACK, .type=Type::GROUND, .flags=0x3}; // Considère un mur comme le sol (utilisé pour le labyrinthe)
-    const Tile FOOD = (Tile) {.color=GREEN, .type=Type::FOOD, .flags=0x10};
+    const Tile FOOD = (Tile) {.color=GREEN, .type=Type::FOOD, .flags=0xA};
     const Tile PHEROMONE = (Tile) {.color=PINK, .type=Type::PHEROMONE, .flags=0x4};
     const Tile BORDER = (Tile) {.color=WHITE, .type=Type::BORDER, .flags=0x1};
     
