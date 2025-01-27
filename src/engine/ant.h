@@ -140,6 +140,8 @@ namespace simu
             double fitness = 0.0;
             Vec2i m_dir;
             Vec2i m_gridPos;
+
+            
             int lastAction = -1; 
             int directionChanges = 0;
             int repeatCount = 0; 

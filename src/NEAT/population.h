@@ -45,6 +45,8 @@ public:
     */
    int generate_next_genome_id();
 
+   int generate_genome_id();
+
    /**
     * @brief Mute le génome en ajoutant ou en supprimant des liens et des neurones, et en modifiant les poids et les biais.
     *
@@ -90,7 +92,8 @@ public:
 
  std::vector<neat::Individual> reproduce_with_speciation(
     const std::vector<Species>& species_list,
-    const std::unordered_map<std::shared_ptr<Genome>, double>& fitness_map
+    const std::unordered_map<Genome, double>& fitness_map
+
 );
 
 

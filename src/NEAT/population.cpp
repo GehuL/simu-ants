@@ -27,6 +27,12 @@ int Population::generate_next_genome_id() {
     return next_genome_id++;
 }
 
+int Population::generate_genome_id() {
+    static int id = 0;
+    return id++;
+}
+
+
 
 
 void Population::mutate(Genome &genome) {
@@ -239,7 +245,8 @@ std::vector<neat::Individual> Population::reproduce_from_genome_roulette_negativ
 
 std::vector<neat::Individual> Population::reproduce_with_speciation(
     const std::vector<Species>& species_list,
-    const std::unordered_map<std::shared_ptr<Genome>, double>& fitness_map
+    const std::unordered_map<Genome, double>& fitness_map
+
 ) {
     std::vector<neat::Individual> new_generation;
 
@@ -249,8 +256,11 @@ std::vector<neat::Individual> Population::reproduce_with_speciation(
         double min_fitness = std::numeric_limits<double>::max();  
 
         for (const auto &genome : species.members) {
-            if (fitness_map.find(genome) != fitness_map.end()) {
-    double adjusted_fitness = fitness_map.at(genome) / species.members.size();
+            if (fitness_map.find(*genome) == fitness_map.end()) {
+        std::cerr << "Erreur: Génome ID " << genome->get_genome_id() << " absent de fitness_map !" << std::endl;
+    }
+            if (fitness_map.find(*genome) != fitness_map.end()) {
+    double adjusted_fitness = fitness_map.at(*genome) / species.members.size();
     
     adjusted_fitnesses.push_back(adjusted_fitness);
 

@@ -75,7 +75,6 @@ void Mutator::mutate_add_link(Genome &genome) {
     neat::LinkMutator link_mutator;
     neat::LinkGene new_link = link_mutator.new_value(input_id, output_id);
     genome.add_link(new_link);
-    std::cout << "Adding link from " << input_id << " to " << output_id << " to genome " << genome.get_genome_id() << std::endl;
 
 }
 
@@ -96,7 +95,6 @@ void Mutator::mutate_add_link_fix(Genome &genome) {
         if (existing_link) {
             if (!existing_link->is_enabled) {
                 existing_link->is_enabled = true; // Réactive le lien désactivé
-                std::cout << "Re-enabling existing link from " << input_id << " to " << output_id << std::endl;
             }
             return;
         }
@@ -111,7 +109,6 @@ void Mutator::mutate_add_link_fix(Genome &genome) {
         neat::LinkGene new_link = link_mutator.new_value(input_id, output_id);
         genome.add_link(new_link);
 
-        std::cout << "Adding link from " << input_id << " to " << output_id << " in genome " << genome.get_genome_id() << std::endl;
         return; // Succès, on sort de la boucle
     }
 }
@@ -167,7 +164,6 @@ void Mutator::mutate_remove_link(Genome &genome) {
 
     auto to_remove = rng.choose_random(removable_links);
     genome.get_links().erase(std::remove(genome.get_links().begin(), genome.get_links().end(), to_remove), genome.get_links().end());
-    std::cout << "Removing link from " << to_remove.link_id.input_id << " to " << to_remove.link_id.output_id << " from genome " << genome.get_genome_id() << std::endl;
 }
 
 void Mutator::mutate_remove_link_fix(Genome &genome) {
@@ -229,9 +225,7 @@ void Mutator::mutate_remove_link_fix(Genome &genome) {
             }),
         genome.get_links().end());
 
-    std::cout << "Removing link from " << to_remove.link_id.input_id
-              << " to " << to_remove.link_id.output_id
-              << " from genome " << genome.get_genome_id() << std::endl;
+    
 
     // Validation post-suppression
     validate_connectivity(genome);
@@ -264,7 +258,6 @@ void Mutator::mutate_add_neuron(Genome &genome) {
     genome.add_link(neat::LinkGene{{link_id.input_id, new_neuron.neuron_id}, 1.0, true});
     genome.add_link(neat::LinkGene{{new_neuron.neuron_id, link_id.output_id}, weight, true});
 
-    std::cout << "Adding neuron " << new_neuron.neuron_id << " to genome " << genome.get_genome_id() << std::endl;
 }
 
 void Mutator::mutate_add_neuron_fix(Genome &genome) {
@@ -295,7 +288,6 @@ void Mutator::mutate_add_neuron_fix(Genome &genome) {
     genome.add_link(link1);
     genome.add_link(link2);
 
-    std::cout << "Adding neuron " << new_neuron.neuron_id << " to genome " << genome.get_genome_id() << std::endl;
 }
 
 
@@ -320,7 +312,6 @@ void Mutator::mutate_remove_neuron(Genome &genome) {
         }),
         genome.get_links().end());
 
-    std::cout << "Removing neuron " << neuron_it->neuron_id << " from genome " << genome.get_genome_id() << std::endl;
 
     genome.get_neurons().erase(neuron_it);
 }
@@ -337,7 +328,6 @@ void Mutator::mutate_link_weight(Genome &genome, const NeatConfig &config, RNG &
 
     // Appliquer la mutation si la probabilité le permet
     if (rng.next_double() < config.probability_mutate_link_weight) {
-        std::cout << "Mutating link weight for genome " << genome.get_genome_id() << "for link"<< link.link_id.input_id << "to" << link.link_id.output_id << std::endl;
         link.weight = mutate_delta(link.weight);  // Muter le poids du lien
     }
 }
@@ -382,7 +372,6 @@ void Mutator::mutate_remove_neuron_fix(Genome &genome) {
         }),
         links.end());
 
-    std::cout << "Removing neuron " << neuron_it->neuron_id << " from genome " << genome.get_genome_id() << std::endl;
 
     // Supprime le neurone sélectionné
     neurons.erase(neuron_it);
@@ -401,7 +390,6 @@ void Mutator::mutate_neuron_bias(Genome &genome, const NeatConfig &config, RNG &
 
     // Appliquer la mutation si la probabilité le permet
     if (rng.next_double() < config.probability_mutate_neuron_bias) {
-        std::cout << "Mutating neuron bias for genome " << genome.get_genome_id() << "for neuron"<< neuron.neuron_id << std::endl;
         neuron.bias = mutate_delta(neuron.bias);  // Muter le biais du neurone
     }
 }

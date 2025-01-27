@@ -5,6 +5,7 @@
 
 #include "world.h"
 
+
 #include <random> 
 
 using namespace simu;
@@ -193,7 +194,7 @@ DemoAnt& DemoAnt::operator=(const DemoAnt& ant)
 RNG gRng;
 
 AntIA::AntIA(const long id, const AntIA& ant) : Ant(id, ant), m_genome(ant.m_genome), m_network(ant.m_network) {}
-AntIA::AntIA(const long id, Vec2i position): Ant(id),  m_genome(Genome::create_diverse_genome(0, 19, 4, 3, gRng)), m_network(FeedForwardNeuralNetwork::create_from_genome(m_genome)), m_gridPos(position)
+AntIA::AntIA(const long id, Vec2i position): Ant(id),  m_genome(Genome::create_diverse_genome_unique(19, 4, 3, gRng)), m_network(FeedForwardNeuralNetwork::create_from_genome(m_genome)), m_gridPos(position)
 {
     m_pos = getWorld().gridToWorld(position);
 }

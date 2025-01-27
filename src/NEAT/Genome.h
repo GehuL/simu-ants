@@ -6,6 +6,7 @@
 #include "rng.h"
 #include <vector>
 #include <optional>
+#include <iostream>
 #include "../external/json.hpp"
 
 using json = nlohmann::json;
@@ -32,7 +33,16 @@ public:
      */
     Genome(int id, int num_inputs, int num_outputs);
 
+    static int last_id;
+
     bool would_create_cycle(int input_id, int output_id) const;
+
+    bool operator==(const Genome &other) const;
+    
+    friend std::ostream& operator<<(std::ostream& os, const Genome& genome) {
+    os << "Genome(ID: " << genome.get_genome_id() << ")";
+    return os;
+}
 
     // Méthodes statiques pour créer un génome
     static Genome create_genome(int id, int num_inputs, int num_outputs, int num_hidden_neurons, RNG &rng);
@@ -40,6 +50,8 @@ public:
     static Genome create_genome_div(int id, int num_inputs, int num_outputs, int num_hidden_neurons, RNG &rng);
 
     static Genome create_diverse_genome(int id, int num_inputs, int num_outputs, int max_hidden_neurons, RNG &rng);
+
+    static Genome create_diverse_genome_unique(int num_inputs, int num_outputs, int max_hidden_neurons, RNG &rng);
 
     double compute_distance(const Genome &other, const NeatConfig &config) const;
 
@@ -162,8 +174,18 @@ private:
     std::vector<neat::LinkGene> links;
 };
 
+namespace std {
+    template <>
+    struct hash<Genome> {
+        size_t operator()(const Genome& genome) const {
+            return std::hash<int>()(genome.get_genome_id());
+        }
+    };
+}
+
 void to_json(json& json, const Genome& genome);
 void from_json(const json& json, Genome& genome);
+
 
 
 

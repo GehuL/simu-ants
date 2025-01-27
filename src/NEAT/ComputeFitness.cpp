@@ -102,7 +102,7 @@ double ComputeFitness::evaluate_lab(const simu::Vec2i &startPos, const simu::Vec
     
 
     // Calcul de la fitness
-   double fitness = (initial_distance - current_distance)*2;
+   double fitness = (initial_distance - current_distance)*4;
    
     fitness += far_from_goal;
     
@@ -121,7 +121,7 @@ double ComputeFitness::evaluate_lab(const simu::Vec2i &startPos, const simu::Vec
     
    
     // Critère d'exploration pour les premières générations
-    if (current_generation < 200) { // Par exemple, encourager l'exploration pendant 50 générations
+    if (current_generation < 300) { // Par exemple, encourager l'exploration pendant 50 générations
         fitness += visitedPositions.size() * 2.0;
         //printf("Visited positions: %d\n", visitedPositions.size());
     if (directionChanges < 3) {

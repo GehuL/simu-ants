@@ -184,7 +184,8 @@ public:
 
     void nextGeneration() {
     std::vector<std::shared_ptr<Genome>> genomes;
-    std::unordered_map<std::shared_ptr<Genome>, double> fitness_map;
+    std::unordered_map<Genome, double> fitness_map;
+
 
     // Collecter les génomes et leurs fitness
     for (const auto &ant : ants) {
@@ -192,7 +193,14 @@ public:
             auto locked_ant = ant.lock();
             std::shared_ptr<Genome> genome = std::make_shared<Genome>(locked_ant->getGenome());
             genomes.push_back(genome);
-            fitness_map[genome] = locked_ant->getFitness();
+            std::cout << "Ajout du génome " << locked_ant->getGenome() << " avec fitness " << locked_ant->getFitness() << std::endl;
+            fitness_map[locked_ant->getGenome()] = locked_ant->getFitness();
+
+            
+
+
+
+
         }
     }
 
@@ -218,6 +226,13 @@ public:
         if (!assigned) {
             species_list.emplace_back(mPop.generate_next_species_id(), *genome);
         }
+
+        std::cout << "Taille de fitness_map: " << fitness_map.size() << std::endl;
+
+for (const auto &species : species_list) {
+    std::cout << "Espèce " << species.id << " a " << species.members.size() << " membres." << std::endl;
+}
+
     }
 
     // Étape 3 : Générer la nouvelle génération en fonction des espèces

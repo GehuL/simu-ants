@@ -40,6 +40,13 @@ bool Genome::would_create_cycle(int input_id, int output_id) const {
     return dfs(output_id);
 }
 
+bool Genome::operator==(const Genome &other) const {
+    return genome_id == other.genome_id;
+}
+
+
+
+
 // Fonction de création du génome avec vérification des cycles
 Genome Genome::create_genome(int id, int num_inputs, int num_outputs, int num_hidden_neurons, RNG &rng) {
     Genome genome(id, num_inputs, num_outputs);
@@ -240,6 +247,89 @@ Genome Genome::create_diverse_genome(int id, int num_inputs, int num_outputs, in
     return genome;
 }
 
+int Genome::last_id = 0;  // Initialise à zéro ou à un autre numéro de départ
+
+
+Genome Genome::create_diverse_genome_unique(int num_inputs, int num_outputs, int max_hidden_neurons, RNG &rng) {
+   
+    int id = last_id++;
+    Genome genome(id, num_inputs, num_outputs);
+
+    // Ajoute neurones d'entrée
+    for (int i = 0; i < num_inputs; ++i) {
+        genome.add_neuron(neat::NeuronGene{i, 0.0, Activation(Activation::Type::Sigmoid)});
+    }
+
+    // Ajoute neurones de sortie avec des biais aléatoires
+    for (int i = 0; i < num_outputs; ++i) {
+        int output_id = num_inputs + i;
+        double bias = rng.uniform(-1.0, 1.0);
+        genome.add_neuron(neat::NeuronGene{output_id, bias, Activation(Activation::Type::Sigmoid)});
+    }
+
+    // Nombre aléatoire de neurones cachés (jusqu'à max_hidden_neurons)
+    int num_hidden_neurons = rng.uniform(0, max_hidden_neurons);
+    for (int i = 0; i < num_hidden_neurons; ++i) {
+        int hidden_id = num_inputs + num_outputs + i;
+        double bias = rng.gaussian(0.0, 1.0);
+        
+        // Fonction d'activation aléatoire
+        Activation::Type activation_type = rng.uniform(0, 2) == 0 
+            ? Activation::Type::Sigmoid 
+            : Activation::Type::ReLU;
+        
+        genome.add_neuron(neat::NeuronGene{hidden_id, bias, Activation(activation_type)});
+    }
+
+    // Ajoute connexions aléatoires (entrée -> caché, caché -> caché, caché -> sortie)
+    auto add_random_connection = [&](int from, int to) {
+        if (!genome.would_create_cycle(from, to)) {
+            genome.add_link(genome.create_link_div_with_inov(from, to, rng));
+        }
+    };
+
+    // Probabilités pour les connexions
+    double prob_input_to_hidden = 0.5;
+    double prob_hidden_to_hidden = 0.3;
+    double prob_hidden_to_output = 0.7;
+
+    // Connexions : entrée -> cachés
+    for (int input_id = 0; input_id < num_inputs; ++input_id) {
+        bool connected_to_hidden = false;
+        for (int hidden_id = num_inputs + num_outputs; hidden_id < num_inputs + num_outputs + num_hidden_neurons; ++hidden_id) {
+            if (rng.uniform(0.0, 1.0) < prob_input_to_hidden) {
+                add_random_connection(input_id, hidden_id);
+                connected_to_hidden = true;
+            }
+        }
+
+        // Si l'entrée n'est pas connectée à un neurone caché, la connecter directement à une sortie
+        if (!connected_to_hidden) {
+            int output_id = rng.uniform(num_inputs, num_inputs + num_outputs); // Connexion à une sortie aléatoire
+            add_random_connection(input_id, output_id);
+        }
+    }
+
+    // Connexions : cachés -> cachés
+    for (int hidden_id = num_inputs + num_outputs; hidden_id < num_inputs + num_outputs + num_hidden_neurons; ++hidden_id) {
+        for (int target_hidden_id = hidden_id + 1; target_hidden_id < num_inputs + num_outputs + num_hidden_neurons; ++target_hidden_id) {
+            if (rng.uniform(0.0, 1.0) < prob_hidden_to_hidden) {
+                add_random_connection(hidden_id, target_hidden_id);
+            }
+        }
+    }
+
+    // Connexions : cachés -> sorties
+    for (int hidden_id = num_inputs + num_outputs; hidden_id < num_inputs + num_outputs + num_hidden_neurons; ++hidden_id) {
+        for (int output_id = num_inputs; output_id < num_inputs + num_outputs; ++output_id) {
+            if (rng.uniform(0.0, 1.0) < prob_hidden_to_output) {
+                add_random_connection(hidden_id, output_id);
+            }
+        }
+    }
+
+    return genome;
+}
 
 
 double Genome::compute_distance(const Genome &other, const NeatConfig &config) const {
