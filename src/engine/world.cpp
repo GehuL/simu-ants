@@ -4,18 +4,10 @@
 
 #include "utils.h"
 #include "ant.h"
-<<<<<<< HEAD
-
-#include "../external/json.hpp"
-
-#include "raygui.h"
-
-=======
 
 #include "raygui.h"
 
 #include "../external/json.hpp"
->>>>>>> engine
 #include "../external/ui/imgui.h"
 #include "../external/ui/rlImGui.h"
 #include "../external/ui/imgui_internal.h"
@@ -38,12 +30,7 @@ void World::init()
     m_seed = GetRandomValue(0, std::numeric_limits<int>::max());
     SetRandomSeed(m_seed);
 
-<<<<<<< HEAD
-    //TRACELOG(LOG_INFO, "seed: %d", m_seed);
-    m_entities.clear();
-=======
     clearEntities();
->>>>>>> engine
 
     if(m_level)
         m_level.get()->onInit();

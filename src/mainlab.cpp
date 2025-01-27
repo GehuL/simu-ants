@@ -5,13 +5,13 @@
 #include "NEAT/Utils.h"
 #include <fstream>
 #include <iostream>
-
+#include "simulation/laborer.h"
 
 using namespace simu;
 
 RNG rng;
 
-class Scene : public WorldListener {
+class Scene : public Level {
     std::vector<std::weak_ptr<AntIA>> ants;
     Population mPop;
     ComputeFitness compute_fitness;
@@ -34,7 +34,8 @@ std::vector<double> min_fitness_per_gen; // Fitness minimum par génération
     double initial_distance; // Distance initiale pré-calculée
 
 public:
-    Scene() : mPop((NeatConfig){}, rng), compute_fitness(rng) {}
+    Scene(const std::string& name) : Level(name), mPop((NeatConfig){}, rng), compute_fitness(rng) {}
+    const std::string getDescription() const override { return "Apprentissage de résolution de labyrinthe."; };
 
     void onInit() override {
         getWorld().getGrid().fromImage("rsc/mazeCheck.png");
@@ -58,7 +59,10 @@ public:
         current_tick = 0;
     }
 
-    void onUnload() override {}
+    void onUnload() override 
+    {
+        export_fitness_data();
+    }
 
     void onDraw() override {
         if (IsKeyPressed(KEY_G)) {
@@ -182,14 +186,9 @@ public:
 
 int main(void) {
     SetTraceLogLevel(LOG_DEBUG);
-
     simu::World &world = simu::getWorld();
-    auto scene = std::make_shared<Scene>();
-    world.setListener(scene);
-
-    int result = world.run(800, 800, "Ants Labyrinth Simulation");
-
-    scene->export_fitness_data();
-
+    world.registerLevel<Scene>("Labyrinth");
+    world.registerLevel<Laborer>("Laborer");
+    int result = world.run(1600, 800, "Ants Labyrinth Simulation");
     return result;
 }

@@ -6,11 +6,6 @@
 
 #include "../external/ui/imgui.h"
 #include "../external/ui/rlImGui.h"
-<<<<<<< HEAD
-
-#include "../external/ui/imgui_spectrum.h"
-=======
->>>>>>> engine
 #include <chrono>
 
 #define MIN(a, b) a > b ? b : a
