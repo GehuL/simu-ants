@@ -117,12 +117,12 @@ namespace simu
             bool isIdle();
             bool isCurrentPositionVisited();
             int getWallProximityBeforeMove();
-            //double getDistanceToWall(Direction dir);
+            double getDistanceToWall(Vec2i dir);
 
             double getFitness() { return fitness; };
             double setFitness(double fit) { fitness = fit; return fitness; };
 
-            static constexpr int inputCount() { return 15; } ;
+            static constexpr int inputCount() { return 19; } ;
             static constexpr int outputCount() { return 4; };
 
             bool move(Vec2i dir);
@@ -140,6 +140,8 @@ namespace simu
             double fitness = 0.0;
             Vec2i m_dir;
             Vec2i m_gridPos;
+
+            
             int lastAction = -1; 
             int directionChanges = 0;
             int repeatCount = 0; 

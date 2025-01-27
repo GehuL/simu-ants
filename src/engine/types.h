@@ -37,6 +37,8 @@ namespace simu
         
         Vec2<T> operator*(const float scalar) const { return Vec2<T>{static_cast<T>(x * scalar), static_cast<T>(y * scalar)}; };
         Vec2<T> operator/(const float scalar) const { return Vec2<T>{static_cast<T>(x / scalar), static_cast<T>(y / scalar)}; };
+
+        Vec2<T> operator+=(const Vec2<T>& vec) { x += vec.x; y += vec.y; return *this; };
     
         size_t operator()() const { return x*x + y*y; };
 

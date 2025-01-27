@@ -20,7 +20,7 @@ class Scene : public Level {
     const int num_ants = 200;        // Nombre de fourmis par génération
     int current_generation = 0;
 
-    const int exploration_generations = 200; // Nombre de générations d'exploration
+    const int exploration_generations = 300; // Nombre de générations d'exploration
     int max_allowed_ticks_during_explo = 0; // Ticks pour exploration
     int max_allowed_ticks = 0;            // Ticks pour générations normales
     int current_tick = 0;
@@ -52,7 +52,8 @@ public:
         double path_length = static_cast<double>(path.size());
         max_steps = static_cast<int>(path_length * 1.5);
 
-        max_allowed_ticks_during_explo = max_steps * 5;
+        //max_allowed_ticks_during_explo = max_steps * 5;
+        max_allowed_ticks_during_explo = 26244 / 2;
         max_allowed_ticks = max_steps * 2;
 
         initial_distance = path_length;
