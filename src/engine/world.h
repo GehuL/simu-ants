@@ -65,7 +65,7 @@ namespace simu
              * @return La position du premier élément ajouté. Renvoie end() si il y a une erreur (count <= 0)
              */
             template<class T, typename... Args, class = TEMPLATE_CONDITION(T)>
-            std::vector<std::weak_ptr<T>> spawnEntities(size_t count, Args&&... args)
+            std::vector<std::weak_ptr<T>> spawnEntities(size_t count, const Args&... args)
             {
                 CHECK_TEMPLATE_ST(T);
 

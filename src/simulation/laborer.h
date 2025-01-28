@@ -15,24 +15,25 @@ namespace simu
     {
 
         public:
-            LaborerIA(const long id, std::vector<Vec2i>* foodPos, Vec2i spawnPos) : Ant(id, getWorld().gridToWorld(spawnPos)), m_genome(Genome::create_diverse_genome(0, 6, 1, 1, gRng))
+            LaborerIA(const long id, std::vector<Vec2i>* foodPos, Vec2i spawnPos) : Ant(id, getWorld().gridToWorld(spawnPos)), m_genome(Genome::create_diverse_genome(0, 1, 1, 1, gRng))
                                                                                 ,m_network(FeedForwardNeuralNetwork::create_from_genome(m_genome)), m_spawnPos(spawnPos), m_foodPos(foodPos) {};
 
-            LaborerIA(const long id, std::vector<Vec2i>* foodPos, const Genome& genome, Vec2i spawnPos) : Ant(id, getWorld().gridToWorld(spawnPos)), m_genome(genome)
+            LaborerIA(const long id, std::vector<Vec2i>* foodPos, Genome genome, Vec2i spawnPos) : Ant(id, getWorld().gridToWorld(spawnPos)), m_genome(genome)
                                                                                                     ,m_network(FeedForwardNeuralNetwork::create_from_genome(m_genome)), m_spawnPos(spawnPos), m_foodPos(foodPos) {};
             
             
             const char* getType() const override { return "laborerIA"; };
-            const Genome& getGenome() const { return m_genome; };
+            const Genome& getGenome() { return m_genome; };
             const FeedForwardNeuralNetwork& getNetwork() const { return m_network; };
 
             void update() override
             {
-                Vec2f spawnPos = getWorld().gridToWorld(m_spawnPos);
+                // Vec2f spawnPos = getWorld().gridToWorld(m_spawnPos);
                 float nearestFood = getNearestFood(getWorld().getGrid().toTileCoord(m_pos));
 
-                std::vector<double> inputs = {m_angle, m_pos.x, m_pos.y, spawnPos.x, spawnPos.y, nearestFood};
-                
+                // std::vector<double> inputs = {m_angle, m_pos.x, m_pos.y, spawnPos.x, spawnPos.y, nearestFood};
+                std::vector<double> inputs = {nearestFood};
+
                 auto outputs = m_network.activate(inputs);
                
               /*int direction = std::distance(outputs.begin(), std::max_element(outputs.begin(), outputs.end()));
@@ -44,8 +45,13 @@ namespace simu
                     case 3: m_angle = SOUTH; break;
                 }*/
 
-                m_angle = outputs[0] * 2 * PI - PI;
-                move(m_angle);
+                if(outputs[0] < 0)
+                    m_angle -= 0.1;
+                else
+                    m_angle += 0.1;
+
+                rotate(m_angle);
+                moveForward();
 
                 if(getTileOn().type == Type::FOOD)
                 {
@@ -99,7 +105,7 @@ namespace simu
         std::vector<Vec2i> m_foodPos;
 
         public:
-            Laborer(std::string name): Level(name), m_pop((NeatConfig) { .population_size = 50, .num_inputs = 6, .num_outputs = 4}, gRng) {};
+            Laborer(std::string name): Level(name), m_pop((NeatConfig) { .population_size = 50, .num_inputs = 1, .num_outputs = 1}, gRng) {};
             const std::string getDescription() const override { return "Apprentissage de récolte de nourriture."; };
 
             void onInit() override
