@@ -246,9 +246,10 @@ std::vector<neat::Individual> Population::reproduce_from_genome_roulette_negativ
 std::vector<neat::Individual> Population::reproduce_with_speciation(
     const std::vector<Species>& species_list,
     const std::unordered_map<Genome, double>& fitness_map
-
 ) {
     std::vector<neat::Individual> new_generation;
+
+    double interspecies_mating_rate = config.interspecies_mating; // Probabilité de croisement inter-espèces
 
     for (const auto &species : species_list) {
         // Ajuster les fitness de l'espèce
@@ -256,54 +257,54 @@ std::vector<neat::Individual> Population::reproduce_with_speciation(
         double min_fitness = std::numeric_limits<double>::max();  
 
         for (const auto &genome : species.members) {
-            if (fitness_map.find(*genome) == fitness_map.end()) {
-        std::cerr << "Erreur: Génome ID " << genome->get_genome_id() << " absent de fitness_map !" << std::endl;
-    }
-            if (fitness_map.find(*genome) != fitness_map.end()) {
-    double adjusted_fitness = fitness_map.at(*genome) / species.members.size();
-    
-    adjusted_fitnesses.push_back(adjusted_fitness);
+           // std::cerr << "Traitement du génome ID: " << genome->get_genome_id() << std::endl;
 
-            // Trouver la fitness minimale
+            if (fitness_map.find(*genome) == fitness_map.end()) {
+                std::cerr << "Erreur: Génome ID " << genome->get_genome_id() << " absent de fitness_map !" << std::endl;
+                continue;
+            }
+
+            double adjusted_fitness = fitness_map.at(*genome) / species.members.size();
+            adjusted_fitnesses.push_back(adjusted_fitness);
+
+            //std::cerr << "Taille de species.members: " << species.members.size() << std::endl;
+            /*
+            std::cerr << "Fitness ajustée pour ID " << genome->get_genome_id() 
+                      << ": " << adjusted_fitness << " (Taille actuelle: " 
+                      << adjusted_fitnesses.size() << ")" << std::endl;
+                      */
+
             if (adjusted_fitness < min_fitness) {
                 min_fitness = adjusted_fitness;
             }
         }
- else {
-    std::cerr << "Erreur: Génome introuvable dans fitness_map !" << std::endl;
-    continue; // Passer au prochain génome
-}
 
-            
-
-        // Appliquer une translation si nécessaire
         if (min_fitness < 0) {
             for (double& fitness : adjusted_fitnesses) {
-                fitness += std::abs(min_fitness) + 1.0; // Translation pour rendre toutes les fitness positives
+                fitness += std::abs(min_fitness) + 1.0;
             }
         }
 
-        // Reproduire au sein de l'espèce
         while (new_generation.size() < config.population_size) {
-            const auto &p1 = rng.roulette_selection(species.members, adjusted_fitnesses);
-            const auto &p2 = rng.roulette_selection(species.members, adjusted_fitnesses);
+            bool interspecies_mating = (rng.next_double() < interspecies_mating_rate);
 
-            // Crossover
+            const auto &p1 = rng.roulette_selection(species.members, adjusted_fitnesses);
+            const auto &p2 = interspecies_mating ? rng.choose_random(species_list).members.front() 
+                                                 : rng.roulette_selection(species.members, adjusted_fitnesses);
+
             neat::Neat neat_instance;
             Genome offspring_genome = neat_instance.alt_crossover(p1, p2, generate_next_genome_id());
             std::shared_ptr<Genome> offspring = std::make_shared<Genome>(offspring_genome);
 
-            // Mutation
             mutate(*offspring);
-
-            // Ajouter à la nouvelle génération
             new_generation.push_back(neat::Individual(offspring));
         }
     }
 
     return new_generation;
 }
-}
+
+
 
 
 

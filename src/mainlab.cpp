@@ -37,22 +37,25 @@ public:
     Scene() : mPop((NeatConfig){}, rng), compute_fitness(rng) {}
 
     void onInit() override {
-        getWorld().getGrid().fromImage("rsc/mazeCheck.png");
+        getWorld().getGrid().fromImage("rsc/miniMaze.png");
         Vec2i startPos(90, 150);
         Vec2i goalPos(73, 0);
-        ants = getWorld().spawnEntities<AntIA>(num_ants, startPos);
+
+        Vec2i goalPos2(41, 0);
+        Vec2i startPos2(41, 76);
+        ants = getWorld().spawnEntities<AntIA>(num_ants, startPos2);
         
         steps_count.resize(num_ants, 0); // Initialiser les compteurs d'étapes
 
         // Calculer le nombre maximal d'actions
         Grid &grid = getWorld().getGrid();
         
-        auto path = grid.findPath(startPos, goalPos);
+        auto path = grid.findPath(startPos2, goalPos2);
         double path_length = static_cast<double>(path.size());
         max_steps = static_cast<int>(path_length * 1.5);
 
         //max_allowed_ticks_during_explo = max_steps * 5;
-        max_allowed_ticks_during_explo = 26244 / 2;
+        max_allowed_ticks_during_explo = 4900 ;
         max_allowed_ticks = max_steps * 2;
 
         initial_distance = path_length;
@@ -107,7 +110,7 @@ public:
         
         // Calculer la fitness individuelle
         double fitness = compute_fitness.evaluate_lab(
-            antPos, Vec2i(73, 0), getWorld().getGrid(), *locked_ant, initial_distance, current_generation
+            Vec2i(41,0), Vec2i(41, 76), getWorld().getGrid(), *locked_ant, initial_distance, current_generation
         );
 
         total_fitness += fitness;
@@ -155,7 +158,7 @@ public:
         getWorld().clearEntities();
 
         for (auto &genome : new_genomes) {
-            ants.push_back(getWorld().spawnEntity<AntIA>(*genome.genome, Vec2i(90, 150)));
+            ants.push_back(getWorld().spawnEntity<AntIA>(*genome.genome, Vec2i(41, 76)));
         }
 
         // Réinitialiser le compteur global et les positions
