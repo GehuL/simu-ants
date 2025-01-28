@@ -540,6 +540,10 @@ void World::loadLevel(const std::string& name)
 {
     if(m_levels.find(name) == m_levels.end())
         throw std::runtime_error("Le niveau " + name + " n'existe pas");
+   
+    // Unload le précédent
+    if(m_level) { m_level.get()->onUnload(); }
     m_levels[name]();
+
     TraceLog(LOG_DEBUG, "Niveau %s chargé", name.c_str());
 }
