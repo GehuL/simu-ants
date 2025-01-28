@@ -220,33 +220,25 @@ void Engine::updateUI()
     BeginTextureMode(m_gui_renderer);
 
     ClearBackground((Color){255, 255, 255, 0});
+    // Controle de la simulation
+    ImGui::SetNextWindowBgAlpha(0.5);
+    ImGui::Begin("Engine", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoScrollbar);
 
-    if(m_pause)
-    {
-        const char* pause_txt = "PAUSED";
-        DrawText(pause_txt, GetScreenWidth() - MeasureText(pause_txt, 20), 0, 20, RED);
-    }
-
-    float framePerSecond = getFPS();
-    float tickPerSecond = getTPS();
-
-    GuiSlider((Rectangle){ GetScreenWidth() / 2.f - 100.f, GetScreenHeight() - 20.f, 200, 16 }, TextFormat("FPS %d", static_cast<int>(framePerSecond)), "100%", &framePerSecond, 1, 300);
-    GuiSlider((Rectangle){ GetScreenWidth() / 2.f - 100.f, GetScreenHeight() - 50.f, 200, 16 }, TextFormat("TPS %d", static_cast<int>(tickPerSecond)), "100%", &tickPerSecond, 0, 1000);
-    
-    if(static_cast<int>(framePerSecond) != getFPS()) {
+    int framePerSecond = getFPS();
+    if(ImGui::SliderInt("FPS", &framePerSecond, 1, 300))
         setFPS(framePerSecond);
-    }
 
-    if(static_cast<int>(tickPerSecond) != getTPS() && !m_noDelay) {
+    int tickPerSecond = getTPS();
+    if(ImGui::SliderInt("TPS", &tickPerSecond, 0, 1000))
         setTPS(tickPerSecond);
-    }
-    
-    bool lastStateNoDelay = m_noDelay;
-    GuiCheckBox((Rectangle){ GetScreenWidth() / 2.f + 150, GetScreenHeight() - 50.f, 16, 16 }, "No limit", &m_noDelay);
-    if(m_noDelay && !lastStateNoDelay) {
-        setTPS(999999999);
-    }
 
+    ImGui::Checkbox("Pause", &m_pause); // { setPause(m_pause); }
+    ImGui::SameLine(); if(ImGui::Button("Single step")) { updateTick(); }
+    ImGui::SameLine(); if(ImGui::Button("No limit")) { setTPS(999999999); }
+    
+    ImGui::End();
+
+    // Affichage profiling
     ImGui::SetNextWindowBgAlpha(0.8f);
     ImGui::SetNextWindowPos(ImVec2(10, 10));
     if(ImGui::Begin("Overlay performance", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav))
@@ -274,7 +266,6 @@ void Engine::updateUI()
     drawUI();
 
     rlImGuiEnd();
-
 
     EndTextureMode();
 }

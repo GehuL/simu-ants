@@ -160,7 +160,7 @@ void World::load(const std::string& filename)
 
 void World::handleMouse()
 {
-    if(ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow))
+    if(ImGui::GetIO().WantCaptureMouse)
         return;
 
     // TODO: Interpoler les points pour tracer des lignes
@@ -221,7 +221,7 @@ void World::handleMouse()
 
 void World::handleKeyboard()
 {
-    if(ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow))
+    if(ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow | ImGuiFocusedFlags_AnyWindow))
         return;
 
     constexpr float camera_speed = 5.0f; 
