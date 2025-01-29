@@ -331,6 +331,27 @@ Genome Genome::create_diverse_genome_unique(int num_inputs, int num_outputs, int
     return genome;
 }
 
+Genome Genome::create_minimal_genome(int num_inputs, int num_outputs, RNG &rng) {
+    int id = last_id++;
+    Genome genome(id, num_inputs, num_outputs);
+    // Ajout des neurones d'entrée
+    for (int i = 0; i < num_inputs; ++i) {
+        genome.add_neuron(neat::NeuronGene{i, 0.0, Activation(Activation::Type::Sigmoid)});
+    }
+    // Ajout des neurones de sortie avec un biais aléatoire
+    for (int i = 0; i < num_outputs; ++i) {
+        int output_id = num_inputs + i;
+        double bias = rng.uniform(-1.0, 1.0);
+        genome.add_neuron(neat::NeuronGene{output_id, bias, Activation(Activation::Type::Sigmoid)});
+    }
+    // Connecte chaque entrée à **toutes** les sorties
+    for (int input_id = 0; input_id < num_inputs; ++input_id) {
+        for (int output_id = num_inputs; output_id < num_inputs + num_outputs; ++output_id) {
+            genome.add_link(genome.create_link_div_with_inov(input_id, output_id, rng));
+        }
+    }
+    return genome;
+}
 
 double Genome::compute_distance(const Genome &other, const NeatConfig &config) const {
     int num_disjoint = 0;

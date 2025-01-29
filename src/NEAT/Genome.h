@@ -53,6 +53,10 @@ public:
 
     static Genome create_diverse_genome_unique(int num_inputs, int num_outputs, int max_hidden_neurons, RNG &rng);
 
+    static Genome create_minimal_genome(int num_inputs, int num_outputs, RNG &rng);
+
+
+
     double compute_distance(const Genome &other, const NeatConfig &config) const;
 
     /**

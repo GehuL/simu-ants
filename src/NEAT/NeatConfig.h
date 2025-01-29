@@ -28,7 +28,7 @@ struct NeatConfig {
     // Seuil de compatibilité pour regrouper les espèces
     double compatibility_threshold = 3.0;
 
-    double interspecies_mating = 0.001;  // Probabilité de croisement inter-espèces
+    double interspecies_mating = 0.00;  // Probabilité de croisement inter-espèces
 
 };
 

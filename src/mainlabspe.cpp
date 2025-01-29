@@ -180,6 +180,8 @@ public:
     // Appeler la spéciation
     speciate();
 
+    mPop.update_species_representatives();
+
     // Réinitialiser pour la prochaine génération
     nextGeneration();
 }
@@ -238,7 +240,9 @@ for (const auto &species : species_list) {
 }
 */
 
+
     }
+      std::cerr << "Nombre total d'especes: " << species_list.size() << std::endl;
 
     // Étape 3 : Générer la nouvelle génération en fonction des espèces
     auto new_generation = mPop.reproduce_with_speciation(species_list, fitness_map);

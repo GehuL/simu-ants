@@ -359,6 +359,22 @@ void Population::create_new_species(std::shared_ptr<Genome> representative) {
     species_list.push_back(std::move(new_species));
 }
 
+void Population::update_species_representatives() {
+    for (auto &species : species_list) {
+        if (species.members.empty()) continue;
+        // Option 1: Prendre un représentant aléatoire parmi les survivants
+        int random_index = rand() % species.members.size();
+        species.representative = *species.members[random_index];
+        // Option 2: Prendre le génome médian
+        // std::sort(species.members.begin(), species.members.end(),
+        //           [](const Genome& a, const Genome& b) { return a.fitness > b.fitness; });
+        // species.representative = species.members[species.members.size() / 2];
+        // Option 3: Prendre le meilleur (déconseillé)
+        // species.representative = *std::max_element(species.members.begin(), species.members.end(),
+        //                                            [](const Genome& a, const Genome& b) { return a.fitness < b.fitness; });
+    }
+}
+
 std::vector<Species> &Population::get_species_list()
 {return species_list;
 }

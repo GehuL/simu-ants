@@ -144,6 +144,8 @@ public:
 
     int generate_next_species_id();
 
+    void update_species_representatives();
+
     
 
    
