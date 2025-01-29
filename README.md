@@ -1,3 +1,9 @@
+
+# Introduction #
+Simulation de fourmis avec intelligence artificielle (NEAT). 
+Projet réalisé en 2e année d'école d'ingénieur à Polytech Dijon. 
+Étudiants: Yohann Turpin et Lauric Géhu. 
+
 # Compilation
 Plusieurs étapes sont nécessaire afin de compiler le projet. 
 Tout d'abord, il est nécessaire de télécharger [Raylib](https://github.com/raysan5/raylib/releases/tag/5.0) et [Raygui](https://github.com/raysan5/raygui/releases/tag/4.0). 
