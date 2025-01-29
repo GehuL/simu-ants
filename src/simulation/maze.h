@@ -1,20 +1,26 @@
-#include "engine/world.h"
-#include "engine/ant.h"
-#include "NEAT/population.h"
-#include "NEAT/ComputeFitness.h"
-#include "NEAT/Utils.h"
+#ifndef __MAZE__H
+#define __MAZE__H
+
+#include "../engine/world.h"
+#include "../engine/ant.h"
+#include "../NEAT/population.h"
+#include "../NEAT/ComputeFitness.h"
+#include "../NEAT/Utils.h"
+#include "../NEAT/NeatConfig.h"
+#include "../NEAT/rng.h"
 #include <fstream>
 #include <iostream>
-#include "simulation/laborer.h"
-#include "simulation/maze.h"
-#include "simulation/road.h"
 
-using namespace simu;
 
-RNG rng;
+namespace simu
+{
+    using namespace simu;
+    using json = nlohmann::json;
+    RNG rng;
 
-class Scene : public Level {
-    std::vector<std::weak_ptr<AntIA>> ants;
+    class MazeCheck: public Level
+    {
+        std::vector<std::weak_ptr<AntIA>> ants;
     Population mPop;
     ComputeFitness compute_fitness;
 
@@ -36,11 +42,11 @@ std::vector<double> min_fitness_per_gen; // Fitness minimum par génération
     double initial_distance; // Distance initiale pré-calculée
 
 public:
-    Scene(const std::string& name) : Level(name), mPop((NeatConfig){}, simu::rng), compute_fitness(simu::rng) {}
+    MazeCheck(std::string name) : Level(name), mPop((NeatConfig){}, simu::gRng), compute_fitness(simu::gRng) {}
     const std::string getDescription() const override { return "Apprentissage de résolution de labyrinthe."; };
 
     void onInit() override {
-        getWorld().getGrid().fromImage("rsc/maze.png");
+        getWorld().getGrid().fromImage("rsc/mazeCheck.png");
         Vec2i startPos(90, 150);
         Vec2i goalPos(73, 0);
 
@@ -186,16 +192,8 @@ public:
     }
 }
 
-};
+    };
 
-
-int main(void) {
-    SetTraceLogLevel(LOG_DEBUG);
-    simu::World &world = simu::getWorld();
-    world.registerLevel<Scene>("Labyrinth");
-    world.registerLevel<Laborer>("Laborer");
-    world.registerLevel<MazeCheck>("MazeCheck");
-    world.registerLevel<Road>("Road");
-    int result = world.run(1600, 800, "Ants Labyrinth Simulation");
-    return result;
 }
+
+#endif 

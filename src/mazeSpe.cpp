@@ -46,7 +46,7 @@ public:
     */
 
     void onInit() override {
-        getWorld().getGrid().fromImage("rsc/maze.png");
+        getWorld().getGrid().fromImage("rsc/mazeCheck.png");
         Vec2i startPos(90, 150);
         Vec2i goalPos(73, 0);
 
