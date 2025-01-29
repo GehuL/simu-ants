@@ -36,7 +36,7 @@ LinkGene Neat::crossover_link(const LinkGene &a, const LinkGene &b) {
     bool is_enabled = rng.choose(0.5, a.is_enabled, b.is_enabled);  // Choix aléatoire de l'activation
     int innovation_number = rng.choose(0.5, a.innovation_number, b.innovation_number);
 
-    return LinkGene{link_id, weight, is_enabled};
+    return LinkGene{link_id, weight, is_enabled,innovation_number};
 }
 
 Genome Neat::crossover(const Individual &dominant, const Individual &recessive, int child_genome_id) {

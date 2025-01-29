@@ -12,14 +12,14 @@
                 "BUILD_MODE=DEBUG",
                 "PROJECT_NAME=simu-ants",
                 //"OBJS=src/*.cpp"
-                "OBJS=src/engine/*.cpp src/NEAT/*.cpp src/mainlab.cpp"
+                "OBJS=src/engine/*.cpp src/NEAT/*.cpp src/minimazeSpe.cpp"
             ],
             "windows": {
                 "command": "mingw32-make.exe",
                 "args": [
                     "RAYLIB_PATH=C:/raylib/raylib",
                     "PROJECT_NAME=simu-ants",
-                    "OBJS=src/engine/*.cpp src/NEAT/*.cpp src/external/ui/*.cpp src/mainlab.cpp",
+                    "OBJS=src/engine/*.cpp src/NEAT/*.cpp src/external/ui/*.cpp src/minimazeSpe.cpp",
                     // "OBJS=src/*.cpp",
                     "BUILD_MODE=DEBUG"
                 ],

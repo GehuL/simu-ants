@@ -22,7 +22,7 @@ class Scene : public WorldListener {
     const int num_ants = 200;        // Nombre de fourmis par génération
     int current_generation = 0;
 
-    const int exploration_generations = 200; // Nombre de générations d'exploration
+    const int exploration_generations = 50; // Nombre de générations d'exploration & à changer dans computefitness.cpp
     int max_allowed_ticks_during_explo = 0; // Ticks pour exploration
     int max_allowed_ticks = 0;            // Ticks pour générations normales
     int current_tick = 0;
@@ -46,9 +46,11 @@ public:
     */
 
     void onInit() override {
-        getWorld().getGrid().fromImage("rsc/mazeCheck.png");
+        getWorld().getGrid().fromImage("rsc/road.png");
         Vec2i startPos(90, 150);
         Vec2i goalPos(73, 0);
+
+
         ants = getWorld().spawnEntities<AntIA>(num_ants, startPos);
         
         steps_count.resize(num_ants, 0); // Initialiser les compteurs d'étapes
@@ -60,7 +62,7 @@ public:
         double path_length = static_cast<double>(path.size());
         max_steps = static_cast<int>(path_length * 1.5);
 
-        max_allowed_ticks_during_explo = max_steps * 5;
+        max_allowed_ticks_during_explo = 26244 / 2;
         max_allowed_ticks = max_steps * 2;
 
         initial_distance = path_length;
@@ -146,7 +148,7 @@ public:
 
         // Calculer la fitness individuelle
         double fitness = compute_fitness.evaluate_lab(
-            antPos, Vec2i(73, 0), getWorld().getGrid(), *locked_ant, initial_distance, current_generation
+            Vec2i(90, 150);, Vec2i(73, 0);, getWorld().getGrid(), *locked_ant, initial_distance, current_generation
         );
 
         total_fitness += fitness;
@@ -176,6 +178,8 @@ public:
     // Appeler la spéciation
     speciate();
 
+    mPop.update_species_representatives();
+
     // Réinitialiser pour la prochaine génération
     nextGeneration();
 }
@@ -193,7 +197,7 @@ public:
             auto locked_ant = ant.lock();
             std::shared_ptr<Genome> genome = std::make_shared<Genome>(locked_ant->getGenome());
             genomes.push_back(genome);
-            std::cout << "Ajout du génome " << locked_ant->getGenome() << " avec fitness " << locked_ant->getFitness() << std::endl;
+            //std::cout << "Ajout du génome " << locked_ant->getGenome() << " avec fitness " << locked_ant->getFitness() << std::endl;
             fitness_map[locked_ant->getGenome()] = locked_ant->getFitness();
 
             
@@ -227,13 +231,16 @@ public:
             species_list.emplace_back(mPop.generate_next_species_id(), *genome);
         }
 
-        std::cout << "Taille de fitness_map: " << fitness_map.size() << std::endl;
-
+        //std::cout << "Taille de fitness_map: " << fitness_map.size() << std::endl;
+/*
 for (const auto &species : species_list) {
     std::cout << "Espèce " << species.id << " a " << species.members.size() << " membres." << std::endl;
 }
+*/
+
 
     }
+      std::cerr << "Nombre total d'especes: " << species_list.size() << std::endl;
 
     // Étape 3 : Générer la nouvelle génération en fonction des espèces
     auto new_generation = mPop.reproduce_with_speciation(species_list, fitness_map);
@@ -241,7 +248,7 @@ for (const auto &species : species_list) {
     getWorld().clearEntities();
 
     for (auto &individual : new_generation) {
-        ants.push_back(getWorld().spawnEntity<AntIA>(*individual.genome, Vec2i(90, 150)));
+        ants.push_back(getWorld().spawnEntity<AntIA>(*individual.genome, Vec2i(90, 150);));
     }
 
     // Réinitialiser le compteur global
