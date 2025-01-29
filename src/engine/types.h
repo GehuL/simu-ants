@@ -24,6 +24,9 @@ namespace simu
         Vec2(const Vec2<V>& vec) : x(vec.x), y(vec.y) {};
         Vec2(const Vector2& vec): x(vec.x), y(vec.y) {}; // Raylib compatiblity
         
+
+        float angle(const Vec2<T>& vec) const { return std::acos((x*vec.x + y*vec.y) / (std::sqrt(mag()) * std::sqrt(vec.mag()))); };
+
         T mag() const { return x*x + y*y; };
 
         T euclide(const Vec2<T>& vec) const { return std::sqrt((vec.x - x)*(vec.x - x) + (vec.y - y)*(vec.y - y)); };
@@ -33,7 +36,7 @@ namespace simu
         bool operator!=(const Vec2<T>& vec) const { return !operator==(vec); };
 
         Vec2<T> operator+(const Vec2<T>& vec) const { return Vec2<T>{x + vec.x, y + vec.y}; };
-        
+        Vec2<T> operator-(const Vec2<T>& vec) const { return Vec2<T>{x - vec.x, y - vec.y}; };
         
         Vec2<T> operator*(const float scalar) const { return Vec2<T>{static_cast<T>(x * scalar), static_cast<T>(y * scalar)}; };
         Vec2<T> operator/(const float scalar) const { return Vec2<T>{static_cast<T>(x / scalar), static_cast<T>(y / scalar)}; };

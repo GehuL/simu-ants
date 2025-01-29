@@ -20,7 +20,12 @@ namespace simu
                 getWorld().spawnEntities<DemoAnt>(1000, Vec2i{89, 161});
             };
 
-            /*void onDrawUI() override 
+            void onUnload() override
+            {
+                TraceLog(LOG_INFO, "Unloaded !");
+            };
+
+            void onDrawUI() override 
             {
                 ImGui::Begin("Démo");
                 ImGui::End();
@@ -28,13 +33,13 @@ namespace simu
 
             void onLoad(json j) override
             {
-                TRACELOG(LOG_INFO, "Loaded !");
+                TraceLog(LOG_INFO, "Loaded !");
             };
 
             void onSave(json j) override
             {
-                TRACELOG(LOG_INFO, "Saved !");
-            };*/
+                TraceLog(LOG_INFO, "Saved !");
+            };
 
             const std::string getDescription() const override { return "Scene de démonstration du moteur. Pas de script d'apprentissage."; };
     };

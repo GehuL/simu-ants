@@ -268,8 +268,6 @@ namespace simu
 
             void drawEntityInfo();
 
-            void drawInputWithError(const char* label, char* buf, size_t buf_size, const char* error);
-        
             unsigned long m_entity_cnt;
             unsigned int m_seed;
 
