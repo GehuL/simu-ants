@@ -17,7 +17,13 @@ namespace simu
             void onInit() override
             {
                 Grid& grid = getWorld().getGrid();
-                grid.fromImage("maze.png");
+                try
+                {
+                    grid.fromImage("rsc/maze.png");
+                }catch(const std::exception& e)
+                {
+                    TraceLog(LOG_ERROR, "Impossible de charger l'image du labyrinthe: %s", e.what());
+                }
                 getWorld().spawnEntities<DemoAnt>(1000, Vec2i{89, 161});
             };
 
