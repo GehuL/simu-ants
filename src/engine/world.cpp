@@ -161,7 +161,7 @@ void World::load(const std::string& filename)
 
 void World::handleMouse()
 {
-    if(ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow))
+    if(ImGui::GetIO().WantCaptureMouse)
         return;
 
     // TODO: Interpoler les points pour tracer des lignes
@@ -222,7 +222,7 @@ void World::handleMouse()
 
 void World::handleKeyboard()
 {
-    if(ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow))
+    if(ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow | ImGuiFocusedFlags_AnyWindow))
         return;
 
     constexpr float camera_speed = 5.0f; 
@@ -541,6 +541,10 @@ void World::loadLevel(const std::string& name)
 {
     if(m_levels.find(name) == m_levels.end())
         throw std::runtime_error("Le niveau " + name + " n'existe pas");
+   
+    // Unload le précédent
+    if(m_level) { m_level.get()->onUnload(); }
     m_levels[name]();
+
     TraceLog(LOG_DEBUG, "Niveau %s chargé", name.c_str());
 }
