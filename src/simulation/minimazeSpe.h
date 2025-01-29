@@ -18,6 +18,7 @@ namespace simu
     using json = nlohmann::json;
   
 
+
     class MiniMazeSpe: public Level
     {
    std::vector<std::weak_ptr<AntIA>> ants;
@@ -40,7 +41,7 @@ std::vector<double> min_fitness_per_gen; // Fitness minimum par génération
     std::vector<int> steps_count;           // Compteur d'étapes par fourmi
     int max_steps;                          // Nombre maximal d'actions
     double initial_distance; // Distance initiale pré-calculée
-
+    NeatConfig config;
 public:
     MiniMazeSpe(std::string name) : Level(name), mPop((NeatConfig){}, simu::gRng), compute_fitness(simu::gRng) {}
     const std::string getDescription() const override { return "Apprentissage de résolution d'un petit labyrinthe avec checkpoint et gestion des espèces"; };

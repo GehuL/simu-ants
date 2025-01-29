@@ -2,6 +2,7 @@
 #define __DEMO__H
 
 #include "../engine/world.h"
+#include "../external/ui/imgui.h"
 
 namespace simu
 {

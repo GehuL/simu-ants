@@ -29,7 +29,7 @@
                 "args": [
                     "RAYLIB_PATH=/home/lauric/Documents/raylib",
                     "PROJECT_NAME=simu-ants",
-                    "OBJS=src/engine/*.cpp src/NEAT/*.cpp src/external/ui/*.cpp src/mainlab.cpp",
+                    "OBJS=src/engine/*.cpp src/NEAT/*.cpp src/external/ui/*.cpp src/main.cpp",
                     // "OBJS=src/*.cpp",
                     "BUILD_MODE=DEBUG"
                 ],
