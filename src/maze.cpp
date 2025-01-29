@@ -197,6 +197,7 @@ int main(void) {
     simu::World &world = simu::getWorld();
     world.registerLevel<Scene>("Labyrinth");
     world.registerLevel<Laborer>("Laborer");
+<<<<<<< HEAD:src/maze.cpp
     world.registerLevel<MazeCheck>("MazeCheck");
     world.registerLevel<Road>("Road");
     world.registerLevel<MazeCheckSpe>("MazeCheckSpe");
@@ -204,5 +205,8 @@ int main(void) {
     world.registerLevel<MiniMazeSpe>("MiniMazeSpe");
     int result = world.run(1600, 800, "Ants Labyrinth Simulation");
 
+=======
+    int result = world.run(800, 800, "Ants Labyrinth Simulation");
+>>>>>>> 17fc903 (oui):src/mainlab.cpp
     return result;
 }

@@ -15,7 +15,7 @@ namespace simu
     {
 
         public:
-            LaborerIA(const long id, std::vector<Vec2i>* foodPos, Vec2i spawnPos) : Ant(id, getWorld().gridToWorld(spawnPos)), m_genome(Genome::create_diverse_genome_unique(4, 2, 1, gRng))
+            LaborerIA(const long id, std::vector<Vec2i>* foodPos, Vec2i spawnPos) : Ant(id, getWorld().gridToWorld(spawnPos)), m_genome(Genome::create_diverse_genome_unique(4, 3, 1, gRng))
                                                                                 ,m_network(FeedForwardNeuralNetwork::create_from_genome(m_genome)), m_spawnPos(spawnPos), m_foodPos(foodPos) {};
 
             LaborerIA(const long id, std::vector<Vec2i>* foodPos, Genome genome, Vec2i spawnPos) : Ant(id, getWorld().gridToWorld(spawnPos)), m_genome(genome)
@@ -42,18 +42,16 @@ namespace simu
                 switch(action)
                 {
                     case 0:
-                        if(outputs[action] > 0)
-                            rotate(m_angle += 0.1);
-                        else
-                            rotate(m_angle -= 0.1);
-                        break;
+                        rotate(m_angle += 0.1);
+                        break
                     case 1:
+                        rotate(m_angle -= 0.1);
+                        break;
+                    case 2:
                         moveForward();
                         break;
                 }
-                        moveForward();
 
-                
                 if(getTileOn().type == Type::FOOD)
                 {
                     eat();
@@ -112,7 +110,7 @@ namespace simu
         std::vector<Vec2i> m_foodPos;
 
         public:
-            Laborer(std::string name): Level(name), m_pop((NeatConfig) { .population_size = m_popSize, .num_inputs = 4, .num_outputs = 2}, gRng) {};
+            Laborer(std::string name): Level(name), m_pop((NeatConfig) { .population_size = m_popSize, .num_inputs = 4, .num_outputs = 3}, gRng) {};
             const std::string getDescription() const override { return "Apprentissage de récolte de nourriture."; };
 
             void onInit() override
