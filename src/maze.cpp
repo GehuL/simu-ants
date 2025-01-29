@@ -189,7 +189,7 @@ public:
     }
 }
 
-};
+}
 
 
 int main(void) {
