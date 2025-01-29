@@ -1,4 +1,4 @@
-// neat.h
+// Neat.h
 #ifndef NEAT_H
 #define NEAT_H
 

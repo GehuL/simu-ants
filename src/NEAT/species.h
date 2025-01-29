@@ -1,6 +1,6 @@
 #include <vector>
 
-#include "genome.h"
+#include "Genome.h"
 
 
 class Species {

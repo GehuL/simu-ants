@@ -24,6 +24,16 @@
                     "BUILD_MODE=DEBUG"
                 ],
             },
+            "linux": {
+                "command": "make",
+                "args": [
+                    "RAYLIB_PATH=/home/lauric/Documents/raylib",
+                    "PROJECT_NAME=simu-ants",
+                    "OBJS=src/engine/*.cpp src/NEAT/*.cpp src/external/ui/*.cpp src/mainlab.cpp",
+                    // "OBJS=src/*.cpp",
+                    "BUILD_MODE=DEBUG"
+                ],
+            },
             "osx": {
                 "args": [
                     "RAYLIB_PATH=<path_to_raylib>/raylib",

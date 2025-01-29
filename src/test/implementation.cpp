@@ -1,5 +1,5 @@
 #include "ant.h"
-#include "neat.h"
+#include "Neat.h"
 
 #include <iostream>
 #include <vector>

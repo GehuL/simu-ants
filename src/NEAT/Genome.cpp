@@ -1,5 +1,5 @@
 #include "Genome.h"
-#include "neat.h"
+#include "Neat.h"
 #include "InnovationTracker.h"
 #include <optional>
 #include <iostream>
