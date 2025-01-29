@@ -43,7 +43,7 @@ std::vector<double> min_fitness_per_gen; // Fitness minimum par génération
 
 public:
     MazeCheck(std::string name) : Level(name), mPop((NeatConfig){}, simu::gRng), compute_fitness(simu::gRng) {}
-    const std::string getDescription() const override { return "Apprentissage de résolution de labyrinthe."; };
+    const std::string getDescription() const override { return "Apprentissage de résolution de labyrinthe avec checkpoint."; };
 
     void onInit() override {
         getWorld().getGrid().fromImage("rsc/mazeCheck.png");

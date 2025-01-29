@@ -8,6 +8,9 @@
 #include "simulation/laborer.h"
 #include "simulation/maze.h"
 #include "simulation/road.h"
+#include "simulation/mazeSpe.h"
+#include "simulation/minimaze.h"
+#include "simulation/minimazeSpe.h"
 
 using namespace simu;
 
@@ -196,6 +199,10 @@ int main(void) {
     world.registerLevel<Laborer>("Laborer");
     world.registerLevel<MazeCheck>("MazeCheck");
     world.registerLevel<Road>("Road");
+    world.registerLevel<MazeCheckSpe>("MazeCheckSpe");
+    world.registerLevel<MiniMaze>("MiniMaze");
+    world.registerLevel<MiniMazeSpe>("MiniMazeSpe");
     int result = world.run(1600, 800, "Ants Labyrinth Simulation");
+
     return result;
 }

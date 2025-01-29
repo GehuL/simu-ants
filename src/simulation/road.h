@@ -68,7 +68,7 @@ public:
         double path_length = static_cast<double>(path.size());
         max_steps = static_cast<int>(path_length * 1.5);
 
-        max_allowed_ticks_during_explo = 26244 / 2;
+        max_allowed_ticks_during_explo = max_steps * 2;
         max_allowed_ticks = max_steps * 2;
 
         initial_distance = path_length;
