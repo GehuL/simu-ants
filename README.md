@@ -3,6 +3,7 @@
 Simulation de fourmis avec intelligence artificielle (NEAT). 
 Projet réalisé en 2e année d'école d'ingénieur à Polytech Dijon. 
 Étudiants: Yohann Turpin et Lauric Géhu. 
+![image](https://github.com/user-attachments/assets/50531c3a-5521-4604-955a-3ae5dee9af25)
 
 # Compilation
 Plusieurs étapes sont nécessaire afin de compiler le projet. 
